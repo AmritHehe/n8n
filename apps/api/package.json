@@ -4,14 +4,19 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1", 
-    "dev" : "npx tsc -b  && node ./dist/index.js"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npx tsc -b  && node ./dist/index.js",
+    "sdk": "npx tsc -b && node ./dist/sdk.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
+  "devDependencies": {
+    "@repo/database" : "*"
+  },
   "dependencies": {
+    "@google/genai": "^1.19.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
