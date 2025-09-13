@@ -17,16 +17,23 @@ model user{
   id   String @id @default(uuid())
   name String  @unique
   pass String 
+  workflow workflow[]
+  credentials credentials[]
 }
 model workflow{ 
   id Int @id @default(autoincrement())
   title String
   nodes String
   Connections String
+  user user @relation(fields: [userId] , references: [id] )
+  userId String 
 }
 model credentials{ 
   id Int @id @default(autoincrement())
   title String 
   platform String
-  data String
+  data Json
+  user user @relation(fields: [userId] , references: [id])
+  userId String
 }
+
