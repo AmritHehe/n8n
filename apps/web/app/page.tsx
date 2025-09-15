@@ -6,14 +6,23 @@ import { useState, useCallback } from 'react';
 import { ReactFlow, applyNodeChanges, applyEdgeChanges, addEdge  , Background , Controls, Position } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { snapshot } from "node:test";
- 
+import { TeligramNode } from "./teligram";
+import { Trigger } from "./Trigger";
+import { Gmail } from "./Gmail";
+
+
 const inititalNodes = [{ 
   id : '1' , 
   position : { x : 0 , y : 0} , 
+  type : 'trigger' ,
   data : { label : 'Node 1'} , 
-  type : 'input'
 } 
 ]
+const nodeTypes = { 
+  telegram : TeligramNode ,
+  trigger : Trigger , 
+  gmail : Gmail
+}
 
 const initialEdges :any  = []
 
@@ -30,13 +39,7 @@ export default function App() {
       id : size , 
       position : { x : 200 , y : 200} , 
       data : { label : name} , 
-      type : 'default'
-    }])
-    //@ts-ignore
-    setEdges(edges => [...edges , { 
-      id : (Math.random().toFixed(0)).toString(),
-      source : nodes.length.toString(),
-      target : (nodes.length+1).toString()
+      type : name
     }])
   }
   const onNodeChange = useCallback(
@@ -57,11 +60,11 @@ export default function App() {
         <div className="flex flex-col absolute z-10 items-center justify-center bg-zinc-800 w-1/6 h-full">
         <h1 className="font-bold text-xl text-white">Whats Next</h1>
           
-          <button onClick={()=> {addNode('teligram')}} className="bg-black rounded-lg p-2 m-2 text-white"> telegram </button>
+          <button onClick={()=> {addNode('telegram')}} className="bg-black rounded-lg p-2 m-2 text-white"> telegram </button>
           <button onClick={()=> {addNode('gmail')}} className="bg-black rounded-lg p-2 m-2 text-white"> gmail </button>
         </div> 
         <div className="w-full h-full" >
-          <ReactFlow colorMode="dark" nodes={nodes} edges={edges} onNodesChange={onNodeChange} onEdgesChange={onEdgesChange} onConnect={onConnect} fitView>
+          <ReactFlow colorMode="dark" nodeTypes={nodeTypes} nodes={nodes} edges={edges} onNodesChange={onNodeChange} onEdgesChange={onEdgesChange} onConnect={onConnect} fitView>
             <Background/>
             <Controls/>
           </ReactFlow>
