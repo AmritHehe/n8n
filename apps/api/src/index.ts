@@ -7,10 +7,10 @@ import { processess } from './processess.js';
 import {Usemiddleware } from './middleware.js';
 import { gmail } from './gmail.js';
 import { telegramBot } from './teligram.js';
+
 const app  = express() ; 
 app.use(express.json()); 
 const JWT_SECRET  : string = process.env.JWT_SECRET!;
-let whatToExecute =  0 ;
 
 
 
@@ -57,7 +57,7 @@ app.post('/api/v0/signin' ,async (req, res)=> {
 //payload or data or schema 
 // title : workflow name 
 //
-app.post('/workflow' , (req , res)=> { 
+app.post('/workflow' , Usemiddleware, async (req , res)=> { 
     //user
     //yha userId leke ek new workflow with empty nodes create hojana chaiye
     const payload = req.body; 
@@ -65,30 +65,61 @@ app.post('/workflow' , (req , res)=> {
     const title = payload.title; 
     const nodes = payload.nodes;
     const connections = payload.connections;
-    
+    //@ts-ignore
+    const userId = req.userId  
     //prisma call to make a new emty workspace
-
+    await prismaClient.workflow.create({ 
+        data : { 
+            title : title , 
+            nodes : nodes , 
+            Connections : connections ,
+            userId : userId
+        }
+    })
     //do a db call to post the nodes
-    let node: node
 })
 
 
-app.get('/workflow' , (req , res)=> { 
+app.get('/workflow' , Usemiddleware ,async (req , res)=> { 
     //yha bs ek be call jayega vo call karega aur sara data be se le aayega
+
+    //@ts-ignore
+    const userId = req.userId
+    await prismaClient.workflow.findMany({ 
+        where : { 
+            userId : userId
+        }
+    })
+
 })
 
-app.post('/workflow/:id', Usemiddleware , (req , res)=> { 
+app.post('/workflow/:id', Usemiddleware ,async (req , res)=> { 
     //create new node and dump it there as a json , what it does 
     const id : number = Number(req.params.id)
     const payload = req.body ; 
     // const data = JSON.parse(payload.data) ; 
     // processess.push(data)
-    const data  = payload.data
-    for(let i = 0 ; i < data.length ; i++){ 
-        processess.push(data[i])
-    }
+    const nodes  = payload.nodes ; 
+    const connections = payload.connections;
+    //@ts-ignore
+    const userId = req.userId 
+    await prismaClient.workflow.update({ 
+        where : { 
+            id : id
+        } , 
+        data : { 
+            title : "data" , 
+            nodes : nodes , 
+            Connections : connections ,
+            userId : userId , 
+        }
+    })
     console.log("data" + JSON.stringify(payload.data) )
     
+    //nodes mein we ll just push nodes and connections to be 
+
+
+    //process schema 
     // processess.push({ 
     //     id : 1 , 
     //     name : "start",
@@ -108,8 +139,25 @@ app.post('/workflow/:id', Usemiddleware , (req , res)=> {
     console.log("processes " + processess )
     res.json("done")
 })
-app.put('/workflow/:id' , (req , res)=> { 
+app.put('/workflow/:id' , Usemiddleware ,async (req , res)=> { 
     //update that node with the following , dump new json there
+    //@ts-ignore
+    const userId = req.userId ;
+    const payload = req.body ;
+    const id = payload.id ; 
+    const data = payload.data
+    try {
+        const response = await prismaClient.workflow.update({ 
+            where : { 
+                id : id
+            } , 
+            data : { 
+               //add new data here 
+            }
+        })
+    } catch (error) {
+        
+    }
 })
 
 app.post('/execute' , Usemiddleware , async (req , res)=> { 
@@ -203,8 +251,33 @@ app.post('/api/v0/credentials', Usemiddleware , async(req , res) => {
     
     //what we need is title platform data
 })
-app.delete('/api/v0/credentials' ,async(req , res)=> { 
+app.delete('/api/v0/credentials' , Usemiddleware ,async(req , res)=> { 
+    const payload = req.body;
+    //@ts-ignore
+    const userId = req.userId; 
+    const platform = payload.platform; 
+    try{ 
+        const data  = await prismaClient.credentials.findFirst({ 
+            where : { 
+                platform : platform , 
+                userId : userId
+            }
+        })
+        const id = data?.id
+        if(id){
+            const response = await prismaClient.credentials.delete({ 
+                where : { 
+                    id : id 
+                }
+            })
+        }
+        res.json("sucessfully deleted the credential" )
+    }
+    catch(e){ 
+        res.status(403).json('didnt worked well ')
+    }
     
+
 })
 
 app.listen(3000)

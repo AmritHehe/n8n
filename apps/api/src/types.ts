@@ -7,8 +7,22 @@ export interface node {
     connection ?: boolean
     
 }
+export interface edge { 
+    id : string ; 
+    source :  string ;
+    target : string ; 
+}
 export interface users { 
-    id : string
+    id : string ;
     name : string ; 
     pass : string ;
+}
+export interface TeligramCredentials{ 
+    token : string;
+}
+export interface GmailCredentials{ 
+    HOST : string ;
+    PORT : number ;
+    username : string ; 
+    password : string 
 }
