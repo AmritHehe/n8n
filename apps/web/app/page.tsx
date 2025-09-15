@@ -15,7 +15,7 @@ const inititalNodes = [{
 } 
 ]
 
-const initialEdges = []
+const initialEdges :any  = []
 
 
 export default function App() {

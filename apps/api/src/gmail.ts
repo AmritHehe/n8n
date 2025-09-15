@@ -1,24 +1,29 @@
 import nodemailer from 'nodemailer'
-export async  function gmail(){ 
+export async  function gmail(data : any){ 
     //user ke credentials , 
-    
-    const transporter = nodemailer.createTransport({
-        host: 'smtp.resend.com',
-        secure: true,
-        port: 465,
-        auth: {
-            user: 'resend',
-            pass: 're_xxxxxxxxx',
-        },
-    });
+    try{
+        const transporter = nodemailer.createTransport({
+            host: 'smtp.resend.com',
+            secure: true,
+            port: 465,
+            auth: {
+                user: data.username,
+                pass: data.password
+            },
+        });
 
-    const info = await transporter.sendMail({
-        from: 'onboarding@resend.dev',
-        to: 'delivered@resend.dev',
-        subject: 'Hello World',
-        html: '<strong>It works!</strong>',
-    });
-    console.log('Message sent: %s', info.messageId);
+        const info = await transporter.sendMail({
+            from: 'onboarding@resend.dev',
+            to: 'amritbarsiphone@gmail.com',
+            subject: 'Hello World',
+            html: '<strong>It works!</strong>',
+        });
+        console.log('Message sent: %s', info.messageId);
+    
+    }
+    catch(e){ 
+        console.error("Error " + e)
+    }
+    
 }
 
-gmail().catch(console.error);
