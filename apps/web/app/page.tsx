@@ -32,6 +32,7 @@ export default function App() {
       data : { label : name} , 
       type : 'default'
     }])
+    //@ts-ignore
     setEdges(edges => [...edges , { 
       id : (Math.random().toFixed(0)).toString(),
       source : nodes.length.toString(),
