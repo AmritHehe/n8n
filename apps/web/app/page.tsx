@@ -3,7 +3,7 @@ import Image, { type ImageProps } from "next/image";
 import { Button } from "@repo/ui/button";
 import styles from "./page.module.css";
 import { useState, useCallback, useEffect } from 'react';
-import { ReactFlow, applyNodeChanges, applyEdgeChanges, addEdge  , Background , Controls, Position } from '@xyflow/react';
+import { ReactFlow, applyNodeChanges, applyEdgeChanges, addEdge  , Background , Controls, Position, useReactFlow } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { snapshot } from "node:test";
 import { TeligramNode } from "./teligram";
@@ -33,7 +33,8 @@ const initialEdges :any  = []
 export default function App() {
   const [nodes ,setNodes] = useState(inititalNodes)
   const [edges , setEdges] = useState(initialEdges)
-  const [token , setToken ] = useState<string|null>()
+  const [token , setToken ] = useState<string|null>(null)
+
   function addNode(name : string){ 
     let size = (nodes.length + 1).toString()
     console.log("size" + size)
@@ -45,6 +46,7 @@ export default function App() {
       type : name
     }])
   }
+
   useEffect(()=> {
       const tokenn = localStorage.getItem("token")
       setToken(tokenn)
@@ -103,7 +105,7 @@ export default function App() {
   )
   const onEdgesChange = useCallback(
     //@ts-ignore
-  (changes) => setEdges((edgesSnapshot) => applyNodeChanges(changes, edgesSnapshot)),
+  (changes) => setEdges((edgesSnapshot) => applyEdgeChanges(changes, edgesSnapshot)),
     [],
   );
   //@ts-ignore
@@ -129,4 +131,5 @@ export default function App() {
     </>
   );
 }
+//todo - add agent node , add desc , add credential page , add workflow page
 
