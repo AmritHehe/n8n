@@ -3,6 +3,6 @@
   "compilerOptions": {
     "outDir": "dist"
   },
-  "include": ["src"],
+  "include": ["src", "../../apps/web/app/components/toast.tsx", "../../apps/web/app/components/AuthButton.tsx", "../../apps/web/app/components/auth.tsx", "../../apps/web/app/components/FormInput.tsx"],
   "exclude": ["node_modules", "dist"]
 }

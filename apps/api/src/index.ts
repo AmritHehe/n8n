@@ -1,4 +1,4 @@
-import express from 'express' ; 
+import express, { response } from 'express' ; 
 import jwt  from 'jsonwebtoken' ; 
 import { prismaClient }  from '@repo/database/client'; 
 import type { node } from './types.js';
@@ -7,14 +7,16 @@ import { processess } from './processess.js';
 import {Usemiddleware } from './middleware.js';
 import { gmail } from './gmail.js';
 import { telegramBot } from './teligram.js';
+import cors from 'cors';
 
 const app  = express() ; 
 app.use(express.json()); 
+app.use(cors())
 const JWT_SECRET  : string = process.env.JWT_SECRET!;
 
 
 
-app.post('/api/v0/signup' , async (req , res)=> { 
+app.post('/api/v1/signup' , async (req , res)=> { 
     const payload = req.body ;
     const name : string= payload.name ; 
     const pass : string = payload.pass ; 
@@ -29,7 +31,8 @@ app.post('/api/v0/signup' , async (req , res)=> {
     res.json("user created")
 
 })
-app.post('/api/v0/signin' ,async (req, res)=> { 
+app.post('/api/v1/signin' ,async (req, res)=> { 
+    console.log('hitted the endpoint ?')
     const payload = req.body ;
     const name = payload.name ; 
     const pass = payload.pass ; 
@@ -46,7 +49,9 @@ app.post('/api/v0/signin' ,async (req, res)=> {
         const token  = jwt.sign({ 
             id : user.id
         }, JWT_SECRET)
-        res.status(200).json("found the user , token : " + token)
+        res.status(200).json({ 
+            token : token
+        })
     }
     else { 
         res.status(403).json("please sign up first")
@@ -95,18 +100,22 @@ app.get('/workflow' , Usemiddleware ,async (req , res)=> {
 
 app.post('/workflow/:id', Usemiddleware ,async (req , res)=> { 
     //create new node and dump it there as a json , what it does 
-    const id : number = Number(req.params.id)
+    //@ts-ignore
+    const id = parseInt(req.params.id)
+    console.log(typeof(id))
     const payload = req.body ; 
+    console.log("id + : "+ id)
+    console.log("iddd dekhraha hu " + req.params.id)
+    const data = payload.data 
     // const data = JSON.parse(payload.data) ; 
     // processess.push(data)
-    const nodes  = payload.nodes ; 
-    const connections = payload.connections;
+    
+    const nodes  = data.nodes ; 
+    const connections = data.connections;
     //@ts-ignore
     const userId = req.userId 
-    await prismaClient.workflow.update({ 
-        where : { 
-            id : id
-        } , 
+    console.log("hitted the data")
+    await prismaClient.workflow.create({ 
         data : { 
             title : "data" , 
             nodes : nodes , 
@@ -115,7 +124,7 @@ app.post('/workflow/:id', Usemiddleware ,async (req , res)=> {
         }
     })
     console.log("data" + JSON.stringify(payload.data) )
-    
+    res.json("done")
     //nodes mein we ll just push nodes and connections to be 
 
 
@@ -137,14 +146,14 @@ app.post('/workflow/:id', Usemiddleware ,async (req , res)=> {
     //     connection: true
     // })
     console.log("processes " + processess )
-    res.json("done")
 })
 app.put('/workflow/:id' , Usemiddleware ,async (req , res)=> { 
     //update that node with the following , dump new json there
     //@ts-ignore
     const userId = req.userId ;
     const payload = req.body ;
-    const id = payload.id ; 
+    const id : number = Number(req.params.id);
+    console.log("id + : "+ id)
     const data = payload.data
     try {
         const response = await prismaClient.workflow.update({ 
@@ -153,11 +162,37 @@ app.put('/workflow/:id' , Usemiddleware ,async (req , res)=> {
             } , 
             data : { 
                //add new data here 
+               title : "updated data" , 
+               nodes :  data.nodes, 
+               Connections : data.connections , 
+               userId : userId
             }
         })
+        res.json("updated the data")
     } catch (error) {
+        console.log(error)
         
     }
+})
+app.get('/workflow/:id' , Usemiddleware , async(req , res) => { 
+
+    console.log("tried to hit the end point")
+    //@ts-ignore
+    
+    const userId = req.userId ;
+    const id : number = Number(req.params.id);
+    try {
+        const response = await prismaClient.workflow.findFirst({ 
+            where : { 
+                id : id
+            } 
+        })
+        console.log("response " + response)
+        res.json(response)
+    } catch (error) {
+        console.log(error)   
+    }
+
 })
 
 app.post('/execute' , Usemiddleware , async (req , res)=> { 
@@ -227,7 +262,7 @@ app.post('/execute' , Usemiddleware , async (req , res)=> {
     
 })
 
-app.post('/api/v0/credentials', Usemiddleware , async(req , res) => { 
+app.post('/api/v1/credentials', Usemiddleware , async(req , res) => { 
     //use middleware
     const payload = req.body;
     //@ts-ignore
@@ -251,7 +286,7 @@ app.post('/api/v0/credentials', Usemiddleware , async(req , res) => {
     
     //what we need is title platform data
 })
-app.delete('/api/v0/credentials' , Usemiddleware ,async(req , res)=> { 
+app.delete('/api/v1/credentials' , Usemiddleware ,async(req , res)=> { 
     const payload = req.body;
     //@ts-ignore
     const userId = req.userId; 
@@ -280,4 +315,6 @@ app.delete('/api/v0/credentials' , Usemiddleware ,async(req , res)=> {
 
 })
 
-app.listen(3000)
+app.listen(3002 , ()=> { 
+    console.log("listening to port 3002")
+})
