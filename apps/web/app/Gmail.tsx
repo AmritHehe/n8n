@@ -1,11 +1,15 @@
-import { Handle , Position, useReactFlow } from "@xyflow/react"
+import { Handle , Position, useEdges, useReactFlow } from "@xyflow/react"
 import Cross from "./components/cross";
+import { setEngine } from "crypto";
 export function Gmail({ id }: { id: string }) {
   const { setNodes } = useReactFlow();
+  const { setEdges } = useReactFlow();
 
   function deleteNode() {
     setNodes((nds) => nds.filter((n) => n.id !== id));
+    setEdges((edges)=>edges.filter((n)=>n.target!==id));
   }
+  
     
     return <> 
         <button onClick={deleteNode} className="text-white "><Cross/></button>

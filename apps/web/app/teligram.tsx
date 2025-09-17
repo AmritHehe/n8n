@@ -2,9 +2,12 @@ import { Handle , Position , useReactFlow  } from "@xyflow/react"
 import Cross from "./components/cross";
 export function TeligramNode({ id }: { id: string }){ 
     const { setNodes } = useReactFlow();
-
+    const {setEdges} = useReactFlow(); 
+    
   function deleteNode() {
     setNodes((nds) => nds.filter((n) => n.id !== id));
+    setEdges((edges)=>edges.filter((n)=>n.target!==id));
+
   }
     return <> 
         <button onClick={deleteNode} className="text-white "><Cross/></button>
