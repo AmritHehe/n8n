@@ -199,6 +199,9 @@ app.post('/execute' , Usemiddleware , async (req , res)=> {
 
     const payload = req.body;
     const id = payload.id; //this will be workflow id only  , considering there will be only 1 workflow
+
+    const nodes = JSON.parse(payload.nodes); 
+    const connections = JSON.parse(payload.connections)
     //@ts-ignore
     const userId  = req.userId;
     for(let i = 0 ; i < processess.length ; i++){ 
@@ -257,6 +260,11 @@ app.post('/execute' , Usemiddleware , async (req , res)=> {
         else { 
             console.log("what the fuck process is this " + proces.type)
         }
+    }
+    for(let i = 0 ; i <nodes.length; i++ ){ 
+        let start = nodes[i] ; 
+        //execute the process here 
+        let target = connections[i]
     }
     res.json('send the message bhai ab jao cold coffee pi aao')
     

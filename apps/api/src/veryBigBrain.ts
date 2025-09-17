@@ -1,0 +1,53 @@
+
+
+let data = '[ {"source":"1","target":"2","id":"xy-edge__1-2"},{"source":"1","target":"3","id":"xy-edge__1-3"},{"source":"3","target":"4","id":"xy-edge__3-4"},{"source":"3","target":"5","id":"xy-edge__3-5"},{"source":"3","target":"6","id":"xy-edge__3-6"},{"source":"2","target":"7","id":"xy-edge__2-7"},{"source":"2","target":"8","id":"xy-edge__2-8"},{"source":"2","target":"9","id":"xy-edge__2-9"},{"source":"2","target":"10","id":"xy-edge__2-10"},{"source":"4","target":"11","id":"xy-edge__4-11"},{"source":"4","target":"12","id":"xy-edge__4-12"},{"source":"4","target":"13","id":"xy-edge__4-13"},{"source":"7","target":"14","id":"xy-edge__7-14"}]';
+let connections = JSON.parse(data); 
+console.log(connections)
+connections.forEach(connection =>{ 
+    connection.source = Number(connection.source );
+    connection.target=Number(connection.target)
+}
+);
+console.log(connections)
+connections.sort((a,b)=> 
+    a.source - b.source
+)
+
+let hehe = []
+function filter(arr , i ){ 
+    if(i > arr.length){ 
+        return
+    }
+    hehe.push(arr[i]);
+    console.log("pushed " + JSON.stringify(arr[i]))
+    let target = arr[i].target; 
+    
+    for(let j = i ; j < arr.length ; j++){ 
+        console.log(" j " +   j)
+        if (arr[j].source == target){ 
+            console.log(" source = " + JSON.stringify(arr[j].source) + "target " + JSON.stringify(target))
+            filter(arr , j)
+        }
+    }
+    i++;
+    
+  
+    
+    
+}  
+let bhag = true; 
+let i = 0 ; 
+while(bhag && hehe.length < connections.length){ 
+    if(connections[i].source == 1){ 
+        filter(connections , i )
+    }
+    else { 
+        bhak = false
+    }
+    i++
+}
+
+console.log(hehe)
+
+
+console.log(connections);
