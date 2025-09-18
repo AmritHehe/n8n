@@ -4,6 +4,9 @@ export interface node {
     type : 'trigger' | 'telegram' | 'gmail' ;
     data : { 
         label :  'trigger'| 'action' ;
+        message ?: string ; 
+        subject ?: string ;
+        to ?: string;
     };
     measured : { 
         width : number , 

@@ -34,7 +34,6 @@ export default function App() {
   const [nodes ,setNodes , onNodeChange] = useNodesState(inititalNodes)
   const [edges , setEdges , onEdgesChange] = useEdgesState(initialEdges)
   const [token , setToken ] = useState<string|null>(null)
-
   function addNode(name : string){ 
     let size = (nodes.length + 1).toString()
     console.log("size" + size)
@@ -42,7 +41,9 @@ export default function App() {
     setNodes(nodes => [...nodes , { 
       id : size , 
       position : { x : 200 , y : 200} , 
-      data : { label : 'action'} , 
+      data : { label : 'action', 
+        message : ""
+      } , 
       type : name
     }])
   }

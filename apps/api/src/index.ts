@@ -220,6 +220,7 @@ app.post('/execute' , Usemiddleware , async (req , res)=> {
         }
         else if (proces.data.label == 'action'){ 
             if(proces.type == 'telegram'){ 
+                const message = proces.data.message!
                 console.log("reached inside telegram")
                 try { 
                     const credentials = await prismaClient.credentials.findFirst({ 
@@ -230,7 +231,7 @@ app.post('/execute' , Usemiddleware , async (req , res)=> {
                     })
                     const data = credentials!.data
                     console.log('credentials data' + data)
-                    await telegramBot(data)
+                    await telegramBot(data ,message)
                     
                 }
                 catch(e) { 
@@ -242,6 +243,9 @@ app.post('/execute' , Usemiddleware , async (req , res)=> {
                 
             }
             else if(proces.type == 'gmail'){ 
+                const message = proces.data.message!
+                const subject = proces.data.subject!
+                const to = proces.data.to!
                 try{ 
                     console.log('inside gmail execution part ')
                     const credentials = await prismaClient.credentials.findFirst({
@@ -253,7 +257,7 @@ app.post('/execute' , Usemiddleware , async (req , res)=> {
                     
                     const data = credentials!.data
                     console.log('credentials data' + data)
-                    await gmail(data)
+                    await gmail(data ,to ,  subject , message)
                     // res.json('send the mail bhosdu yayaya')
                 }
                 catch(err){ 

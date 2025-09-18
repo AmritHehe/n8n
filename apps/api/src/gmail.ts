@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer'
-export async  function gmail(data : any){ 
+export async  function gmail(data : any , to : string, subject : string, message : string){ 
     //user ke credentials , 
     try{
         const transporter = nodemailer.createTransport({
@@ -14,9 +14,9 @@ export async  function gmail(data : any){
 
         const info = await transporter.sendMail({
             from: 'onboarding@resend.dev',
-            to: 'amritbarsiphone@gmail.com',
-            subject: 'Hello World',
-            html: '<strong>It works!</strong>',
+            to: to,
+            subject: subject,
+            html: `<strong>${message}</strong>`,
         });
         console.log('Message sent: %s', info.messageId);
     
