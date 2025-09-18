@@ -6,7 +6,7 @@ export async function telegramBot(data : any){
     const token = data.token;
     const chatId= data.chatId ;
 
-    const bot = new TelegramBot(token , {polling:true});
+    const bot = new TelegramBot(token , {polling:false});
 
     await bot.sendMessage(chatId ,"hello from mini n8n")
 }

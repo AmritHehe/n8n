@@ -1,12 +1,32 @@
 export interface node { 
     id : number ;
-    name : string ; 
-    type : 'trigger'| 'action' | 'string' ;
-    do : string  | 'mail' | 'teligram';
-    done : boolean ;
-    connection ?: boolean
+    position : { x : number , y : number}
+    type : 'trigger' | 'telegram' | 'gmail' ;
+    data : { 
+        label :  'trigger'| 'action' ;
+    };
+    measured : { 
+        width : number , 
+        height : number
+    };
+  
     
 }
+// {
+//     "id": "1",
+//     "position": {
+//       "x": 0,
+//       "y": 0
+//     },
+//     "type": "trigger",
+//     "data": {
+//       "label": "Node 1"
+//     },
+//     "measured": {
+//       "width": 64,
+//       "height": 48
+//     }
+//   },
 export interface edge { 
     id : string ; 
     source :  string ;

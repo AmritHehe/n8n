@@ -17,7 +17,7 @@ const inititalNodes = [{
   id : '1' , 
   position : { x : 0 , y : 0} , 
   type : 'trigger' ,
-  data : { label : 'Node 1'} , 
+  data : { label : 'trigger'} , 
 } 
 ]
 const nodeTypes = { 
@@ -42,7 +42,7 @@ export default function App() {
     setNodes(nodes => [...nodes , { 
       id : size , 
       position : { x : 200 , y : 200} , 
-      data : { label : name} , 
+      data : { label : 'action'} , 
       type : name
     }])
   }
@@ -97,6 +97,18 @@ export default function App() {
     console.log("response " + res); 
     
   }
+  async function  execute() {
+    const response = await axios.post('http://localhost:3002/execute', { 
+      nodes : JSON.stringify(nodes) , 
+      connections : JSON.stringify(edges)
+    }, { 
+      headers : { 
+        authorization : token
+      }
+    })
+    console.log("response " + response)
+    alert("executed the node ! ")
+  }
   
   const onConnect = useCallback((params :any)=> setEdges((edgesSnapshot)=> addEdge(params , edgesSnapshot)) ,[], ) 
   
@@ -109,6 +121,7 @@ export default function App() {
           <button onClick={()=> {addNode('telegram')}} className="bg-black rounded-lg p-2 m-2 text-white"> telegram </button>
           <button onClick={()=> {addNode('gmail')}} className="bg-black rounded-lg p-2 m-2 text-white"> gmail </button>
           <button className="bg-indigo-700 text-white font-bold p-2 m-2 rounded-xl " onClick={savegraph}> Save Graph </button>
+          <button onClick={execute} className="bg-orange-600 text-amber-50 font bold px-4 py-3 m-2 rounded-xl"> Execute Workflow</button>
         </div> 
         <div className="w-full h-full" >
           <ReactFlow colorMode="dark" nodeTypes={nodeTypes} nodes={nodes} edges={edges} onNodesChange={onNodeChange} onEdgesChange={onEdgesChange} onConnect={onConnect}  fitView>

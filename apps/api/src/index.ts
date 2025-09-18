@@ -3,12 +3,12 @@ import jwt  from 'jsonwebtoken' ;
 import { prismaClient }  from '@repo/database/client'; 
 import type { node } from './types.js';
 import type { users } from './types.js';
-import { processess } from './processess.js';
+// import { processess } from './processess.js';
 import {Usemiddleware } from './middleware.js';
 import { gmail } from './gmail.js';
 import { telegramBot } from './teligram.js';
 import cors from 'cors';
-
+import { preOrderTraversal } from './veryBigBrain.js';
 const app  = express() ; 
 app.use(express.json()); 
 app.use(cors())
@@ -145,7 +145,7 @@ app.post('/workflow/:id', Usemiddleware ,async (req , res)=> {
     //     done : false , 
     //     connection: true
     // })
-    console.log("processes " + processess )
+    // console.log("processes " + processess )
 })
 app.put('/workflow/:id' , Usemiddleware ,async (req , res)=> { 
     //update that node with the following , dump new json there
@@ -201,18 +201,25 @@ app.post('/execute' , Usemiddleware , async (req , res)=> {
     const id = payload.id; //this will be workflow id only  , considering there will be only 1 workflow
 
     const nodes = JSON.parse(payload.nodes); 
-    const connections = JSON.parse(payload.connections)
+    const connections = (payload.connections);
+    const sortedArray = preOrderTraversal(connections) ; 
     //@ts-ignore
     const userId  = req.userId;
-    for(let i = 0 ; i < processess.length ; i++){ 
-        const proces :node = processess[i]!
-        console.log('currently executing process no ' + i);
-        if(proces.type == 'trigger'){ 
-            proces.done = true;
+    console.log('userId : ' + userId)
+    //now we have to execute the nodes(sources) of the sorted array by processing the nodes
+    //take the data from the nodes 
+
+    for(let i = 0 ; i < sortedArray.length ; i++){ 
+        const processtoexecute = sortedArray[i].target
+        const proces :node = nodes[processtoexecute-1]!
+        console.log('currently executing process no ' + processtoexecute);
+        console.log("the process / node " + JSON.stringify(proces))
+        if(proces.data.label == 'trigger'){ 
+            // proces.done = true;
             console.log('this done')
         }
-        else if (proces.type == 'action'){ 
-            if(proces.do == 'teligram'){ 
+        else if (proces.data.label == 'action'){ 
+            if(proces.type == 'telegram'){ 
                 console.log("reached inside telegram")
                 try { 
                     const credentials = await prismaClient.credentials.findFirst({ 
@@ -228,12 +235,13 @@ app.post('/execute' , Usemiddleware , async (req , res)=> {
                 }
                 catch(e) { 
                     // res.status(403).json("the error " + e)
+                    console.log("process with id  : " + processtoexecute + " failed with error " + e )
                 }
                 //function call teligram
                 //check krenge ki kya us cheez ke credentials hai
                 
             }
-            else if(proces.do == 'gmail'){ 
+            else if(proces.type == 'gmail'){ 
                 try{ 
                     console.log('inside gmail execution part ')
                     const credentials = await prismaClient.credentials.findFirst({
@@ -249,23 +257,28 @@ app.post('/execute' , Usemiddleware , async (req , res)=> {
                     // res.json('send the mail bhosdu yayaya')
                 }
                 catch(err){ 
-                    res.status(403).json('didnt found the credentials')
+                    // res.status(403).json('didnt found the credentials')
+                    console.log("process with id  : " + processtoexecute + " failed with error " + err )
+
                 }
                 
                 //function call gmail 
                 //check krenge ki credentials hai ya nahi
                 
             }
+            else { 
+                console.log("wtf proces is this bhay" + JSON.stringify(proces))
+            }
         }
         else { 
             console.log("what the fuck process is this " + proces.type)
         }
     }
-    for(let i = 0 ; i <nodes.length; i++ ){ 
-        let start = nodes[i] ; 
-        //execute the process here 
-        let target = connections[i]
-    }
+    // for(let i = 0 ; i <nodes.length; i++ ){ 
+    //     let start = nodes[i] ; 
+    //     //execute the process here 
+    //     let target = connections[i]
+    // }
     res.json('send the message bhai ab jao cold coffee pi aao')
     
 })
