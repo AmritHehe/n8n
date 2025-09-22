@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx tsc -b  && node --env-file=.env ./dist/index.js",
-    "sdk": "npx tsc -b && node --env-file = .env ./dist/sdk.js"
+    "langchain": "npx tsc -b && node --env-file = .env ./dist/langchain.js"
   },
   "keywords": [],
   "author": "",
@@ -18,6 +18,9 @@
   },
   "dependencies": {
     "@google/genai": "^1.19.0",
+    "@langchain/core": "^0.3.77",
+    "@langchain/google-genai": "^0.2.18",
+    "@langchain/langgraph": "^0.4.9",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
@@ -26,6 +29,7 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "node-telegram-bot-api": "^0.66.0",
-    "nodemailer": "^7.0.6"
+    "nodemailer": "^7.0.6",
+    "zod": "^4.1.11"
   }
 }

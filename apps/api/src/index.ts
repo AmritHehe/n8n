@@ -9,12 +9,14 @@ import { gmail } from './gmail.js';
 import { telegramBot } from './teligram.js';
 import cors from 'cors';
 import { preOrderTraversal } from './veryBigBrain.js';
+import { genai } from './langchain.js';
 const app  = express() ; 
 app.use(express.json()); 
 app.use(cors())
 const JWT_SECRET  : string = process.env.JWT_SECRET!;
 
 
+genai() ; 
 
 app.post('/api/v1/signup' , async (req , res)=> { 
     const payload = req.body ;

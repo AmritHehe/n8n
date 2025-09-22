@@ -1,16 +1,14 @@
 "use client"
-import Image, { type ImageProps } from "next/image";
+// import Image, { type ImageProps } from "next/image";
 import { Button } from "@repo/ui/button";
-import styles from "./page.module.css";
+// import styles from "./page.module.css";
 import { useState, useCallback, useEffect } from 'react';
 import { ReactFlow, applyNodeChanges, applyEdgeChanges, addEdge  , Background , Controls, Position, useReactFlow, useNodesState, useEdgesState } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { snapshot } from "node:test";
 import { TeligramNode } from "./teligram";
 import { Trigger } from "./Trigger";
 import { Gmail } from "./Gmail";
 import axios from "axios";
-import { connection } from "next/server";
 
 
 const inititalNodes = [{ 
