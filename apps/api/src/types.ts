@@ -1,12 +1,15 @@
 export interface node { 
     id : number ;
     position : { x : number , y : number}
-    type : 'trigger' | 'telegram' | 'gmail' ;
+    type : 'trigger' | 'telegram' | 'gmail' | 'agent' | 'webhook'  ;
     data : { 
-        label :  'trigger'| 'action' ;
+        label :  'trigger'| 'action'  ;
+        webhook ?: boolean ;
         message ?: string ; 
         subject ?: string ;
+        isExecuting ?: boolean ;
         to ?: string;
+        afterPlayNodes ?: number
     };
     measured : { 
         width : number , 

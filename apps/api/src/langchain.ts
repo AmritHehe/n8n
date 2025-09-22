@@ -2,7 +2,8 @@ import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { tool } from "@langchain/core/tools";
 import { z } from "zod"; 
-export async function genai (){ 
+import type { MessageContent } from "@langchain/core/messages";
+export async function genai (message : string){ 
     const model = new ChatGoogleGenerativeAI({ 
         model : "gemini-2.0-flash" , 
         temperature : 0
@@ -16,11 +17,12 @@ export async function genai (){
         messages : [
             { 
                 role : "user" , 
-                content : "how to get the only message you reply when I call this invoke function , it returns an array "
+                content : message
             }
         ]
     })
+    let hehe : MessageContent =  (result.messages[1]?.content)!
+     console.log("response inside: " + JSON.stringify(result.messages[1]?.content))
 
-    console.log("response : " + JSON.stringify(result.messages[1]?.content))
+    return hehe;
 }
-genai()
