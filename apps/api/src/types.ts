@@ -1,7 +1,7 @@
 export interface node { 
     id : number ;
     position : { x : number , y : number}
-    type : 'trigger' | 'telegram' | 'gmail' | 'agent' | 'webhook'  ;
+    type : 'trigger' | 'telegram' | 'gmail' | 'agent' | 'webhook' | 'awaitGmail' ;
     data : { 
         label :  'trigger'| 'action'  ;
         webhook ?: boolean ;

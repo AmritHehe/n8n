@@ -69,7 +69,7 @@ export async function executeIt( payload : any , user :any  , indexToStartWith ?
                         
                         const data = credentials!.data
                         console.log('credentials data' + data)
-                        await gmail(data ,to ,  subject , message)
+                        await gmail(data ,to ,  subject , message , false)
                         // res.json('send the mail bhosdu yayaya')
                     }
                     catch(err){ 
@@ -101,7 +101,7 @@ export async function executeIt( payload : any , user :any  , indexToStartWith ?
                 else if(proces.type == 'webhook'){ 
                     if (proces.data.webhook==false){ 
                         console.log("waiting for webhook execution")
-                        proces.data.afterPlayNodes = i;
+                        proces.data.afterPlayNodes = i + 1;
                         proces.data.isExecuting = true;
                         nodes[processtoexecute-1].data.isExecuting = true;
                         await prismaClient.workflow.update({
@@ -119,6 +119,52 @@ export async function executeIt( payload : any , user :any  , indexToStartWith ?
                     }
                     else { 
                         console.log("webhook executed")
+                    }
+                }
+                else if (proces.type == 'awaitGmail'){ 
+                    const message = proces.data.message!
+                    const subject = proces.data.subject!
+                    const to = proces.data.to!
+                    try{ 
+                        console.log('inside gmail execution part ')
+                        const credentials = await prismaClient.credentials.findFirst({
+                            where : { 
+                                userId : userId,
+                                platform : 'gmail'
+                            }
+                        })
+                        
+                        const data = credentials!.data
+                        console.log('credentials data' + data)
+                        await gmail(data ,to ,  subject , message , true , proces.id )
+                        if (proces.data.webhook==false){ 
+                            console.log("waiting for user to respond ")
+                            proces.data.afterPlayNodes = i + 1;
+                            proces.data.isExecuting = true;
+                            nodes[processtoexecute-1].data.isExecuting = true;
+                            await prismaClient.workflow.update({
+                                where : { 
+                                    id : 1
+                                }, 
+                                data : { 
+                                    title : "now it must work",
+                                    nodes : JSON.stringify(nodes)
+                                }
+                            })
+                            console.log("proces : " + JSON.stringify(proces))
+                            break;
+
+                        }
+                        else { 
+                            console.log("webhook executed")
+                        }
+
+                        // res.json('send the mail bhosdu yayaya')
+                    }
+                    catch(err){ 
+                        // res.status(403).json('didnt found the credentials')
+                        console.log("process with id  : " + processtoexecute + " failed with error " + err )
+    
                     }
                 }
                 else { 
