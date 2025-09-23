@@ -11,24 +11,24 @@ connections.forEach(connection =>{
     connection.target=Number(connection.target)
 }
 );
-console.log(connections)
+
 connections.sort((a :any,b :any )=> 
     a.source - b.source
 )
-
+console.log(connections)
 let hehe :any[] = []
 function filter(arr :any[], i :number ){ 
     if(i > arr.length){ 
         return
     }
     hehe.push(arr[i]);
-    console.log("pushed " + JSON.stringify(arr[i]))
+    // console.log("pushed " + JSON.stringify(arr[i]))
     let target = arr[i].target; 
     
     for(let j = i ; j < arr.length ; j++){ 
-        console.log(" j " +   j)
+        // console.log(" j " +   j)
         if (arr[j].source == target){ 
-            console.log(" source = " + JSON.stringify(arr[j].source) + "target " + JSON.stringify(target))
+            // console.log(" source = " + JSON.stringify(arr[j].source) + "target " + JSON.stringify(target))
             filter(arr , j)
         }
     }

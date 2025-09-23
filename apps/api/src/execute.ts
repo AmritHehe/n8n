@@ -4,9 +4,9 @@ import { prismaClient }  from '@repo/database/client';
 import { telegramBot } from "./teligram.js";
 import { gmail } from "./gmail.js";
 import { genai } from "./langchain.js";
-export async function executeIt( payload : any , user :any){ 
-        const nodes = (payload.nodes); 
-        const connections = JSON.stringify(payload.connections);
+export async function executeIt( payload : any , user :any  , indexToStartWith ?: number){ 
+        const nodes = JSON.parse(payload.nodes); 
+        const connections = (payload.connections);
         const sortedArray = preOrderTraversal(connections) ; 
         
         const userId  = user;
@@ -15,14 +15,14 @@ export async function executeIt( payload : any , user :any){
         // console.log("nodes " + nodes)
         //now we have to execute the nodes(sources) of the sorted array by processing the nodes
         //take the data from the nodes 
-
-        for(let i = 0 ; i < sortedArray.length ; i++){ 
+        let i  = 0 
+        if(indexToStartWith){ 
+            i = indexToStartWith;
+        }
+        for( ; i < sortedArray.length ; i++){ 
             
             const processtoexecute = sortedArray[i].target
             const proces :node = nodes[processtoexecute-1]!
-            if(proces.data.afterPlayNodes){ 
-                i = proces.data.afterPlayNodes;
-            }
             console.log('currently executing process no ' + processtoexecute);
             console.log("the process / node " + JSON.stringify(proces))
             if(proces.data.label == 'trigger'){ 

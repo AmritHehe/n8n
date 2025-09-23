@@ -166,8 +166,8 @@ app.put('/workflow/:id' , Usemiddleware ,async (req , res)=> {
                //add new data here 
                title : "updated data" , 
                //JSON stringify is only for backend , as our frontend already send the data in string only 
-               nodes :  JSON.stringify(data.nodes), 
-               Connections :JSON.stringify(data.connections) , 
+               nodes :  (data.nodes), 
+               Connections :(data.connections) , 
                userId : userId
             }
         })
@@ -222,6 +222,7 @@ app.all('/webhook/:id' , Usemiddleware  , async(req , res) => {
             }
             else{ 
                 nodes[indexToUpdate].data.webhook = true;
+                let indexToStartWith = nodes[indexToUpdate].data.afterPlayNodes ;
                 // webHookNode.data.webhook = true;
                 console.log(" updated the webhook " + JSON.stringify(nodes[indexToUpdate]))   
                     await prismaClient.workflow.update({ 
@@ -235,11 +236,11 @@ app.all('/webhook/:id' , Usemiddleware  , async(req , res) => {
                     })
                     //call execute here
                     const payload = { 
-                        nodes : nodes , 
-                        connections : connections 
+                        nodes :JSON.stringify(nodes) , 
+                        connections : JSON.stringify(connections) 
                     }
                     res.json("executed the webhook");
-                    executeIt(payload , userId)
+                    executeIt(payload , userId ,  indexToStartWith)
             }
 
         } 
