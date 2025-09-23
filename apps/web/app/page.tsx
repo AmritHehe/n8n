@@ -8,6 +8,7 @@ import '@xyflow/react/dist/style.css';
 import { TeligramNode } from "./teligram";
 import { Trigger } from "./Trigger";
 import { Gmail } from "./Gmail";
+import { Webhook } from "./Webhook";
 import axios from "axios";
 
 
@@ -21,7 +22,8 @@ const inititalNodes = [{
 const nodeTypes = { 
   telegram : TeligramNode ,
   trigger : Trigger , 
-  gmail : Gmail
+  gmail : Gmail , 
+  webhook : Webhook
 }
 
 
@@ -32,7 +34,7 @@ export default function App() {
   const [nodes ,setNodes , onNodeChange] = useNodesState(inititalNodes)
   const [edges , setEdges , onEdgesChange] = useEdgesState(initialEdges)
   const [token , setToken ] = useState<string|null>(null)
-  function addNode(name : string){ 
+  function addNode(name : string , webhook ?: boolean , isExecuting ?:boolean){ 
     let size = (nodes.length + 1).toString()
     console.log("size" + size)
     
@@ -40,7 +42,23 @@ export default function App() {
       id : size , 
       position : { x : 200 , y : 200} , 
       data : { label : 'action', 
-        message : ""
+        message : "", 
+      } , 
+      type : name
+    }])
+  }
+  function addWebhookNode(name : string ){ 
+    let size = (nodes.length + 1).toString()
+    console.log("size" + size)
+    
+    setNodes(nodes => [...nodes , { 
+      id : size , 
+      position : { x : 200 , y : 200} , 
+      data : { label : 'action', 
+        message : "", 
+        webhook : false , 
+        isExecuting : false ,
+        afterPlayNodes : null
       } , 
       type : name
     }])
@@ -66,7 +84,7 @@ export default function App() {
         const noodes = JSON.parse(data.data.nodes);
         //@ts-ignore
         const cooonecs = JSON.parse(data.data.Connections)   ;
-        setNodes(noodes)
+        setNodes(noodes) 
         setEdges(cooonecs)
       }
 
@@ -119,6 +137,7 @@ export default function App() {
           
           <button onClick={()=> {addNode('telegram')}} className="bg-black rounded-lg p-2 m-2 text-white"> telegram </button>
           <button onClick={()=> {addNode('gmail')}} className="bg-black rounded-lg p-2 m-2 text-white"> gmail </button>
+          <button onClick={()=> {addWebhookNode('webhook')}} className="bg-black rounded-lg p-2 m-2 text-white"> webhook </button>
           <button className="bg-indigo-700 text-white font-bold p-2 m-2 rounded-xl " onClick={savegraph}> Save Graph </button>
           <button onClick={execute} className="bg-orange-600 text-amber-50 font bold px-4 py-3 m-2 rounded-xl"> Execute Workflow</button>
         </div> 
