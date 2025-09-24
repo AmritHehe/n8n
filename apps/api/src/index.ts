@@ -11,6 +11,7 @@ import cors from 'cors';
 import { preOrderTraversal } from './veryBigBrain.js';
 import { genai } from './langchain.js';
 import { executeIt } from './execute.js';
+import { FakeListChatMessageHistory } from '@langchain/core/utils/testing';
 const app  = express() ; 
 app.use(express.json()); 
 app.use(cors())
@@ -156,7 +157,11 @@ app.put('/workflow/:id' , Usemiddleware ,async (req , res)=> {
     const payload = req.body ;
     const id : number = Number(req.params.id);
     console.log("id + : "+ id)
-    const data = payload.data
+    const data = payload.data;
+    const FilteredNodes = JSON.parse(data.nodes)
+
+    FilteredNodes.forEach((i : node) => { i.type == 'webhook' || i.type == 'awaitGmail' ?( i.data.webhook = false  ,i.data.isExecuting = false , i.data.afterPlayNodes = undefined ) : console.log("wow bhay") })
+  
     try {
         const response = await prismaClient.workflow.update({ 
             where : { 
@@ -166,7 +171,7 @@ app.put('/workflow/:id' , Usemiddleware ,async (req , res)=> {
                //add new data here 
                title : "updated data" , 
                //JSON stringify is only for backend , as our frontend already send the data in string only 
-               nodes :  (data.nodes), 
+               nodes :  JSON.stringify(FilteredNodes), 
                Connections :(data.connections) , 
                userId : userId
             }
@@ -265,6 +270,12 @@ app.post('/execute' , Usemiddleware , async (req , res)=> {
     const id = payload.id; //this will be workflow id only  , considering there will be only 1 workflow
     //@ts-ignore
     const userId  = req.userId;
+    const FilteredNodes = JSON.parse(payload.nodes)
+    FilteredNodes.forEach((i : node) => { i.type == 'webhook' || i.type == 'awaitGmail' ?( i.data.webhook = false  ,i.data.isExecuting = false , i.data.afterPlayNodes = undefined ) : console.log("wow bhay") })
+
+    payload.nodes = JSON.stringify(FilteredNodes);
+    //we must take data from backend here instead of taking nodes and connections in payload
+    //one simple good solution to filter nodes here only and make isexecuting and webhook false here
     await executeIt(payload , userId)
     // const nodes = JSON.parse(payload.nodes); 
     // const connections = (payload.connections);
