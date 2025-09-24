@@ -34,7 +34,18 @@ export async function executeIt( payload : any , user :any  , indexToStartWith ?
                 if(proces.type == 'telegram'){ 
                     const message = proces.data.message!
                     console.log("reached inside telegram")
+                    let oldResponses;
                     try { 
+                        try{ 
+                            oldResponses = await prismaClient.responses.findFirst({ 
+                                where : { 
+                                    workflowId : 1
+                                }
+                            })
+                        }
+                        catch(err){ 
+                            console.error("prismaClient Serch Failed")
+                        }
                         const credentials = await prismaClient.credentials.findFirst({ 
                             where : { 
                                 userId : userId , 
@@ -42,9 +53,34 @@ export async function executeIt( payload : any , user :any  , indexToStartWith ?
                             }
                         })
                         const data = credentials!.data
-                        console.log('credentials data' + data)
-                        await telegramBot(data ,message)
                         
+                        console.log('credentials data' + data)
+                        if(proces.data.previousResponse){ 
+                            if(oldResponses){ 
+                                console.log("hi bhai ji bhai")
+                                let oldResponsesData = JSON.parse(oldResponses.data);
+                                let whichNodePreviousData = proces.data.previousResponseFromWhichNode; 
+                                console.log("old responses data  : " + JSON.stringify(oldResponsesData))
+                                if(whichNodePreviousData){ 
+                                    console.log("which node previous data : " + whichNodePreviousData)
+                                    let dataa = oldResponsesData.find((i : any) => i.outputNodeIndex == whichNodePreviousData)
+                                    console.log(" dataa"+ JSON.stringify(dataa))
+                                    let Message = dataa.data
+                                    console.log("message "+ Message)
+                                    console.log(" data : " + JSON.stringify(dataa)) ; 
+                                    console.log(" message "  + Message)
+                                    await telegramBot(data , Message )
+
+                                }
+                                
+                                
+
+                            }
+                            
+                        }
+                        else { 
+                            await telegramBot(data ,message)
+                        } 
                     }
                     catch(e) { 
                         // res.status(403).json("the error " + e)

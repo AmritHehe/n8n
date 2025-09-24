@@ -9,7 +9,9 @@ export interface node {
         subject ?: string ;
         isExecuting ?: boolean ;
         to ?: string;
-        afterPlayNodes ?: number
+        afterPlayNodes ?: number ; 
+        previousResponse ?: boolean ; 
+        previousResponseFromWhichNode ?: number
     };
     measured : { 
         width : number , 

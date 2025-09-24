@@ -104,7 +104,7 @@ app.get('/workflow' , Usemiddleware ,async (req , res)=> {
 app.post('/workflow/:id', Usemiddleware ,async (req , res)=> { 
     //create new node and dump it there as a json , what it does 
     //@ts-ignore
-    const id = parseInt(req.params.id)
+    const id : number= parseInt(req.params.id)
     console.log(typeof(id))
     const payload = req.body ; 
     console.log("id + : "+ id)
@@ -118,16 +118,32 @@ app.post('/workflow/:id', Usemiddleware ,async (req , res)=> {
     //@ts-ignore
     const userId = req.userId 
     console.log("hitted the data")
-    await prismaClient.workflow.create({ 
-        data : { 
-            title : "data" , 
-            nodes : nodes , 
-            Connections : connections ,
-            userId : userId , 
-        }
-    })
-    console.log("data" + JSON.stringify(payload.data) )
-    res.json("done")
+    try {
+        await prismaClient.workflow.create({ 
+            data : { 
+                title : "data" , 
+                nodes : nodes , 
+                Connections : connections ,
+                userId : userId , 
+            }
+        })
+        await prismaClient.responses.create({ 
+            data : { 
+                workflowId : id,
+                data : "",
+                userId : userId
+            }
+        })
+        console.log("data" + JSON.stringify(payload.data) )
+
+        res.json("done")
+    }
+    catch(err){ 
+        console.error(" error hogis " + err)
+        res.json("something bad happened")
+    } 
+    
+    
     //nodes mein we ll just push nodes and connections to be 
 
 
@@ -176,6 +192,16 @@ app.put('/workflow/:id' , Usemiddleware ,async (req , res)=> {
                userId : userId
             }
         })
+        await prismaClient.responses.update({ 
+            where : { 
+                id : 1
+            },
+            data : { 
+                workflowId : id,
+                data : "",
+                userId : userId
+            }
+        })
         res.json("updated the data" + response)
     } catch (error) {
         console.log(error)
@@ -206,6 +232,7 @@ app.all('/webhook/:id' , Usemiddleware  , async(req , res) => {
     const id  :number = Number( req.params.id ); 
     //@ts-ignore
     const userId = req.userId;
+    const ResponseData = req.body.message;
     //we need workflowID here , assuming that there is one workflow only
     //ab ye node already hai db mein , we just have to update its value to true and hit the execution end point again 
     try{ 
@@ -218,8 +245,12 @@ app.all('/webhook/:id' , Usemiddleware  , async(req , res) => {
             const nodes = JSON.parse(data.nodes);
             const connections = JSON.parse(data.Connections)
             // const webHookNode  = nodes.find((value : node ) => value.id == id);
-            
-            const indexToUpdate = nodes.findIndex((value : node) => value.id == id)
+            console.log("webhook id : " + id)
+            const indexToUpdate = nodes.findIndex((value : node) => value.id == id);
+            const payloadToSend= { 
+                data : ResponseData , 
+                outputNodeIndex : id 
+            }
             if(nodes[indexToUpdate].data.isExecuting == false){ 
                 console.log(" nodes " + JSON.stringify(nodes[indexToUpdate]))   
 
@@ -239,6 +270,40 @@ app.all('/webhook/:id' , Usemiddleware  , async(req , res) => {
                             nodes : JSON.stringify(nodes)
                         }
                     })
+                    if(ResponseData){ 
+                        console.log("yha tk agya lesgo")
+                        const oldData =  await prismaClient.responses.findFirst({
+                            where : { 
+                                id : 1
+                            }
+                        })
+                        if(oldData){ 
+                            console.log("yha tk agya hu olddata ke andr")
+                            let newData
+                            if(oldData.data == ""){ 
+                                 newData = [ payloadToSend ]
+
+                            }
+                            else {
+                            let parsedOldData = JSON.parse(oldData?.data)
+                             newData = [...parsedOldData , payloadToSend ]
+                            }
+                            
+                            console.log("new Data " + JSON.stringify(newData))
+                            await prismaClient.responses.update({ 
+                                where : { 
+                                    id : 1 
+                                } ,
+                                data : { 
+                                    data : JSON.stringify(newData) 
+                                }
+                            })
+                            console.log("updated the data")
+                        }
+                    }
+                        
+                        
+                    
                     //call execute here
                     const payload = { 
                         nodes :JSON.stringify(nodes) , 
