@@ -1,4 +1,4 @@
-import express, { response } from 'express' ; 
+import express, { request, response } from 'express' ; 
 import jwt  from 'jsonwebtoken' ; 
 import { prismaClient }  from '@repo/database/client'; 
 import type { node } from './types.js';
@@ -76,14 +76,22 @@ app.post('/workflow' , Usemiddleware, async (req , res)=> {
     //@ts-ignore
     const userId = req.userId  
     //prisma call to make a new emty workspace
-    await prismaClient.workflow.create({ 
+    const response = await prismaClient.workflow.create({ 
         data : { 
             title : title , 
-            nodes : nodes , 
-            Connections : connections ,
+            nodes : JSON.stringify(nodes) , 
+            Connections : JSON.stringify(connections) ,
             userId : userId
         }
     })
+    await prismaClient.responses.create({ 
+            data : { 
+                workflowId : response.id,
+                data : "",
+                userId : userId
+            }
+        })
+    res.json(response)
     //do a db call to post the nodes
 })
 
@@ -92,13 +100,34 @@ app.get('/workflow' , Usemiddleware ,async (req , res)=> {
     //yha bs ek be call jayega vo call karega aur sara data be se le aayega
 
     //@ts-ignore
-    const userId = req.userId
-    await prismaClient.workflow.findMany({ 
-        where : { 
-            userId : userId
-        }
-    })
+    const userId = req.userId; 
+    try { 
+        const data = await prismaClient.workflow.findMany({ 
+            where : { 
+                userId : userId
+            }
+        })
+        res.json(data)
+    }
+    catch(e) { 
+        res.json("erro hogis" + e)
+    }
+    
 
+})
+app.delete('/workflow' , Usemiddleware , async(req , res) => { 
+    const id = req.body.id; 
+    try{ 
+        const data = await prismaClient.workflow.delete({ 
+            where : { 
+                id : id
+            }
+        })
+        res.json(data)
+    }
+    catch(e){ 
+        console.log("error happened " + e) 
+    }
 })
 
 app.post('/workflow/:id', Usemiddleware ,async (req , res)=> { 
@@ -121,6 +150,7 @@ app.post('/workflow/:id', Usemiddleware ,async (req , res)=> {
     try {
         await prismaClient.workflow.create({ 
             data : { 
+                id : 1 , 
                 title : "data" , 
                 nodes : nodes , 
                 Connections : connections ,
@@ -172,6 +202,7 @@ app.put('/workflow/:id' , Usemiddleware ,async (req , res)=> {
     const userId = req.userId ;
     const payload = req.body ;
     const id : number = Number(req.params.id);
+    console.log("checking req params id "  + id )
     console.log("id + : "+ id)
     const data = payload.data;
     const FilteredNodes = JSON.parse(data.nodes)
@@ -194,7 +225,7 @@ app.put('/workflow/:id' , Usemiddleware ,async (req , res)=> {
         })
         await prismaClient.responses.update({ 
             where : { 
-                id : 1
+                workflowId : id
             },
             data : { 
                 workflowId : id,
@@ -233,12 +264,14 @@ app.all('/webhook/:id' , Usemiddleware  , async(req , res) => {
     //@ts-ignore
     const userId = req.userId;
     const ResponseData = req.body.message;
+    const workflowId = req.body.id;
+    console.log("workflow Id " + workflowId)
     //we need workflowID here , assuming that there is one workflow only
     //ab ye node already hai db mein , we just have to update its value to true and hit the execution end point again 
     try{ 
         const data = await prismaClient.workflow.findFirst({ 
             where : { 
-                id : 1
+                id : workflowId
             }
         })
         if(data){ 
@@ -263,7 +296,7 @@ app.all('/webhook/:id' , Usemiddleware  , async(req , res) => {
                 console.log(" updated the webhook " + JSON.stringify(nodes[indexToUpdate]))   
                     await prismaClient.workflow.update({ 
                         where : { 
-                            id : 1
+                            id : workflowId
                         } , 
                         data : { 
                             title : "changed the webhook " ,
@@ -274,7 +307,7 @@ app.all('/webhook/:id' , Usemiddleware  , async(req , res) => {
                         console.log("yha tk agya lesgo")
                         const oldData =  await prismaClient.responses.findFirst({
                             where : { 
-                                id : 1
+                                workflowId : workflowId
                             }
                         })
                         if(oldData){ 
@@ -292,7 +325,7 @@ app.all('/webhook/:id' , Usemiddleware  , async(req , res) => {
                             console.log("new Data " + JSON.stringify(newData))
                             await prismaClient.responses.update({ 
                                 where : { 
-                                    id : 1 
+                                    workflowId : workflowId 
                                 } ,
                                 data : { 
                                     data : JSON.stringify(newData) 
@@ -301,16 +334,14 @@ app.all('/webhook/:id' , Usemiddleware  , async(req , res) => {
                             console.log("updated the data")
                         }
                     }
-                        
-                        
-                    
                     //call execute here
                     const payload = { 
                         nodes :JSON.stringify(nodes) , 
                         connections : JSON.stringify(connections) 
                     }
                     res.json("executed the webhook");
-                    executeIt(payload , userId ,  indexToStartWith)
+                    executeIt(payload , userId ,  workflowId ,  indexToStartWith ,)
+                    
             }
 
         } 
@@ -330,9 +361,8 @@ app.all('/webhook/:id' , Usemiddleware  , async(req , res) => {
 })
 
 app.post('/execute' , Usemiddleware , async (req , res)=> { 
-
     const payload = req.body;
-    const id = payload.id; //this will be workflow id only  , considering there will be only 1 workflow
+    const  workflowId = payload.id; //this will be workflow id only  , considering there will be only 1 workflow
     //@ts-ignore
     const userId  = req.userId;
     const FilteredNodes = JSON.parse(payload.nodes)
@@ -341,7 +371,7 @@ app.post('/execute' , Usemiddleware , async (req , res)=> {
     payload.nodes = JSON.stringify(FilteredNodes);
     //we must take data from backend here instead of taking nodes and connections in payload
     //one simple good solution to filter nodes here only and make isexecuting and webhook false here
-    await executeIt(payload , userId)
+    await executeIt(payload , userId , workflowId)
     // const nodes = JSON.parse(payload.nodes); 
     // const connections = (payload.connections);
     // const sortedArray = preOrderTraversal(connections) ; 

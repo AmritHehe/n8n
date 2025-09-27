@@ -4,7 +4,7 @@ import { prismaClient }  from '@repo/database/client';
 import { telegramBot } from "./teligram.js";
 import { gmail } from "./gmail.js";
 import { genai } from "./langchain.js";
-export async function executeIt( payload : any , user :any  , indexToStartWith ?: number){ 
+export async function executeIt( payload : any , user :any  , workflowId : number , indexToStartWith ?: number){ 
         const nodes = JSON.parse(payload.nodes); 
         const connections = (payload.connections);
         const sortedArray = preOrderTraversal(connections) ; 
@@ -12,6 +12,7 @@ export async function executeIt( payload : any , user :any  , indexToStartWith ?
         const userId  = user;
         
         console.log('userId : ' + userId)
+        // console.log("hello I got this this data , payload : " + JSON.stringify(payload)  + " user " + JSON.stringify(user) + " workflowID " + workflowId    + "index to start with " + indexToStartWith    )
         // console.log("nodes " + nodes)
         //now we have to execute the nodes(sources) of the sorted array by processing the nodes
         //take the data from the nodes 
@@ -39,7 +40,7 @@ export async function executeIt( payload : any , user :any  , indexToStartWith ?
                         try{ 
                             oldResponses = await prismaClient.responses.findFirst({ 
                                 where : { 
-                                    workflowId : 1
+                                    workflowId : workflowId
                                 }
                             })
                         }
@@ -58,6 +59,7 @@ export async function executeIt( payload : any , user :any  , indexToStartWith ?
                         if(proces.data.previousResponse){ 
                             if(oldResponses){ 
                                 console.log("hi bhai ji bhai")
+                                console.log(" old responses" + JSON.stringify(oldResponses))
                                 let oldResponsesData = JSON.parse(oldResponses.data);
                                 let whichNodePreviousData = proces.data.previousResponseFromWhichNode; 
                                 console.log("old responses data  : " + JSON.stringify(oldResponsesData))
@@ -142,7 +144,7 @@ export async function executeIt( payload : any , user :any  , indexToStartWith ?
                         nodes[processtoexecute-1].data.isExecuting = true;
                         await prismaClient.workflow.update({
                             where : { 
-                                id : 1
+                                id : workflowId
                             }, 
                             data : { 
                                 title : "now it must work",
@@ -180,7 +182,7 @@ export async function executeIt( payload : any , user :any  , indexToStartWith ?
                             nodes[processtoexecute-1].data.isExecuting = true;
                             await prismaClient.workflow.update({
                                 where : { 
-                                    id : 1
+                                    id : workflowId
                                 }, 
                                 data : { 
                                     title : "now it must work",
