@@ -3,9 +3,9 @@ export async  function gmail(data : any , to : string, subject : string, message
     //user ke credentials , 
     try{
         const transporter = nodemailer.createTransport({
-            host: 'smtp.resend.com',
+            host: data.HOST ,
             secure: true,
-            port: 465,
+            port: data.PORT,
             auth: {
                 user: data.username,
                 pass: data.password

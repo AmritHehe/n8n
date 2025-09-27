@@ -446,14 +446,30 @@ app.post('/execute' , Usemiddleware , async (req , res)=> {
     res.json('send the message bhai ab jao cold coffee pi aao')
     
 })
-
+app.get('/api/v1/credentials' , Usemiddleware  ,  async ( req , res) => { 
+    //@ts-ignore
+    const userId  = req.userId; 
+    try { 
+        const data = await prismaClient.credentials.findMany({ 
+            where : { 
+                userId : userId
+            }
+        })
+        console.log(" data " + JSON.stringify(data) );
+        res.json(data)
+    }
+    catch(e){ 
+        console.log("this credentials end point is not working , error :  "   + e )
+        res.json("something went wrong " + e)
+    }
+})
 app.post('/api/v1/credentials', Usemiddleware , async(req , res) => { 
     //use middleware
     const payload = req.body;
     //@ts-ignore
     const userId  = req.userId;
     try{ 
-        await prismaClient.credentials.create({ 
+        const response = await prismaClient.credentials.create({ 
             data : {    
                 title : payload.title , 
                 platform : payload.platform , 
@@ -462,7 +478,7 @@ app.post('/api/v1/credentials', Usemiddleware , async(req , res) => {
             }
         
         })
-        res.json("created the credentials table")
+        res.json({id : response.id})
     }
     catch(err){ 
         res.status(411).json("something went wrong" + err)
@@ -475,15 +491,8 @@ app.delete('/api/v1/credentials' , Usemiddleware ,async(req , res)=> {
     const payload = req.body;
     //@ts-ignore
     const userId = req.userId; 
-    const platform = payload.platform; 
+    const id = payload.id; 
     try{ 
-        const data  = await prismaClient.credentials.findFirst({ 
-            where : { 
-                platform : platform , 
-                userId : userId
-            }
-        })
-        const id = data?.id
         if(id){
             const response = await prismaClient.credentials.delete({ 
                 where : { 
@@ -499,6 +508,20 @@ app.delete('/api/v1/credentials' , Usemiddleware ,async(req , res)=> {
     
 
 })
+// let client :any = null
+// app.get('/task-status' , async(req , res)=> { 
+//     res.setHeader('Content-type' , 'text/event-stream'); 
+//     res.setHeader('Cache-control' , 'no-cache'); 
+//     res.setHeader('Connection' , 'keep-alive'); 
+
+//     function GiveUpdate(data : string){ 
+//         res.write( data );
+//     }
+//     client = res;
+//     res.write(" we are connected")
+
+// })
+        
 
 app.listen(3002 , ()=> { 
     console.log("listening to port 3002")
