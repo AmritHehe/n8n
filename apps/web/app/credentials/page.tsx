@@ -1,28 +1,45 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import axios from "axios";
+import axios, { get } from "axios";
 import CredentialInput from "../components/CredentialInput";
 import CredentialCard from "../components/CredentialCard";
+import { redirect } from "next/navigation";
+import jwt from 'jsonwebtoken';
 
 const Credentials = () => {
   const [existingCredentials, setExistingCredentials] = useState<any[]>([]);
   const [showCreateForm, setShowCreateForm] = useState<string | null>(null);
 
-  const [telegramData, setTelegramData] = useState({ botToken: "", chatId: "" });
-  const [smtpData, setSmtpData] = useState({ host: "", port: "", username: "", password: "" });
-
-  const [loading, setLoading] = useState<string | null>(null);
+  const [telegramData, setTelegramData] = useState({ token: "", chatId: "" });
+  const [smtpData, setSmtpData] = useState({  HOST: "", PORT: "", username: "", password: "" });
+  const [token , setToken ] = useState<string>()
+  const [loading, setLoading] = useState<string | null |number>(null);
   const [message, setMessage] = useState<string | null>(null);
-
   useEffect(() => {
+    getToken()
     fetchCredentials();
   }, []);
-
+  function getToken(){ 
+    const token = localStorage.getItem('token')!
+    if(!token) { 
+      redirect('/signin')
+    }
+   
+    setToken(token)
+    // console.log("token " + token )
+  }
   const fetchCredentials = async () => {
+    const token = localStorage.getItem('token')
+    console.log("token inside fetch credentials " + token )
     try {
-      const response = await axios.get("/api/v1/credentials");
+      const response = await axios.get("http://localhost:3002/api/v1/credentials", { 
+        headers : { 
+          authorization : token
+        }
+      });
       const data = response.data;
+      console.log("data : + " + JSON.stringify(data))
       setExistingCredentials(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Failed to fetch credentials:", error);
@@ -31,15 +48,19 @@ const Credentials = () => {
   };
 
   const saveTelegramCredential = async () => {
-    if (!telegramData.botToken || !telegramData.chatId) {
+    if (!telegramData.token || !telegramData.chatId) {
       setMessage("Please fill all Telegram fields");
       return;
     }
     setLoading("telegram");
     try {
-      await axios.post("/api/v1/credentials", { title: "Telegram Send Message", platform: "telegram", data: telegramData });
+      const res = await axios.post("http://localhost:3002/api/v1/credentials", { title: "Telegram Send Message", platform: "teligram", data: telegramData } , {  headers : { 
+        authorization : token
+
+      } } 
+    );
       setMessage("Telegram credentials saved successfully!");
-      setTelegramData({ botToken: "", chatId: "" });
+      setTelegramData({ token: "", chatId: ""  });
       setShowCreateForm(null);
       fetchCredentials();
     } catch (error) {
@@ -50,15 +71,20 @@ const Credentials = () => {
   };
 
   const saveSMTPCredential = async () => {
-    if (!smtpData.host || !smtpData.port || !smtpData.username || !smtpData.password) {
+    if (!smtpData.HOST || !smtpData.PORT || !smtpData.username || !smtpData.password) {
       setMessage("Please fill all SMTP fields");
       return;
     }
     setLoading("smtp");
     try {
-      await axios.post("/api/v1/credentials", { title: "SMTP Account", platform: "smtp", data: smtpData });
+      await axios.post("http://localhost:3002/api/v1/credentials", { title: "SMTP Account", platform: "smtp", data: smtpData } , { 
+        headers  : { 
+          authorization : token
+
+        }
+      });
       setMessage("SMTP credentials saved successfully!");
-      setSmtpData({ host: "", port: "", username: "", password: "" });
+      setSmtpData({ HOST: "", PORT: "", username: "", password: "" });
       setShowCreateForm(null);
       fetchCredentials();
     } catch (error) {
@@ -68,14 +94,23 @@ const Credentials = () => {
     setLoading(null);
   };
 
-  const deleteCredential = async (platform: string) => {
-    setLoading(platform);
+  const deleteCredential = async (id: number) => {
+    setLoading(id);
+    console.log("token")
     try {
-      await axios.delete("/api/v1/credentials", { data: { platform } });
-      setMessage(`${platform} credentials deleted successfully!`);
+      await axios.delete("http://localhost:3002/api/v1/credentials",{ 
+        headers : { 
+          authorization : token
+
+        }, 
+        data : { 
+          id : id
+        }
+      } as any );
+      setMessage(`credential with ${id}  deleted successfully!`);
       fetchCredentials();
     } catch (error) {
-      setMessage(`Failed to delete ${platform} credentials`);
+      setMessage(`Failed to delete credential with id : ${id} `);
       console.error(error);
     }
     setLoading(null);
@@ -126,8 +161,9 @@ const Credentials = () => {
                 <div key={idx} className="bg-[hsl(var(--surface)/0.6)] backdrop-blur-xl border border-[hsl(var(--border))] rounded-[var(--radius-lg)] p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
+                      <h4 className="font-semibold text-lg">{cred.id}</h4>
                       <div className="w-12 h-12 bg-[hsl(var(--primary)/0.2)] rounded-[var(--radius)] flex items-center justify-center">
-                        {cred.platform === "telegram" ? (
+                        {cred.platform === "teligram" ? (
                           <svg className="w-6 h-6 text-[hsl(var(--primary))]" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.820 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
                           </svg>
@@ -143,7 +179,7 @@ const Credentials = () => {
                       </div>
                     </div>
                     <button
-                      onClick={() => deleteCredential(cred.platform)}
+                      onClick={() => deleteCredential(cred.id)}
                       disabled={loading === cred.platform}
                       className="px-4 py-2 bg-[hsl(var(--error)/0.2)] text-[hsl(var(--error))] border border-[hsl(var(--error)/0.4)] rounded-[var(--radius)] hover:bg-[hsl(var(--error)/0.3)] transition-[var(--transition-smooth)]"
                     >
@@ -207,8 +243,8 @@ const Credentials = () => {
                   label="Bot Token"
                   type="password"
                   placeholder="Enter your bot token"
-                  value={telegramData.botToken}
-                  onChange={(value) => setTelegramData((prev) => ({ ...prev, botToken: value }))}
+                  value={telegramData.token}
+                  onChange={(value) => setTelegramData((prev) => ({ ...prev, token: value }))}
                   required
                 />
                 <CredentialInput
@@ -233,16 +269,16 @@ const Credentials = () => {
                 <CredentialInput
                   label="SMTP Host"
                   placeholder="smtp.gmail.com"
-                  value={smtpData.host}
-                  onChange={(value) => setSmtpData((prev) => ({ ...prev, host: value }))}
+                  value={smtpData.HOST}
+                  onChange={(value) => setSmtpData((prev) => ({ ...prev, HOST: value }))}
                   required
                 />
                 <CredentialInput
                   label="Port"
                   type="number"
                   placeholder="587"
-                  value={smtpData.port}
-                  onChange={(value) => setSmtpData((prev) => ({ ...prev, port: value }))}
+                  value={smtpData.PORT}
+                  onChange={(value) => setSmtpData((prev) => ({ ...prev, PORT: value }))}
                   required
                 />
                 <CredentialInput
