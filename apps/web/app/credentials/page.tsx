@@ -94,7 +94,7 @@ const Credentials = () => {
     setLoading(null);
   };
 
-  const deleteCredential = async (id: number) => {
+  const deleteCredential = async (id: number , platform : string) => {
     setLoading(id);
     console.log("token")
     try {
@@ -107,10 +107,10 @@ const Credentials = () => {
           id : id
         }
       } as any );
-      setMessage(`credential with ${id}  deleted successfully!`);
+      setMessage(` ${platform} credential with ${id}  deleted successfully!`);
       fetchCredentials();
     } catch (error) {
-      setMessage(`Failed to delete credential with id : ${id} `);
+      setMessage(`Failed to delete ${platform} credential with id : ${id} `);
       console.error(error);
     }
     setLoading(null);
@@ -179,7 +179,7 @@ const Credentials = () => {
                       </div>
                     </div>
                     <button
-                      onClick={() => deleteCredential(cred.id)}
+                      onClick={() => deleteCredential(cred.id , cred.platform )}
                       disabled={loading === cred.platform}
                       className="px-4 py-2 bg-[hsl(var(--error)/0.2)] text-[hsl(var(--error))] border border-[hsl(var(--error)/0.4)] rounded-[var(--radius)] hover:bg-[hsl(var(--error)/0.3)] transition-[var(--transition-smooth)]"
                     >

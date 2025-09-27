@@ -2,23 +2,38 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
-
-
+import { redirect } from 'next/navigation';
 const Workflows = () => {
   const [workflows, setWorkflows] = useState<any[]>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newWorkflowTitle, setNewWorkflowTitle] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-
+  const [token , setToken ] = useState<string>()
   useEffect(() => {
     fetchWorkflows();
+    getToken();
   }, []);
 
+  function getToken(){ 
+      const tokennn = localStorage.getItem("token")
+      if(!tokennn) { 
+        redirect('/signin')
+      }
+     
+      setToken(tokennn)
+      // console.log("token " + tokennn )
+    }
   const fetchWorkflows = async () => {
     try {
-      const response = await axios.get('/workflow');
+      const token = localStorage.getItem('token')
+      const response = await axios.get('http://localhost:3002/workflow' , { 
+        headers : { 
+          authorization : token 
+        }
+      });
       const data = response.data;
+      console.log("incoming data " + JSON.stringify(data))
       setWorkflows(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to fetch workflows:', error);
@@ -26,7 +41,29 @@ const Workflows = () => {
     }
   };
 
+  const deleteWorkflow = async (id: number  , title : string) => {
+    setLoading(true);
+    console.log("token")
+    try {
+      await axios.delete("http://localhost:3002/workflow",{ 
+        headers : { 
+          authorization : token
+
+        }, 
+        data : { 
+          id : id
+        }
+      } as any );
+      setMessage(`workflow ${title}  deleted successfully!`);
+      fetchWorkflows();
+    } catch (error) {
+      setMessage(`Failed to delete credential with id : ${title} `);
+      console.error(error);
+    }
+    setLoading(false);
+  };
   const createWorkflow = async () => {
+    // const token = localStorage.getItem('token');
     if (!newWorkflowTitle.trim()) {
       setMessage('Please enter a workflow title');
       return;
@@ -34,10 +71,14 @@ const Workflows = () => {
 
     setLoading(true);
     try {
-      await axios.post('/workflow', {
+      await axios.post('http://localhost:3002/workflow', {
         title: newWorkflowTitle,
         nodes: [],
         connections: []
+      } , { 
+        headers : { 
+          authorization : token
+        }
       });
       setMessage('Workflow created successfully!');
       setNewWorkflowTitle('');
@@ -133,9 +174,8 @@ const Workflows = () => {
         {Array.isArray(workflows) && workflows.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {workflows.map((workflow) => (
-              <Link
+              <div
                 key={workflow.id}
-                href={`/workflow/${workflow.id}`}
                 className="bg-[hsl(var(--surface))]/60 backdrop-blur-xl border border-[hsl(var(--border))] rounded-2xl p-6 hover:border-[hsl(var(--primary))]/50 hover:scale-105 transition-[var(--transition-slow)] group"
               >
                 <div className="flex items-center gap-3 mb-4">
@@ -149,19 +189,35 @@ const Workflows = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg text-[hsl(var(--foreground))] group-hover:text-[hsl(var(--primary))] transition-colors">
-                      {workflow.title || 'Untitled Workflow'}
-                    </h3>
-                    <p className="text-sm text-[hsl(var(--foreground-muted))]">
-                      {workflow.nodes?.length || 0} nodes
-                    </p>
-                  </div>
+                  <Link 
+                    key={workflow.id}
+                    href={`/workflow/${workflow.id}`}
+                  >
+                    <div className="flex-1">
+          
+                      <h3 className="font-semibold text-lg text-[hsl(var(--foreground))] group-hover:text-[hsl(var(--primary))] transition-colors">
+                        {workflow.title || 'Untitled Workflow'}
+                      </h3>
+
+                      <p className="text-sm text-[hsl(var(--foreground-muted))]">
+                        {(JSON.parse(workflow.nodes)).length|| 0} nodes
+                      </p>
+                    
+                    </div>
+                    </Link>
+                  <button
+                      onClick={() => deleteWorkflow(workflow.id , workflow.title)}
+                      // disabled={loading === true}
+                      className="px-4 py-2 bg-[hsl(var(--error)/0.2)] text-[hsl(var(--error))] border border-[hsl(var(--error)/0.4)] rounded-[var(--radius)] hover:bg-[hsl(var(--error)/0.3)] transition-[var(--transition-smooth)]"
+                    >
+                      Delete
+                    </button>
                 </div>
                 <div className="text-xs text-[hsl(var(--foreground-dim))]">
                   Created: {new Date(workflow.createdAt).toLocaleDateString()}
                 </div>
-              </Link>
+              
+              </div>
             ))}
           </div>
         ) : (

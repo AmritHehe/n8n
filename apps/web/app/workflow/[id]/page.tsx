@@ -5,12 +5,12 @@ import { Button } from "@repo/ui/button";
 import { useState, useCallback, useEffect } from 'react';
 import { ReactFlow, applyNodeChanges, applyEdgeChanges, addEdge  , Background , Controls, Position, useReactFlow, useNodesState, useEdgesState } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { TeligramNode } from "./teligram";
-import { Trigger } from "./Trigger";
-import { Gmail } from "./Gmail";
-import { Webhook } from "./Webhook";
+import { TeligramNode } from "../../teligram";
+import { Trigger } from "../../Trigger";
+import { Gmail } from "../../Gmail";
+import { Webhook } from "../../Webhook";
 import axios from "axios";
-import { AwaitGmail } from "./AwaitGmail";
+import { AwaitGmail } from "../../AwaitGmail";
 
 
 const inititalNodes = [{ 
@@ -32,7 +32,9 @@ const nodeTypes = {
 const initialEdges :any  = []
 
 
-export default function App() {
+export default function Wrokflow({params} : any) {
+  const id = Number(params.id)
+  console.log(" id  " + id)
   const [nodes ,setNodes , onNodeChange] = useNodesState(inititalNodes)
   const [edges , setEdges , onEdgesChange] = useEdgesState(initialEdges)
   const [token , setToken ] = useState<string|null>(null)
@@ -72,7 +74,7 @@ export default function App() {
       console.log("token " + tokenn )
       let data 
       async function datacall(){ 
-        data = await axios.get("http://localhost:3002/workflow/01" , { 
+        data = await axios.get(`http://localhost:3002/workflow/${id}` , { 
         
           headers : {  
             authorization  : tokenn
@@ -86,8 +88,11 @@ export default function App() {
         const noodes = JSON.parse(data.data.nodes);
         //@ts-ignore
         const cooonecs = JSON.parse(data.data.Connections)   ;
-        setNodes(noodes) 
-        setEdges(cooonecs)
+        if(noodes.length > 0){ 
+            setNodes(noodes) 
+            setEdges(cooonecs)
+        }
+   
       }
 
       datacall()
@@ -99,9 +104,11 @@ export default function App() {
   //@ts-ignore
   
   async function savegraph(){ 
-    console.log("inside savegraph function ")
+    
+    console.log("inside savegraph function ");
     console.log("nodes " + nodes + "edges" + edges)
-    const res = await axios.put('http://localhost:3002/workflow/01' ,  { 
+    console.log( " id from same graph " + id)
+    const res = await axios.put(`http://localhost:3002/workflow/${id}` ,  { 
         data : { 
           nodes : JSON.stringify(nodes) , 
           connections : JSON.stringify(edges) ,  
@@ -113,15 +120,14 @@ export default function App() {
         }
       }
     )
-    await axios.post('http://localhost:3002/responses')
     console.log("response " + res); 
     
   }
   async function  execute() {
     const response = await axios.post('http://localhost:3002/execute', { 
       nodes : JSON.stringify(nodes) , 
-      connections : JSON.stringify(edges) , 
-      id : 1
+      connections : JSON.stringify(edges) ,
+      id : id
     }, { 
       headers : { 
         authorization : token
