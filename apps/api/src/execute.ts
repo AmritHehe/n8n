@@ -10,7 +10,6 @@ export async function executeIt( payload : any , user :any  , workflowId : numbe
         const sortedArray = preOrderTraversal(connections) ; 
         
         const userId  = user;
-        
         console.log('userId : ' + userId)
         // console.log("hello I got this this data , payload : " + JSON.stringify(payload)  + " user " + JSON.stringify(user) + " workflowID " + workflowId    + "index to start with " + indexToStartWith    )
         // console.log("nodes " + nodes)
@@ -20,8 +19,18 @@ export async function executeIt( payload : any , user :any  , workflowId : numbe
         if(indexToStartWith){ 
             i = indexToStartWith;
         }
-        for( ; i < sortedArray.length ; i++){ 
-            
+        for( ; i <= sortedArray.length ; i++){ 
+            if(i == sortedArray.length){ 
+                await prismaClient.responses.update({ 
+                    where : { 
+                        workflowId : workflowId
+                    },
+                    data : { 
+                        data : JSON.stringify([])
+                    }
+                })
+                return ;
+            }    
             const processtoexecute = sortedArray[i].target
             const proces :node = nodes[processtoexecute-1]!
             console.log('currently executing process no ' + processtoexecute);
