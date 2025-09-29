@@ -5,7 +5,7 @@ import { useCallback, useState } from "react";
 export function Webhook({ id , data }: { id: string , data :any }) {
   const { setNodes } = useReactFlow();
   const { setEdges } = useReactFlow();
-
+  const workflowId = data.workflowId;
   function deleteNode() {
     setNodes((nds) => nds.filter((n) => n.id !== id));
     setEdges((edges)=>edges.filter((n)=>n.target!==id));
@@ -26,7 +26,7 @@ export function Webhook({ id , data }: { id: string , data :any }) {
                     {/* <input value={data?.to || ""}  onChange={(e)=>updateField("to" , e.target.value)} type="text" className="ronded-l p-2 m-2 bg-amber-100 text-black font-bold" placeholder="to :"   />
                     <input value={data?.subject || ""} onChange={(e)=>updateField("subject" , e.target.value)} type="text" className="ronded-l p-2 m-2 bg-amber-100 text-black font-bold" placeholder="subject : "/>
                     <input value={data?.message || ""} onChange={(e)=>updateField("message" , e.target.value)} type="text" className="ronded-l p-2 m-2 bg-amber-100 text-black font-bold" placeholder="body" /> */}
-                    <div className="text-white "> Webhook Link : {`http://localhost:3002/webhook/${id}`} </div>
+                    <div className="text-white "> Webhook Link : {`http://localhost:3002/webhook/${id}?workflowId=${workflowId}`} </div>
                 </div>
                  : <></> } 
             <div className="flex items-center justify-center shadow-zinc-600 bg-zinc-300 px-6 py-4 rounded-xl">
