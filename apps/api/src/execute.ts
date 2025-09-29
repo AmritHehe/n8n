@@ -4,15 +4,18 @@ import { prismaClient }  from '@repo/database/client';
 import { telegramBot } from "./teligram.js";
 import { gmail } from "./gmail.js";
 import { genai } from "./langchain.js";
+import { response } from "express";
 
-export async function executeIt( payload : any , user :any  , workflowId : number , indexToStartWith ?: number , ExecutedFirstIndex ?: boolean){ 
-        
+export async function executeIt( payload : any , user :any  , workflowId : number , indexToStartWith ?: number , ExecutedFirstIndex ?: boolean , logCallBack ?: (msg : string)=> void){ 
+       
+
         const nodes = JSON.parse(payload.nodes); 
         const connections = (payload.connections);
         const sortedArray = preOrderTraversal(connections) ; 
         
         const userId  = user;
         console.log('userId : ' + userId)
+        // logCallBack?.('userId : ' + userId)
         // console.log("hello I got this this data , payload : " + JSON.stringify(payload)  + " user " + JSON.stringify(user) + " workflowID " + workflowId    + "index to start with " + indexToStartWith    )
         // console.log("nodes " + nodes)
         //now we have to execute the nodes(sources) of the sorted array by processing the nodes
@@ -31,18 +34,22 @@ export async function executeIt( payload : any , user :any  , workflowId : numbe
                         data : JSON.stringify([])
                     }
                 })
+                logCallBack?.('done')
                 return ;
             }    
             let processtoexecute = sortedArray[i].target
             if(i==0 && ExecutedFirstIndex == false){ 
                 console.log("executed first index")
+
                 processtoexecute = 1;
                 i-- ;
                 ExecutedFirstIndex = true
             }
             const proces :node = nodes[processtoexecute-1]!
             console.log('currently executing process no ' + processtoexecute);
+            logCallBack?.("currently executing the process no . " + processtoexecute)
             console.log("the process / node " + JSON.stringify(proces))
+            // logCallBack?.('the node' + JSON.stringify(proces) )
             if(proces.data.label == 'trigger'){ 
                 // proces.done = true;
                 console.log('this done')
@@ -52,6 +59,7 @@ export async function executeIt( payload : any , user :any  , workflowId : numbe
                 if(proces.type == 'telegram'){ 
                     const message = proces.data.message!
                     console.log("reached inside telegram")
+                    logCallBack?.("executing telegram")
                     let oldResponses;
                     try { 
                         try{ 
@@ -103,7 +111,8 @@ export async function executeIt( payload : any , user :any  , workflowId : numbe
                     }
                     catch(e) { 
                         // res.status(403).json("the error " + e)
-                        console.log("process with id  : " + processtoexecute + " failed with error " + e )
+                        console.log( )
+                        logCallBack?.("process with id  : " + processtoexecute + " failed with error " + e)
                     }
                     //function call teligram
                     //check krenge ki kya us cheez ke credentials hai
@@ -115,6 +124,7 @@ export async function executeIt( payload : any , user :any  , workflowId : numbe
                     const to = proces.data.to!
                     try{ 
                         console.log('inside gmail execution part ')
+                        logCallBack?.("executing gmail")
                         const credentials = await prismaClient.credentials.findFirst({
                             where : { 
                                 userId : userId,
@@ -140,6 +150,7 @@ export async function executeIt( payload : any , user :any  , workflowId : numbe
                 else if(proces.type == 'agent'){ 
                     const message = proces.data.message; 
                     console.log("reached till here agent 1")
+                    logCallBack?.("executing agent")
                     try { 
                         if(message){ 
                             const ai_response = await genai(message); 
@@ -156,6 +167,7 @@ export async function executeIt( payload : any , user :any  , workflowId : numbe
                 else if(proces.type == 'webhook'){ 
                     if (proces.data.webhook==false){ 
                         console.log("waiting for webhook execution")
+                        logCallBack?.("waiting for webhook execution ! ")
                         proces.data.afterPlayNodes = i + 1;
                         proces.data.isExecuting = true;
                         nodes[processtoexecute-1].data.isExecuting = true;
@@ -174,7 +186,9 @@ export async function executeIt( payload : any , user :any  , workflowId : numbe
                     }
                     else { 
                         console.log("webhook executed")
+                        // logCallBack?.("webhook exceuted")
                     }
+
                 }
                 else if (proces.type == 'awaitGmail'){ 
                     const message = proces.data.message!
@@ -182,6 +196,7 @@ export async function executeIt( payload : any , user :any  , workflowId : numbe
                     const to = proces.data.to!
                     try{ 
                         console.log('inside gmail execution part ')
+                        logCallBack?.("executing  awaitGmail")
                         const credentials = await prismaClient.credentials.findFirst({
                             where : { 
                                 userId : userId,
@@ -194,6 +209,7 @@ export async function executeIt( payload : any , user :any  , workflowId : numbe
                         await gmail(data ,to ,  subject , message , true , proces.id )
                         if (proces.data.webhook==false){ 
                             console.log("waiting for user to respond ")
+                            logCallBack?.("awaiting telegram response")
                             proces.data.afterPlayNodes = i + 1;
                             proces.data.isExecuting = true;
                             nodes[processtoexecute-1].data.isExecuting = true;
@@ -212,6 +228,7 @@ export async function executeIt( payload : any , user :any  , workflowId : numbe
                         }
                         else { 
                             console.log("webhook executed")
+                            logCallBack?.("response arrived ")
                         }
 
                         // res.json('send the mail bhosdu yayaya')
@@ -219,6 +236,7 @@ export async function executeIt( payload : any , user :any  , workflowId : numbe
                     catch(err){ 
                         // res.status(403).json('didnt found the credentials')
                         console.log("process with id  : " + processtoexecute + " failed with error " + err )
+                        logCallBack?.("process with id  : " + processtoexecute + " failed with error " + err )
     
                     }
                 }

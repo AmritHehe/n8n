@@ -13,9 +13,12 @@ import { genai } from './langchain.js';
 import { executeIt } from './execute.js';
 import { FakeListChatMessageHistory } from '@langchain/core/utils/testing';
 import { useId } from 'react';
+import { number } from 'zod';
 const app  = express() ; 
 app.use(express.json()); 
 app.use(cors())
+const workflowLogStreams: { [workflowId: number]: ((msg: string) => void) | undefined } = {};
+
 const JWT_SECRET  : string = process.env.JWT_SECRET!;
 
 
@@ -342,10 +345,18 @@ app.all('/webhook/:id' ,Usemiddleware ,  async(req , res) => {
                         nodes :JSON.stringify(nodes) , 
                         connections : JSON.stringify(connections) 
                     }
-                    res.json("executed the webhook");
-                    executeIt(payload , userId ,  workflowId ,  indexToStartWith ,true)
+                    const logCallback = workflowLogStreams[workflowId]; // SSE callback from main execution
+
+                    // res.send({status : "continuing"})
+                    // res.json("executed the webhook");
+                    logCallback?.("Webhook executed, continuing remaining workflow");
+                    await executeIt(payload , userId ,  workflowId ,  indexToStartWith ,true ,logCallback)
+                    res.send({ status: "Webhook executed" });
                     
-            }
+
+
+                        
+            }   
 
         } 
 
@@ -479,6 +490,87 @@ app.post('/execute' , Usemiddleware , async (req , res)=> {
     res.json('send the message bhai ab jao cold coffee pi aao')
     
 })
+app.get('/execute/logs/:workflowId', async (req, res) => {
+  const { workflowId } = req.params;
+  //@ts-ignore
+  const token = req.query.token as string ;
+  if(!token){ 
+    return res.status(401).send('Unauthorized: Token missing');
+  }
+  const JWT_SECRET = process.env.JWT_SECRET! ;
+  console.log(JWT_SECRET)
+  const user = jwt.verify(token , JWT_SECRET)
+  //@ts-ignore
+  const userId = user.id;
+          
+  console.log("user Id sdjsdfmnvfx  : " + userId )
+  const id = Number(workflowId)
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.flushHeaders();
+
+  const sendLog = (msg: string) => {
+    res.write(`data: ${msg}\n\n`);
+  };
+  // Helper to send log messages
+    workflowLogStreams[id] = sendLog;
+    req.on("close", () => {
+    delete workflowLogStreams[id];
+  });
+    // sendLog("SSE connected. Waiting for workflow execution...");
+
+
+
+//   try { 
+//     const data = await prismaClient.workflow.findFirst({ 
+//         where : { 
+//             id : id
+//         } 
+//     })
+//     console.log(response)
+//     if(data){
+//         const noodes = (data.nodes);
+//         //@ts-ignore
+//         const cooonecs = (data.Connections) ;
+//         let payload = { 
+//             nodes : noodes,
+//             connections : cooonecs
+//         }
+//         try {
+//         // If executeIt can accept a callback for logs, we pass sendLog
+//         const response = await executeIt(
+//             payload ,
+//             userId,
+//             id,
+//             0,
+//             false,
+//             sendLog  // ✅ pass sendLog so logs are streamed
+//         );
+    
+//         if(response == 'done'){ 
+//             res.write(`event: done\ndata: Workflow finished\n\n`);
+//             res.end();
+//         }
+//         else { 
+//             setTimeout(u=> )
+//         }
+//     } catch (err) {
+//         sendLog(`Error: ${err}`);
+//         res.end();
+//     }
+//      }
+    
+//     }
+//     catch(e) { 
+//         console.log("prisma client error")
+//     }
+  
+
+  req.on("close", () => {
+    res.end();
+  });
+});
 app.get('/api/v1/credentials' , Usemiddleware  ,  async ( req , res) => { 
     //@ts-ignore
     const userId  = req.userId; 
