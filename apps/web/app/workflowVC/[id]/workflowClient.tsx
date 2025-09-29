@@ -37,7 +37,7 @@ import { AwaitGmail } from "../../AwaitGmail";
 
 
 
-const initialEdges: Edge[] = [];
+const initialEdges: any = [];
 
 
 const nodeTypes = { 
@@ -69,6 +69,8 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showSaveWarning, setShowSaveWarning] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
+  const [workflows, setWorkflows] = useState<any[]>([]);
+
   const [configModal, setConfigModal] = useState<{
     isOpen: boolean;
     nodeId: string | null;
@@ -145,26 +147,28 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
 
   const onConnect = useCallback(
     (params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
+    []
   );
 
   // Add first node (trigger)
   const addFirstNode = (name: string) => {
         if(name == 'webhook'){ 
             addWebhookNode(name , workflowId)
+            setShowRightPanel(false);
         }
         else { 
           let size = (nodes.length + 1).toString()
           const newNode: Node = {
           id: size ,
           type : name,
-          position: { x: 400, y: 200 },
+          position: { x: 100, y: 100 },
           data: {  label : 'trigger', showPlusButton: true },
           };
+          setNodes([newNode]);
+          setShowRightPanel(false);
         }
     //@ts-ignore
-        setNodes([newNode]);
-        setShowRightPanel(false);
+        
     
   }
     // Fit view to show the new node at normal scale after a short delay
@@ -173,42 +177,48 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
   const addActionNode = (name:string) => {
     let size = (nodes.length + 1).toString()
     console.log("size" + size)
+    const x = Math.floor(Math.random() * 500) + 100; // tweak range
+    const y = Math.floor(Math.random() * 500) + 100;
     if(name == 'webhook' ||  name == 'awaitGmail'){ 
       console.log("sending workflowid from here " + workflowId)
         addWebhookNode(name , workflowId)
+        setShowRightPanel(false);
+        setSelectedNodeId(null);
     }
     else { 
       setNodes(nodes => [...nodes , { 
         id : size , 
-        position : { x : 200 , y : 200} , 
+        position : { x : x , y : y} , 
         data : { label : 'action', 
           message : "", 
         } , 
         type : name
       }])
+      setShowRightPanel(false);
+      setSelectedNodeId(null);
     } 
 
-    setShowRightPanel(false);
-    setSelectedNodeId(null);
+    
+    // setSelectedNodeId(null);
   };
 
   // Show action panel when plus button clicked
-  const handlePlusClick = (nodeId: string) => {
-    setSelectedNodeId(nodeId);
-    setPanelType('action');
-    setShowRightPanel(true);
-  };
+  // const handlePlusClick = (nodeId: string) => {
+  //   setSelectedNodeId(nodeId);
+  //   setPanelType('action');
+  //   setShowRightPanel(true);
+  // };
 
   // Handle node configuration
-  const handleNodeConfig = (nodeId: string, nodeType: string) => {
-    const node = nodes.find(n => n.id === nodeId);
-    setConfigModal({
-      isOpen: true,
-      nodeId,
-      nodeType,
-      nodeData: node?.data || {},
-    });
-  };
+  // const handleNodeConfig = (nodeId: string, nodeType: string) => {
+  //   const node = nodes.find(n => n.id === nodeId);
+  //   setConfigModal({
+  //     isOpen: true,
+  //     nodeId,
+  //     nodeType,
+  //     nodeData: node?.data || {},
+  //   });
+  // };
 
   // Save node configuration
   const saveNodeConfig = (data: any) => {
@@ -246,7 +256,7 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
       );
       
       // Wait for 1.2 seconds for smoother animation
-      await new Promise(resolve => setTimeout(resolve, 1200));
+      await new Promise(resolve => setTimeout(resolve, 2000));
     }
     
     // Clear executing state
@@ -341,16 +351,15 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
   };
 
   // Make functions available globally for nodes
-  useEffect(() => {
-    window.handlePlusClick = handlePlusClick;
-    window.handleNodeConfig = handleNodeConfig;
-    return () => {
-      delete window.handlePlusClick;
-      delete window.handleNodeConfig;
-    };
+  // useEffect(() => {
+  //   window.handlePlusClick = handlePlusClick;
+  //   window.handleNodeConfig = handleNodeConfig;
+  //   return () => {
+  //     delete window.handlePlusClick;
+  //     delete window.handleNodeConfig;
+  //   };
     
-  }, [handlePlusClick, handleNodeConfig]);
-    const [workflows, setWorkflows] = useState<any[]>([]);
+  // }, [handlePlusClick, handleNodeConfig]);
 
   const fetchWorkflows = async () => {
     try {
@@ -630,13 +639,14 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
               onEdgesChange={onEdgesChange}
               onConnect={onConnect}
               nodeTypes={nodeTypes}
-              connectionMode={ConnectionMode.Loose}
+              connectionMode={ConnectionMode.Strict}
               defaultViewport={{ x: 0, y: 0, zoom: 1.0 }}
               className="bg-[hsl(var(--background))]"
+              
             >
               <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
               <Controls />
-              <MiniMap className="bg-indigo-600" bgColor='#000000' nodeColor="#333" />
+              <MiniMap  bgColor='#000000' nodeColor="#333" />
             </ReactFlow>
           )}
         </div>
