@@ -264,7 +264,7 @@ app.all('/webhook/:id' ,Usemiddleware ,  async(req , res) => {
     const id  :number = Number( req.params.id ); 
     //@ts-ignore
     //ADD userId and workflow Id in params too
-    const userId = req.query.userId;
+    const userId = req.userId;
     const ResponseData = req.body.message;
     const workflowId = Number(req.query.workflowId);
     console.log("workflow Id " + workflowId)
@@ -343,7 +343,7 @@ app.all('/webhook/:id' ,Usemiddleware ,  async(req , res) => {
                         connections : JSON.stringify(connections) 
                     }
                     res.json("executed the webhook");
-                    executeIt(payload , userId ,  workflowId ,  indexToStartWith ,)
+                    executeIt(payload , userId ,  workflowId ,  indexToStartWith ,true)
                     
             }
 
@@ -374,7 +374,7 @@ app.post('/execute' , Usemiddleware , async (req , res)=> {
     payload.nodes = JSON.stringify(FilteredNodes);
     //we must take data from backend here instead of taking nodes and connections in payload
     //one simple good solution to filter nodes here only and make isexecuting and webhook false here
-    await executeIt(payload , userId , workflowId)
+    await executeIt(payload , userId , workflowId , 0  , false)
     // const nodes = JSON.parse(payload.nodes); 
     // const connections = (payload.connections);
     // const sortedArray = preOrderTraversal(connections) ; 

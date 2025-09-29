@@ -4,7 +4,9 @@ import { prismaClient }  from '@repo/database/client';
 import { telegramBot } from "./teligram.js";
 import { gmail } from "./gmail.js";
 import { genai } from "./langchain.js";
-export async function executeIt( payload : any , user :any  , workflowId : number , indexToStartWith ?: number){ 
+
+export async function executeIt( payload : any , user :any  , workflowId : number , indexToStartWith ?: number , ExecutedFirstIndex ?: boolean){ 
+        
         const nodes = JSON.parse(payload.nodes); 
         const connections = (payload.connections);
         const sortedArray = preOrderTraversal(connections) ; 
@@ -31,7 +33,13 @@ export async function executeIt( payload : any , user :any  , workflowId : numbe
                 })
                 return ;
             }    
-            const processtoexecute = sortedArray[i].target
+            let processtoexecute = sortedArray[i].target
+            if(i==0 && ExecutedFirstIndex == false){ 
+                console.log("executed first index")
+                processtoexecute = 1;
+                i-- ;
+                ExecutedFirstIndex = true
+            }
             const proces :node = nodes[processtoexecute-1]!
             console.log('currently executing process no ' + processtoexecute);
             console.log("the process / node " + JSON.stringify(proces))
