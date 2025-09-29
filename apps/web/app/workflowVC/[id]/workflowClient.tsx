@@ -316,6 +316,58 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
       type : name
     }])
   }
+  async function executeWithLogs() {
+    if (nodes.length === 0) {
+      setMessage('Add nodes to execute workflow');
+      setTimeout(() => setMessage(null), 3000);
+      return;
+    }
+
+    setLoading(true);
+    const token = localStorage.getItem("token");
+
+    setMessage("Started workflow execution...\n"); // reset message
+
+    try {
+      // Open SSE connection to backend logs
+      const eventSource = new EventSource(`http://localhost:3002/execute/logs/${workflowId}?token=${token}`);
+
+      eventSource.onmessage = (event) => {
+        // append each incoming log to message
+        setMessage((prev) => prev + event.data + "\n");
+        console.log("message aya message aya  " + event.data)
+
+        if (event.data === "done") {
+            console.log("Workflow finished!");
+            setMessage((prev) => (prev ? prev + "\n" : "") + "Execution completed!");
+            eventSource.close(); // close SSE connection
+            setLoading(false);
+          }
+
+      };
+
+      eventSource.onerror = (err) => {
+        setMessage((prev) => prev + "Error streaming logs\n");
+        console.error("SSE error:", err);
+        eventSource.close();
+        setLoading(false);
+      };
+
+      // Trigger backend execution separately (so logs start streaming)
+      await axios.post(`http://localhost:3002/execute`, {
+        nodes: JSON.stringify(nodes),
+        connections: JSON.stringify(edges),
+        id: workflowId,
+      }, {
+        headers: { authorization: token },
+      });
+
+    } catch (error) {
+      setMessage((prev) => prev + "Execution failed\n");
+      console.error(error);
+      setLoading(false);
+    }
+}
   // Execute workflow
   const executeWorkflow = async () => {
     if (nodes.length === 0) {
@@ -659,7 +711,7 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
             className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-10"
           >
             <button
-              onClick={executeWorkflow}
+              onClick={executeWithLogs}
               disabled={loading || isExecuting}
               className="px-8 py-4 bg-[hsl(var(--primary))] hover:bg-[hsl(var(--primary-hover))] disabled:opacity-50 text-white rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-3"
             >
