@@ -12,6 +12,7 @@ import { preOrderTraversal } from './veryBigBrain.js';
 import { genai } from './langchain.js';
 import { executeIt } from './execute.js';
 import { FakeListChatMessageHistory } from '@langchain/core/utils/testing';
+import { useId } from 'react';
 const app  = express() ; 
 app.use(express.json()); 
 app.use(cors())
@@ -259,13 +260,15 @@ app.get('/workflow/:id' , Usemiddleware , async(req , res) => {
     }
 
 })
-app.all('/webhook/:id' , Usemiddleware  , async(req , res) => { 
+app.all('/webhook/:id' ,Usemiddleware ,  async(req , res) => { 
     const id  :number = Number( req.params.id ); 
     //@ts-ignore
-    const userId = req.userId;
+    //ADD userId and workflow Id in params too
+    const userId = req.query.userId;
     const ResponseData = req.body.message;
-    const workflowId = req.body.id;
+    const workflowId = Number(req.query.workflowId);
     console.log("workflow Id " + workflowId)
+    console.log(" here is the workflow id " + workflowId)
     //we need workflowID here , assuming that there is one workflow only
     //ab ye node already hai db mein , we just have to update its value to true and hit the execution end point again 
     try{ 
