@@ -16,10 +16,12 @@
     "@types/axios": "^0.9.36",
     "@xyflow/react": "^12.8.4",
     "axios": "^1.12.2",
+    "lucide": "^0.544.0",
+    "lucide-react": "^0.544.0",
     "motion": "^12.23.22",
     "next": "^15.5.3",
     "postcss": "^8.5.6",
-    "react": "^19.1.0",
+    "react": "^19.1.1",
     "react-dom": "^19.1.0",
     "tailwindcss": "^4.1.13"
   },
