@@ -6,9 +6,7 @@ import { gmail } from "./gmail.js";
 import { genai } from "./langchain.js";
 import { response } from "express";
 
-export async function executeIt( payload : any , user :any  , workflowId : number , indexToStartWith ?: number , ExecutedFirstIndex ?: boolean , logCallBack ?: (msg : string)=> void){ 
-       
-
+export async function executeIt( payload : any , user :any  , workflowId : string , indexToStartWith ?: number , ExecutedFirstIndex ?: boolean , logCallBack ?: (msg : string)=> void){ 
         const nodes = JSON.parse(payload.nodes); 
         const connections = (payload.connections);
         const sortedArray = preOrderTraversal(connections) ; 

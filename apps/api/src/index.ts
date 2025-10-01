@@ -11,13 +11,10 @@ import cors from 'cors';
 import { preOrderTraversal } from './veryBigBrain.js';
 import { genai } from './langchain.js';
 import { executeIt } from './execute.js';
-import { FakeListChatMessageHistory } from '@langchain/core/utils/testing';
-import { useId } from 'react';
-import { number } from 'zod';
 const app  = express() ; 
 app.use(express.json()); 
 app.use(cors())
-const workflowLogStreams: { [workflowId: number]: ((msg: string) => void) | undefined } = {};
+const workflowLogStreams: { [workflowId: string]: ((msg: string) => void) | undefined } = {};
 
 const JWT_SECRET  : string = process.env.JWT_SECRET!;
 
@@ -134,78 +131,78 @@ app.delete('/workflow' , Usemiddleware , async(req , res) => {
     }
 })
 
-app.post('/workflow/:id', Usemiddleware ,async (req , res)=> { 
-    //create new node and dump it there as a json , what it does 
-    //@ts-ignore
-    const id : number= parseInt(req.params.id)
-    console.log(typeof(id))
-    const payload = req.body ; 
-    console.log("id + : "+ id)
-    console.log("iddd dekhraha hu " + req.params.id)
-    const data = payload.data 
-    // const data = JSON.parse(payload.data) ; 
-    // processess.push(data)
+// app.post('/workflow/:id', Usemiddleware ,async (req , res)=> { 
+//     //create new node and dump it there as a json , what it does 
+//     //@ts-ignore
+//     const id : number= parseInt(req.params.id)
+//     console.log(typeof(id))
+//     const payload = req.body ; 
+//     console.log("id + : "+ id)
+//     console.log("iddd dekhraha hu " + req.params.id)
+//     const data = payload.data 
+//     // const data = JSON.parse(payload.data) ; 
+//     // processess.push(data)
     
-    const nodes  = data.nodes ; 
-    const connections = data.connections;
-    //@ts-ignore
-    const userId = req.userId 
-    console.log("hitted the data")
-    try {
-        await prismaClient.workflow.create({ 
-            data : { 
-                id : 1 , 
-                title : "data" , 
-                nodes : nodes , 
-                Connections : connections ,
-                userId : userId , 
-            }
-        })
-        await prismaClient.responses.create({ 
-            data : { 
-                workflowId : id,
-                data : "",
-                userId : userId
-            }
-        })
-        console.log("data" + JSON.stringify(payload.data) )
+//     const nodes  = data.nodes ; 
+//     const connections = data.connections;
+//     //@ts-ignore
+//     const userId = req.userId 
+//     console.log("hitted the data")
+//     try {
+//         await prismaClient.workflow.create({ 
+//             data : { 
+//                 id : 1 , 
+//                 title : "data" , 
+//                 nodes : nodes , 
+//                 Connections : connections ,
+//                 userId : userId , 
+//             }
+//         })
+//         await prismaClient.responses.create({ 
+//             data : { 
+//                 workflowId : id,
+//                 data : "",
+//                 userId : userId
+//             }
+//         })
+//         console.log("data" + JSON.stringify(payload.data) )
 
-        res.json("done")
-    }
-    catch(err){ 
-        console.error(" error hogis " + err)
-        res.json("something bad happened")
-    } 
+//         res.json("done")
+//     }
+//     catch(err){ 
+//         console.error(" error hogis " + err)
+//         res.json("something bad happened")
+//     } 
     
     
-    //nodes mein we ll just push nodes and connections to be 
+//     //nodes mein we ll just push nodes and connections to be 
 
 
-    //process schema 
-    // processess.push({ 
-    //     id : 1 , 
-    //     name : "start",
-    //     type : "trigger",
-    //     do : "onclick" , 
-    //     done : false , 
-    //     connection: true
-    // })
-    // processess.push({ 
-    //     id : 2 , 
-    //     name : "action",
-    //     type : "action",
-    //     do : "gmail" , 
-    //     done : false , 
-    //     connection: true
-    // })
-    // console.log("processes " + processess )
-})
+//     //process schema 
+//     // processess.push({ 
+//     //     id : 1 , 
+//     //     name : "start",
+//     //     type : "trigger",
+//     //     do : "onclick" , 
+//     //     done : false , 
+//     //     connection: true
+//     // })
+//     // processess.push({ 
+//     //     id : 2 , 
+//     //     name : "action",
+//     //     type : "action",
+//     //     do : "gmail" , 
+//     //     done : false , 
+//     //     connection: true
+//     // })
+//     // console.log("processes " + processess )
+// })
 app.put('/workflow/:id' , Usemiddleware ,async (req , res)=> { 
     //update that node with the following , dump new json there
     //@ts-ignore
     const userId = req.userId ;
     const payload = req.body ;
-    const id : number = Number(req.params.id);
+    const id : string = (req.params.id)!;
     console.log("checking req params id "  + id )
     console.log("id + : "+ id)
     const data = payload.data;
@@ -249,7 +246,7 @@ app.get('/workflow/:id' , Usemiddleware , async(req , res) => {
     //@ts-ignore
     
     const userId = req.userId ;
-    const id : number = Number(req.params.id);
+    const id : string = (req.params.id)!;
     try {
         const response = await prismaClient.workflow.findFirst({ 
             where : { 
@@ -269,7 +266,7 @@ app.all('/webhook/:id' ,Usemiddleware ,  async(req , res) => {
     //ADD userId and workflow Id in params too
     const userId = req.userId;
     const ResponseData = req.body.message;
-    const workflowId = Number(req.query.workflowId);
+    const workflowId :string  = (req.query.workflowId) as string;
     console.log("workflow Id " + workflowId)
     console.log(" here is the workflow id " + workflowId)
     //we need workflowID here , assuming that there is one workflow only
@@ -376,7 +373,7 @@ app.all('/webhook/:id' ,Usemiddleware ,  async(req , res) => {
 
 app.post('/execute' , Usemiddleware , async (req , res)=> { 
     const payload = req.body;
-    const  workflowId = payload.id; //this will be workflow id only  , considering there will be only 1 workflow
+    const  workflowId :string = payload.id; //this will be workflow id only  , considering there will be only 1 workflow
     //@ts-ignore
     const userId  = req.userId;
     const FilteredNodes = JSON.parse(payload.nodes)
@@ -385,7 +382,8 @@ app.post('/execute' , Usemiddleware , async (req , res)=> {
     payload.nodes = JSON.stringify(FilteredNodes);
     //we must take data from backend here instead of taking nodes and connections in payload
     //one simple good solution to filter nodes here only and make isexecuting and webhook false here
-    await executeIt(payload , userId , workflowId , 0  , false)
+    const logCallback = workflowLogStreams[workflowId];
+    await executeIt(payload , userId , workflowId , 0  , false , logCallback)
     // const nodes = JSON.parse(payload.nodes); 
     // const connections = (payload.connections);
     // const sortedArray = preOrderTraversal(connections) ; 
@@ -504,20 +502,24 @@ app.get('/execute/logs/:workflowId', async (req, res) => {
   const userId = user.id;
           
   console.log("user Id sdjsdfmnvfx  : " + userId )
-  const id = Number(workflowId)
+  const id = (workflowId)
+  console.log(" workflow Id dgfkgjkf : " + workflowId)
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
   res.flushHeaders();
 
+  console.log("arrived till here" )
   const sendLog = (msg: string) => {
     res.write(`data: ${msg}\n\n`);
   };
   // Helper to send log messages
-    workflowLogStreams[id] = sendLog;
+    workflowLogStreams[workflowId] = sendLog;
+
     req.on("close", () => {
-    delete workflowLogStreams[id];
+    delete workflowLogStreams[workflowId];
   });
+//  
     // sendLog("SSE connected. Waiting for workflow execution...");
 
 
