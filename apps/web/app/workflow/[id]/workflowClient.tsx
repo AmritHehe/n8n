@@ -17,8 +17,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { motion, AnimatePresence } from 'framer-motion';
-// import NodeConfigModal from './NodeConfigModal';
-
+import NodeConfigModal from '../../components/NodeConfigModal';
 // Declare global window property
 declare global {
   interface Window {
@@ -889,7 +888,13 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
           </motion.div>
         )}
       </AnimatePresence>
-
+      <NodeConfigModal
+        isOpen={configModal.isOpen}
+        nodeType={configModal.nodeType || ''}
+        nodeData={configModal.nodeData}
+        onClose={() => setConfigModal({ isOpen: false, nodeId: null, nodeType: null, nodeData: null })}
+        onSave={saveNodeConfig}
+      />
     </div> 
   );
 };
