@@ -22,7 +22,7 @@ model user{
   res Responses[]
 }
 model workflow{ 
-  id Int @id @default(autoincrement())
+  id String @id @default(uuid())
   title String
   nodes String
   Connections String
@@ -36,7 +36,7 @@ model Responses{
   user user @relation(fields: [userId] , references: [id])
   data String
   userId String
-  workflowId Int @unique
+  workflowId String @unique
   
 }
 model credentials{ 
