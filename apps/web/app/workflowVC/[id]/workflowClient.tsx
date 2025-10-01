@@ -480,7 +480,7 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
         initial={{ x: -300 }}
         animate={{ x: 0 }}
         transition={{ duration: 0.3 }}
-        className="w-64 bg-[hsl(var(--surface))] border-r border-[hsl(var(--border))] flex flex-col"
+        className="w-64 bg-[hsl(var(--surface))] border-r border-[hsl(var(--border))] h-screen flex flex-col"
       >
         {/* Navigation Header */}
         <div className="p-4 border-b border-[hsl(var(--border))]">
@@ -488,7 +488,7 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
         </div>
 
         {/* Navigation Links */}
-        <div className="flex-1 p-4 space-y-2">
+        <div className="flex-1 flex flex-col p-4 space-y-2 min-h-0">
           <button
             onClick={() => handleNavigation('/')}
             className="w-full p-3 text-left hover:bg-[hsl(var(--surface-elevated))] rounded-lg transition-colors flex items-center gap-3"
@@ -498,7 +498,7 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
             </svg>
             <span className="text-[hsl(var(--foreground))]">Homepage</span>
           </button>
-          
+
           <button
             onClick={() => handleNavigation('/workflows')}
             className="w-full p-3 text-left hover:bg-[hsl(var(--surface-elevated))] rounded-lg transition-colors flex items-center gap-3"
@@ -509,67 +509,62 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
             <span className="text-[hsl(var(--foreground))]">All Workflows</span>
           </button>
 
-          <div className="pt-4 border-t border-[hsl(var(--border))] mt-4">
-            <h3 className="text-sm font-medium text-[hsl(var(--foreground-muted))] mb-2 px-3">Switch Workflow</h3>
-            {Array.isArray(workflows) && workflows.length > 0 ? (
-          <div className="grid grid-cols-1 gap-6">
-            {workflows.map((workflow) => (
-              <div
-                key={workflow.id}
-                className="bg-[hsl(var(--surface))]/60 backdrop-blur-xl border border-[hsl(var(--border))] rounded-2xl p-6 hover:border-[hsl(var(--primary))]/50 hover:scale-105 transition-[var(--transition-slow)] group"
-              >
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-[hsl(var(--primary))]/20 rounded-[var(--radius)] flex items-center justify-center group-hover:bg-[hsl(var(--primary))]/30 transition-[var(--transition-smooth)]">
-                    <svg
-                      className="w-6 h-6 text-[hsl(var(--primary))]"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                  </div>
-                  <Link 
-                    key={workflow.id}
-                    href={`/workflow/${workflow.id}`}
-                  >
-                    <div className="flex-1">
-          
-                      <h3 className="font-semibold text-lg text-[hsl(var(--foreground))] group-hover:text-[hsl(var(--primary))] transition-colors">
-                        {workflow.title || 'Untitled Workflow'}
-                      </h3>
+          {/* Workflow List */}
+          <div className="pt-4 border-t border-[hsl(var(--border))] mt-4 flex-1 flex flex-col min-h-0">
+            <h3 className="text-sm font-medium text-[hsl(var(--foreground-muted))] mb-2 px-3 shrink-0">
+              Switch Workflow
+            </h3>
 
-                      <p className="text-sm text-[hsl(var(--foreground-muted))]">
-                        {(JSON.parse(workflow.nodes)).length|| 0} nodes
-                      </p>
-                    
+            {Array.isArray(workflows) && workflows.length > 0 ? (
+              <div className="flex-1 min-h-0 p-2 overflow-y-auto grid grid-cols-1 gap-6 overflow-x-hidden scrollbar-hide">
+                {workflows.map((workflow) => (
+                  <div
+                    key={workflow.id}
+                    className="bg-[hsl(var(--surface))]/60 backdrop-blur-xl border border-[hsl(var(--border))] rounded-2xl p-6 hover:border-[hsl(var(--primary))]/50 hover:scale-105 transition-[var(--transition-slow)] group"
+                  >
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-12 h-12 bg-[hsl(var(--primary))]/20 rounded-[var(--radius)] flex items-center justify-center group-hover:bg-[hsl(var(--primary))]/30 transition-[var(--transition-smooth)]">
+                        <svg
+                          className="w-6 h-6 text-[hsl(var(--primary))]"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                      </div>
+                      <Link key={workflow.id} href={`/workflow/${workflow.id}`}>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg text-[hsl(var(--foreground))] group-hover:text-[hsl(var(--primary))] transition-colors">
+                            {workflow.title || 'Untitled Workflow'}
+                          </h3>
+                          <p className="text-sm text-[hsl(var(--foreground-muted))]">
+                            {(JSON.parse(workflow.nodes)).length || 0} nodes
+                          </p>
+                        </div>
+                      </Link>
                     </div>
-                    </Link>
-                  
-                </div>
-              
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-16">
-            <div className="w-24 h-24 bg-[hsl(var(--primary))]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-12 h-12 text-[hsl(var(--primary))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-[hsl(var(--foreground))] mb-2">No workflows yet</h3>
-            <p className="text-[hsl(var(--foreground-muted))] mb-6">Create your first automation workflow to get started</p>
-            <button
-              className="px-6 py-3 bg-[hsl(var(--primary))] text-[hsl(var(--foreground))] rounded-[var(--radius)] hover:bg-[hsl(var(--primary-hover))] transition-[var(--transition-smooth)]"
-            >
-              Create Your First Workflow
-            </button>
-          </div>
-        )}
+            ) : (
+              <div className="text-center py-16">
+                <div className="w-24 h-24 bg-[hsl(var(--primary))]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-12 h-12 text-[hsl(var(--primary))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-[hsl(var(--foreground))] mb-2">No workflows yet</h3>
+                <p className="text-[hsl(var(--foreground-muted))] mb-6">Create your first automation workflow to get started</p>
+                <button className="px-6 py-3 bg-[hsl(var(--primary))] text-[hsl(var(--foreground))] rounded-[var(--radius)] hover:bg-[hsl(var(--primary-hover))] transition-[var(--transition-smooth)]">
+                  Create Your First Workflow
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </motion.div>
+
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">

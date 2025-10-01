@@ -104,10 +104,12 @@
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 1.2, delay: 0.7 }}
+            className="z-40"
             >
+            
             <Link
-                href="/workflow/new"
-                className="inline-flex items-center gap-3 px-10 py-4 bg-[hsl(var(--primary))] hover:bg-[hsl(var(--primary-hover))] text-white font-semibold text-lg md:text-xl rounded-xl shadow-[0_0_40px_hsl(var(--primary)/0.25)] hover:shadow-[0_0_60px_hsl(var(--primary)/0.35)] transition-all duration-300"
+                href="/workflows"
+                className="inline-flex items-center gap-3 px-10 py-4 bg-[hsl(var(--primary))] hover:bg-[hsl(var(--primary-hover))] text-white font-semibold z-4 text-lg md:text-xl rounded-xl shadow-[0_0_40px_hsl(var(--primary)/0.25)] hover:shadow-[0_0_60px_hsl(var(--primary)/0.35)] transition-all "
             >
                 <Zap className="w-6 h-6" />
                 Get Started
