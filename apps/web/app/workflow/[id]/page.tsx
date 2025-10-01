@@ -1,12 +1,10 @@
 
-import MainWorkFlow from "./mainWorkflow";
+import WorkflowClient from "./workflowClient";
 
 
-
-export default async function Wrokflow({params} : {params : Promise<{id : string}>}) {
+export default async function WorkflowVC({params} : {params : Promise<{id : string}>}) {
   const {id} = await params
-  const workflowId = Number(id);
-  return <MainWorkFlow id = {workflowId}/>
+  return <WorkflowClient workflowId = {id}/>
 
 }
 //todo - add agent node , add desc , add credential page , add workflow page

@@ -50,7 +50,7 @@ const nodeTypes = {
 }
 
 interface WorkflowClientProps {
-  workflowId: number;
+  workflowId: string;
 }
 
 const inititalNodes  : any = [] 
@@ -296,7 +296,7 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
     }
     setLoading(false);
   };
-  function addWebhookNode(name : string , workflowId : number ){ 
+  function addWebhookNode(name : string , workflowId : string ){ 
     console.log(" hello from add webhook function")
     console.log(" workflow Id" + workflowId)
     let id = workflowId
@@ -330,9 +330,11 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
 
     try {
       // Open SSE connection to backend logs
+      console.log("worflow Id : " + workflowId)
       const eventSource = new EventSource(`http://localhost:3002/execute/logs/${workflowId}?token=${token}`);
 
       eventSource.onmessage = (event) => {
+        console.log("agar yaha tk agye fir kuch to gadbd hai daya")
         // append each incoming log to message
         setMessage((prev) => prev + event.data + "\n");
         console.log("message aya message aya  " + event.data)
@@ -347,17 +349,23 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
       };
 
       eventSource.onerror = (err) => {
+        console.log("erorrrr" + err)
         setMessage((prev) => prev + "Error streaming logs\n");
         console.error("SSE error:", err);
         eventSource.close();
         setLoading(false);
       };
-
+      await  new Promise<void>( (resolve , reject)=> { 
+        eventSource.onopen = () => { 
+            console.log("SSE connected")
+            resolve()
+          }
+      } )
       // Trigger backend execution separately (so logs start streaming)
       await axios.post(`http://localhost:3002/execute`, {
         nodes: JSON.stringify(nodes),
         connections: JSON.stringify(edges),
-        id: workflowId,
+        id: workflowId
       }, {
         headers: { authorization: token },
       });
@@ -577,7 +585,8 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
         >
           <div>
             <h1 className="text-xl font-semibold text-[hsl(var(--foreground))]">
-              Workflow #{workflowId}
+              {/* Workflow #{workflowId} */}
+              Lets Automate!
             </h1>
             <p className="text-sm text-[hsl(var(--foreground-muted))]">Design your automation flow</p>
           </div>
