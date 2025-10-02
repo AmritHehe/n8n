@@ -27,6 +27,7 @@ const NodeConfigModal = ({ isOpen, nodeType, nodeData, onClose, onSave, previous
             }
         });
         console.log("response " + JSON.stringify(res))
+        //@ts-ignore
         setCredentials(res.data);
 
       } catch (err) {
@@ -46,7 +47,7 @@ const NodeConfigModal = ({ isOpen, nodeType, nodeData, onClose, onSave, previous
       <>
         <option value="">Select Account</option>
         {credentials.map((cred) => (
-          <option key={cred.id} value={cred.title}>
+          <option key={cred.id} value={cred.id}>
             {cred.type} - {cred.title || cred.name || cred.label}
           </option>
         ))}
@@ -73,11 +74,20 @@ const NodeConfigModal = ({ isOpen, nodeType, nodeData, onClose, onSave, previous
               <label className="block text-sm font-medium text-[hsl(var(--foreground))] mb-2">
                 Credentials
               </label>
-              <select
+               <select
                 className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg text-[hsl(var(--foreground))]"
-                value={formData.credentials || ''}
-                onChange={(e) => setFormData({ ...formData, credentials: e.target.value })}
+                value={formData.credentialsId || ''}
+                onChange={(e) => {
+                  const selectedId = e.target.value;
+                  const selectedCred = credentials.find((c) => c.id === selectedId);
+                  setFormData({
+                    ...formData,
+                    credentialsId: selectedId,
+                    credentialsLabel: selectedCred ? selectedCred.platform : "",
+                  });
+                }}
               >
+                <option value="">Select Account</option>
                 {renderCredentialOptions()}
               </select>
             </div>
@@ -122,7 +132,7 @@ const NodeConfigModal = ({ isOpen, nodeType, nodeData, onClose, onSave, previous
                   <textarea
                     className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg text-[hsl(var(--foreground))] h-24"
                     value={formData.message || ''}
-                    onChange={(e) => setFormData({ ...formData, body: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     placeholder="Email content..."
                   />
                 </div>
