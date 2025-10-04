@@ -1,15 +1,11 @@
-import express, { request, response } from 'express' ; 
+import express, {  type Request, type Response } from 'express' ; 
 import jwt  from 'jsonwebtoken' ; 
 import { prismaClient }  from '@repo/database/client'; 
 import type { node } from './types.js';
 import type { users } from './types.js';
 // import { processess } from './processess.js';
 import {Usemiddleware } from './middleware.js';
-import { gmail } from './gmail.js';
-import { telegramBot } from './teligram.js';
 import cors from 'cors';
-import { preOrderTraversal } from './veryBigBrain.js';
-import { genai } from './langchain.js';
 import { executeIt } from './execute.js';
 const app  = express() ; 
 app.use(express.json()); 
@@ -35,7 +31,7 @@ app.post('/api/v1/signup' , async (req , res)=> {
     res.json("user created")
 
 })
-app.post('/api/v1/signin' ,async (req, res)=> { 
+app.post('/api/v1/signin' ,async (req : Request, res :Response)=> { 
     console.log('hitted the endpoint ?')
     const payload = req.body ;
     const name = payload.name ; 
@@ -66,7 +62,7 @@ app.post('/api/v1/signin' ,async (req, res)=> {
 //payload or data or schema 
 // title : workflow name 
 //
-app.post('/workflow' , Usemiddleware, async (req , res)=> { 
+app.post('/workflow' , Usemiddleware, async (req : Request , res : Response)=> { 
     //user
     //yha userId leke ek new workflow with empty nodes create hojana chaiye
     const payload = req.body; 
@@ -97,7 +93,7 @@ app.post('/workflow' , Usemiddleware, async (req , res)=> {
 })
 
 
-app.get('/workflow' , Usemiddleware ,async (req , res)=> { 
+app.get('/workflow' , Usemiddleware ,async (req  : Request, res : Response)=> { 
     //yha bs ek be call jayega vo call karega aur sara data be se le aayega
 
     //@ts-ignore
@@ -116,7 +112,7 @@ app.get('/workflow' , Usemiddleware ,async (req , res)=> {
     
 
 })
-app.delete('/workflow' , Usemiddleware , async(req , res) => { 
+app.delete('/workflow' , Usemiddleware , async(req : Request , res : Response) => { 
     const id = req.body.id; 
     try{ 
         const data = await prismaClient.workflow.delete({ 
@@ -178,26 +174,8 @@ app.delete('/workflow' , Usemiddleware , async(req , res) => {
 //     //nodes mein we ll just push nodes and connections to be 
 
 
-//     //process schema 
-//     // processess.push({ 
-//     //     id : 1 , 
-//     //     name : "start",
-//     //     type : "trigger",
-//     //     do : "onclick" , 
-//     //     done : false , 
-//     //     connection: true
-//     // })
-//     // processess.push({ 
-//     //     id : 2 , 
-//     //     name : "action",
-//     //     type : "action",
-//     //     do : "gmail" , 
-//     //     done : false , 
-//     //     connection: true
-//     // })
-//     // console.log("processes " + processess )
-// })
-app.put('/workflow/:id' , Usemiddleware ,async (req , res)=> { 
+
+app.put('/workflow/:id' , Usemiddleware ,async (req : Request , res : Response)=> { 
     //update that node with the following , dump new json there
     //@ts-ignore
     const userId = req.userId ;
@@ -240,7 +218,7 @@ app.put('/workflow/:id' , Usemiddleware ,async (req , res)=> {
         
     }
 })
-app.get('/workflow/:id' , Usemiddleware , async(req , res) => { 
+app.get('/workflow/:id' , Usemiddleware , async(req  : Request, res : Response) => { 
 
     console.log("tried to hit the end point")
     //@ts-ignore
@@ -260,7 +238,7 @@ app.get('/workflow/:id' , Usemiddleware , async(req , res) => {
     }
 
 })
-app.all('/webhook/:id' ,Usemiddleware ,  async(req , res) => { 
+app.all('/webhook/:id' ,Usemiddleware ,  async(req : Request , res : Response) => { 
     const id  :number = Number( req.params.id ); 
     //@ts-ignore
     //ADD userId and workflow Id in params too
@@ -371,7 +349,7 @@ app.all('/webhook/:id' ,Usemiddleware ,  async(req , res) => {
 //     }
 })
 
-app.post('/execute' , Usemiddleware , async (req , res)=> { 
+app.post('/execute' , Usemiddleware , async (req : Request , res : Response)=> { 
     const payload = req.body;
     const  workflowId :string = payload.id; //this will be workflow id only  , considering there will be only 1 workflow
     //@ts-ignore
@@ -384,111 +362,10 @@ app.post('/execute' , Usemiddleware , async (req , res)=> {
     //one simple good solution to filter nodes here only and make isexecuting and webhook false here
     const logCallback = workflowLogStreams[workflowId];
     await executeIt(payload , userId , workflowId , 0  , false , logCallback)
-    // const nodes = JSON.parse(payload.nodes); 
-    // const connections = (payload.connections);
-    // const sortedArray = preOrderTraversal(connections) ; 
-    // //@ts-ignore
-    // const userId  = req.userId;
-    
-    // console.log('userId : ' + userId)
-    // // console.log("nodes " + nodes)
-    // //now we have to execute the nodes(sources) of the sorted array by processing the nodes
-    // //take the data from the nodes 
-
-    // for(let i = 0 ; i < sortedArray.length ; i++){ 
-    //     const processtoexecute = sortedArray[i].target
-    //     const proces :node = nodes[processtoexecute-1]!
-    //     console.log('currently executing process no ' + processtoexecute);
-    //     console.log("the process / node " + JSON.stringify(proces))
-    //     if(proces.data.label == 'trigger'){ 
-    //         // proces.done = true;
-    //         console.log('this done')
-    //     }
-    //     else if (proces.data.label == 'action'){ 
-    //         if(proces.type == 'telegram'){ 
-    //             const message = proces.data.message!
-    //             console.log("reached inside telegram")
-    //             try { 
-    //                 const credentials = await prismaClient.credentials.findFirst({ 
-    //                     where : { 
-    //                         userId : userId , 
-    //                         platform : 'teligram'
-    //                     }
-    //                 })
-    //                 const data = credentials!.data
-    //                 console.log('credentials data' + data)
-    //                 await telegramBot(data ,message)
-                    
-    //             }
-    //             catch(e) { 
-    //                 // res.status(403).json("the error " + e)
-    //                 console.log("process with id  : " + processtoexecute + " failed with error " + e )
-    //             }
-    //             //function call teligram
-    //             //check krenge ki kya us cheez ke credentials hai
-                
-    //         }
-    //         else if(proces.type == 'gmail'){ 
-    //             const message = proces.data.message!
-    //             const subject = proces.data.subject!
-    //             const to = proces.data.to!
-    //             try{ 
-    //                 console.log('inside gmail execution part ')
-    //                 const credentials = await prismaClient.credentials.findFirst({
-    //                     where : { 
-    //                         userId : userId,
-    //                         platform : 'gmail'
-    //                     }
-    //                 })
-                    
-    //                 const data = credentials!.data
-    //                 console.log('credentials data' + data)
-    //                 await gmail(data ,to ,  subject , message)
-    //                 // res.json('send the mail bhosdu yayaya')
-    //             }
-    //             catch(err){ 
-    //                 // res.status(403).json('didnt found the credentials')
-    //                 console.log("process with id  : " + processtoexecute + " failed with error " + err )
-
-    //             }
-                
-    //             //function call gmail 
-    //             //check krenge ki credentials hai ya nahi
-                
-    //         }
-    //         else if(proces.type == 'agent'){ 
-    //             const message = proces.data.message; 
-    //             console.log("reached till here agent 1")
-    //             try { 
-    //                 if(message){ 
-    //                     const ai_response = await genai(message); 
-    //                     console.log("reached till here agent !")
-    //                     console.log("response : " +  JSON.stringify(ai_response)); 
-    //                     //store the message here 
-    //                 }
-
-    //             }
-    //             catch(e){ 
-    //                 console.log("something went wrong!" + e)
-    //             }
-    //         }
-    //         else { 
-    //             console.log("wtf proces is this bhay" + JSON.stringify(proces))
-    //         }
-    //     }
-    //     else { 
-    //         console.log("what the fuck process is this " + proces.type)
-    //     }
-    // }
-    // for(let i = 0 ; i <nodes.length; i++ ){ 
-    //     let start = nodes[i] ; 
-    //     //execute the process here 
-    //     let target = connections[i]
-    // }
     res.json('send the message bhai ab jao cold coffee pi aao')
     
 })
-app.get('/execute/logs/:workflowId', async (req, res) => {
+app.get('/execute/logs/:workflowId', async (req : Request , res :Response) => {
   const { workflowId } = req.params;
   //@ts-ignore
   const token = req.query.token as string ;
@@ -502,7 +379,7 @@ app.get('/execute/logs/:workflowId', async (req, res) => {
   const userId = user.id;
           
   console.log("user Id sdjsdfmnvfx  : " + userId )
-  const id = (workflowId)
+  const id  : string = (workflowId)!
   console.log(" workflow Id dgfkgjkf : " + workflowId)
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
@@ -514,66 +391,18 @@ app.get('/execute/logs/:workflowId', async (req, res) => {
     res.write(`data: ${msg}\n\n`);
   };
   // Helper to send log messages
-    workflowLogStreams[workflowId] = sendLog;
+    workflowLogStreams[id] = sendLog;
 
     req.on("close", () => {
-    delete workflowLogStreams[workflowId];
-  });
-//  
+    delete workflowLogStreams[id];
+  });  
     // sendLog("SSE connected. Waiting for workflow execution...");
-
-
-
-//   try { 
-//     const data = await prismaClient.workflow.findFirst({ 
-//         where : { 
-//             id : id
-//         } 
-//     })
-//     console.log(response)
-//     if(data){
-//         const noodes = (data.nodes);
-//         //@ts-ignore
-//         const cooonecs = (data.Connections) ;
-//         let payload = { 
-//             nodes : noodes,
-//             connections : cooonecs
-//         }
-//         try {
-//         // If executeIt can accept a callback for logs, we pass sendLog
-//         const response = await executeIt(
-//             payload ,
-//             userId,
-//             id,
-//             0,
-//             false,
-//             sendLog  // ✅ pass sendLog so logs are streamed
-//         );
-    
-//         if(response == 'done'){ 
-//             res.write(`event: done\ndata: Workflow finished\n\n`);
-//             res.end();
-//         }
-//         else { 
-//             setTimeout(u=> )
-//         }
-//     } catch (err) {
-//         sendLog(`Error: ${err}`);
-//         res.end();
-//     }
-//      }
-    
-//     }
-//     catch(e) { 
-//         console.log("prisma client error")
-//     }
-  
-
   req.on("close", () => {
     res.end();
   });
 });
-app.get('/api/v1/credentials' , Usemiddleware  ,  async ( req , res) => { 
+
+app.get('/api/v1/credentials' , Usemiddleware  ,  async ( req :Request , res : Response) => { 
     //@ts-ignore
     const userId  = req.userId; 
     try { 
@@ -590,7 +419,7 @@ app.get('/api/v1/credentials' , Usemiddleware  ,  async ( req , res) => {
         res.json("something went wrong " + e)
     }
 })
-app.post('/api/v1/credentials', Usemiddleware , async(req , res) => { 
+app.post('/api/v1/credentials', Usemiddleware , async(req :Request , res :Response) => { 
     //use middleware
     const payload = req.body;
     //@ts-ignore
@@ -614,7 +443,7 @@ app.post('/api/v1/credentials', Usemiddleware , async(req , res) => {
     
     //what we need is title platform data
 })
-app.delete('/api/v1/credentials' , Usemiddleware ,async(req , res)=> { 
+app.delete('/api/v1/credentials' , Usemiddleware ,async(req :Request, res : Response)=> { 
     const payload = req.body;
     //@ts-ignore
     const userId = req.userId; 
@@ -635,21 +464,7 @@ app.delete('/api/v1/credentials' , Usemiddleware ,async(req , res)=> {
     
 
 })
-// let client :any = null
-// app.get('/task-status' , async(req , res)=> { 
-//     res.setHeader('Content-type' , 'text/event-stream'); 
-//     res.setHeader('Cache-control' , 'no-cache'); 
-//     res.setHeader('Connection' , 'keep-alive'); 
-
-//     function GiveUpdate(data : string){ 
-//         res.write( data );
-//     }
-//     client = res;
-//     res.write(" we are connected")
-
-// })
         
-
 app.listen(3002 , ()=> { 
     console.log("listening to port 3002")
 })
