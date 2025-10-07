@@ -12,7 +12,7 @@ export interface node {
         afterPlayNodes ?: number ; 
         previousResponse ?: boolean ; 
         previousResponseFromWhichNode ?: number; 
-        credentials : number;
+        credentialsId : number;
         chatId : string
     };
     measured : { 

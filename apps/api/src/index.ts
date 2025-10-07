@@ -325,8 +325,9 @@ app.all('/webhook/:id' ,Usemiddleware ,  async(req : Request , res : Response) =
                     // res.send({status : "continuing"})
                     // res.json("executed the webhook");
                     logCallback?.("Webhook executed, continuing remaining workflow");
-                    await executeIt(payload , userId ,  workflowId ,  indexToStartWith ,true ,logCallback)
                     res.send({ status: "Webhook executed" });
+                    await executeIt(payload , userId ,  workflowId ,  indexToStartWith ,true ,logCallback)
+                   
                     
 
 

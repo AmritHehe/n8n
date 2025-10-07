@@ -69,7 +69,7 @@ export async function executeIt( payload : any , user :any  , workflowId : strin
                         catch(err){ 
                             console.error("prismaClient Serch Failed")
                         }
-                        const credId = proces.data.credentials; 
+                        const credId = proces.data.credentialsId; 
                         const chatId = proces.data.chatId;
                         const credentials = await prismaClient.credentials.findFirst({ 
                             where : { 
@@ -80,7 +80,12 @@ export async function executeIt( payload : any , user :any  , workflowId : strin
                         console.log("user Id " + userId)
                         console.log("credentials " + credentials)
                         const data :any = credentials!.data
-                        data.chatId = chatId
+                        // if(chatId != null || chatId != "" || chatId !=undefined){ 
+                        //     // console.log("yha araha hu bhai why ")
+                        //     // data.chatId = chatId
+                        // }
+                        
+                        // console.log("data chat id : " + data.chatId)
                         console.log('credentials data' + JSON.stringify(data))
                         if(proces.data.previousResponse){ 
                             if(oldResponses){ 
@@ -210,7 +215,7 @@ export async function executeIt( payload : any , user :any  , workflowId : strin
                         await gmail(data ,to ,  subject , message , true , proces.id )
                         if (proces.data.webhook==false){ 
                             console.log("waiting for user to respond ")
-                            logCallBack?.("awaiting telegram response")
+                            logCallBack?.("awaiting gmail response")
                             proces.data.afterPlayNodes = i + 1;
                             proces.data.isExecuting = true;
                             nodes[processtoexecute-1].data.isExecuting = true;
