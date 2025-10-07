@@ -4,7 +4,6 @@ import { prismaClient }  from '@repo/database/client';
 import { telegramBot } from "./teligram.js";
 import { gmail } from "./gmail.js";
 import { genai } from "./langchain.js";
-import { response } from "express";
 
 export async function executeIt( payload : any , user :any  , workflowId : string , indexToStartWith ?: number , ExecutedFirstIndex ?: boolean , logCallBack ?: (msg : string)=> void){ 
         const nodes = JSON.parse(payload.nodes); 
@@ -70,15 +69,19 @@ export async function executeIt( payload : any , user :any  , workflowId : strin
                         catch(err){ 
                             console.error("prismaClient Serch Failed")
                         }
+                        const credId = proces.data.credentials; 
+                        const chatId = proces.data.chatId;
                         const credentials = await prismaClient.credentials.findFirst({ 
                             where : { 
                                 userId : userId , 
-                                platform : 'teligram'
+                                id : Number(credId)
                             }
                         })
-                        const data = credentials!.data
-                        
-                        console.log('credentials data' + data)
+                        console.log("user Id " + userId)
+                        console.log("credentials " + credentials)
+                        const data :any = credentials!.data
+                        data.chatId = chatId
+                        console.log('credentials data' + JSON.stringify(data))
                         if(proces.data.previousResponse){ 
                             if(oldResponses){ 
                                 console.log("hi bhai ji bhai")

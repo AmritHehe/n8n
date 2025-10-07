@@ -354,6 +354,7 @@ app.post('/execute' , Usemiddleware , async (req : Request , res : Response)=> {
     const  workflowId :string = payload.id; //this will be workflow id only  , considering there will be only 1 workflow
     //@ts-ignore
     const userId  = req.userId;
+    console.log("userID : from execute : " + userId)
     const FilteredNodes = JSON.parse(payload.nodes)
     FilteredNodes.forEach((i : node) => { i.type == 'webhook' || i.type == 'awaitGmail' ?( i.data.webhook = false  ,i.data.isExecuting = false , i.data.afterPlayNodes = undefined ) : console.log("wow bhay") })
 

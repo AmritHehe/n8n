@@ -11,7 +11,9 @@ export interface node {
         to ?: string;
         afterPlayNodes ?: number ; 
         previousResponse ?: boolean ; 
-        previousResponseFromWhichNode ?: number
+        previousResponseFromWhichNode ?: number; 
+        credentials : number;
+        chatId : string
     };
     measured : { 
         width : number , 
