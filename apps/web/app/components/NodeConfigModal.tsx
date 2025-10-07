@@ -167,7 +167,7 @@ const NodeConfigModal = ({ isOpen, nodeType, nodeData, onClose, onSave, previous
           </div>
         );
 
-      case 'telegram':
+      case 'teligram':
         return (
           <div className="space-y-4 scrollbar-hide">
             <div>
@@ -216,7 +216,7 @@ const NodeConfigModal = ({ isOpen, nodeType, nodeData, onClose, onSave, previous
   const getModalTitle = () => {
     switch (nodeType) {
       case 'gmail': return 'Configure Gmail';
-      case 'telegram': return 'Configure Telegram';
+      case 'teligram': return 'Configure Telegram';
       case 'aiagent': return 'Configure AI Agent';
       case 'webhook': return 'Configure Webhook';
       case 'awaitGmail': return 'Configure Await Gmail';
