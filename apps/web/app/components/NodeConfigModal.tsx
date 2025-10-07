@@ -6,30 +6,26 @@ interface NodeConfigModalProps {
   isOpen: boolean;
   nodeType: string;
   nodeData: any;
+  nodeId : string | number;
   onClose: () => void;
   onSave: (data: any) => void;
-  previousNodes?: any[]; // to allow picking from previous nodes
+  previousNodes?: any[];
 }
 
-const NodeConfigModal = ({ isOpen, nodeType, nodeData, onClose, onSave, previousNodes }: NodeConfigModalProps) => {
+const NodeConfigModal = ({ isOpen, nodeType, nodeData,  nodeId , onClose, onSave, previousNodes }: NodeConfigModalProps) => {
   const [formData, setFormData] = useState(nodeData || {});
   const [credentials, setCredentials] = useState<any[]>([]);
 
-  // Fetch credentials from API
+  // Fetch credentials
   useEffect(() => {
     async function fetchCredentials() {
       try {
-        const token = localStorage.getItem('token')
-
-        const res  = await axios.get('http://localhost:3002/api/v1/credentials', { 
-            headers : { 
-                authorization : token
-            }
+        const token = localStorage.getItem('token');
+        const res = await axios.get('http://localhost:3002/api/v1/credentials', {
+          headers: { authorization: token },
         });
-        console.log("response " + JSON.stringify(res))
         //@ts-ignore
         setCredentials(res.data);
-
       } catch (err) {
         console.error("Error fetching credentials:", err);
       }
@@ -46,14 +42,20 @@ const NodeConfigModal = ({ isOpen, nodeType, nodeData, onClose, onSave, previous
     return (
       <>
         <option value="">Select Account</option>
-        {credentials.map((cred) => (
-          <option key={cred.id} value={cred.id}>
-            {cred.type} - {cred.title || cred.name || cred.label}
-          </option>
-        ))}
+        {credentials
+          .filter(c => {
+            if (nodeType === 'gmail' || nodeType === 'awaitGmail') return c.platform === 'gmail';
+            if (nodeType === 'teligram') return c.platform === 'teligram';
+            return true;
+          })
+          .map(c => (
+            <option key={c.id} value={c.id}>
+              {c.type} - {c.title || c.name || c.label}
+            </option>
+          ))}
         {previousNodes && previousNodes.length > 0 && (
           <optgroup label="From Previous Nodes">
-            {previousNodes.map((node) => (
+            {previousNodes.map(node => (
               <option key={node.id} value={`prevNode:${node.id}`}>
                 {node.label || node.type} ({node.id})
               </option>
@@ -67,159 +69,261 @@ const NodeConfigModal = ({ isOpen, nodeType, nodeData, onClose, onSave, previous
   const renderForm = () => {
     switch (nodeType) {
       case 'gmail':
-      case 'awaitGmail':
         return (
-          <div className="space-y-4 scrollbar-hide">
+          <div className="space-y-4 scrollbar-hide text-[hsl(var(--foreground))]">
             <div>
-              <label className="block text-sm font-medium text-[hsl(var(--foreground))] mb-2">
-                Credentials
-              </label>
-               <select
-                className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg text-[hsl(var(--foreground))]"
+              <label className="block text-sm font-medium mb-2">Credentials</label>
+              <select
+                className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg"
                 value={formData.credentialsId || ''}
-                onChange={(e) => {
+                onChange={e => {
                   const selectedId = e.target.value;
-                  const selectedCred = credentials.find((c) => c.id === selectedId);
-                  setFormData({
-                    ...formData,
-                    credentialsId: selectedId,
-                    credentialsLabel: selectedCred ? selectedCred.platform : "",
-                  });
+                  const selectedCred = credentials.find(c => c.id === selectedId);
+                  setFormData({ ...formData, credentialsId: selectedId, credentialsLabel: selectedCred?.platform || "" });
                 }}
               >
-                <option value="">Select Account</option>
-                {renderCredentialOptions()}
-              </select>
-            </div>
-
-            {nodeType === 'gmail' && (
-              <>
-                <div>
-                  <label className="block text-sm font-medium text-[hsl(var(--foreground))] mb-2">From</label>
-                  <input
-                    type="email"
-                    className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg text-[hsl(var(--foreground))]"
-                    value={formData.from || ''}
-                    onChange={(e) => setFormData({ ...formData, from: e.target.value })}
-                    placeholder="sender@gmail.com"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-[hsl(var(--foreground))] mb-2">To</label>
-                  <input
-                    type="email"
-                    className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg text-[hsl(var(--foreground))]"
-                    value={formData.to || ''}
-                    onChange={(e) => setFormData({ ...formData, to: e.target.value })}
-                    placeholder="recipient@email.com"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-[hsl(var(--foreground))] mb-2">Subject</label>
-                  <input
-                    type="text"
-                    className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg text-[hsl(var(--foreground))]"
-                    value={formData.subject || ''}
-                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                    placeholder="Email subject"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-[hsl(var(--foreground))] mb-2">Body</label>
-                  <textarea
-                    className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg text-[hsl(var(--foreground))] h-24"
-                    value={formData.message || ''}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    placeholder="Email content..."
-                  />
-                </div>
-              </>
-            )}
-
-            {nodeType === 'awaitGmail' && (
-              <>
-                <div>
-                  <label className="block text-sm font-medium text-[hsl(var(--foreground))] mb-2">From Filter</label>
-                  <input
-                    type="email"
-                    className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg text-[hsl(var(--foreground))]"
-                    value={formData.fromFilter || ''}
-                    onChange={(e) => setFormData({ ...formData, fromFilter: e.target.value })}
-                    placeholder="sender@email.com"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-[hsl(var(--foreground))] mb-2">Subject Contains</label>
-                  <input
-                    type="text"
-                    className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg text-[hsl(var(--foreground))]"
-                    value={formData.subjectFilter || ''}
-                    onChange={(e) => setFormData({ ...formData, subjectFilter: e.target.value })}
-                    placeholder="Keywords to match"
-                  />
-                </div>
-              </>
-            )}
-          </div>
-        );
-
-      case 'teligram':
-        return (
-          <div className="space-y-4 scrollbar-hide">
-            <div>
-              <label className="block text-sm font-medium text-[hsl(var(--foreground))] mb-2">Credentials</label>
-              <select
-                className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg text-[hsl(var(--foreground))]"
-                value={formData.credentials || ''}
-                onChange={(e) => setFormData({ ...formData, credentials: e.target.value })}
-              >
                 {renderCredentialOptions()}
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[hsl(var(--foreground))] mb-2">Chat ID</label>
+              <label className="block text-sm font-medium mb-2">From</label>
+              <input
+                type="email"
+                className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg"
+                value={formData.from || ''}
+                onChange={e => setFormData({ ...formData, from: e.target.value })}
+                placeholder="sender@gmail.com"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">To</label>
+              <input
+                type="email"
+                className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg"
+                value={formData.to || ''}
+                onChange={e => setFormData({ ...formData, to: e.target.value })}
+                placeholder="recipient@email.com"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Subject</label>
               <input
                 type="text"
-                className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg text-[hsl(var(--foreground))]"
-                value={formData.chatId || ''}
-                onChange={(e) => setFormData({ ...formData, chatId: e.target.value })}
-                placeholder="@username or chat ID"
+                className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg"
+                value={formData.subject || ''}
+                onChange={e => setFormData({ ...formData, subject: e.target.value })}
+                placeholder="Email subject"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[hsl(var(--foreground))] mb-2">Message</label>
+              <label className="block text-sm font-medium mb-2">Body</label>
               <textarea
-                className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg text-[hsl(var(--foreground))] h-24"
+                className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg h-24"
                 value={formData.message || ''}
-                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                placeholder="Message to send..."
+                onChange={e => setFormData({ ...formData, message: e.target.value })}
+                placeholder="Email content..."
               />
             </div>
           </div>
         );
 
-      default:
-        return (
-          <div className="text-center py-8">
-            <p className="text-[hsl(var(--foreground-muted))]">No configuration available for this node type.</p>
+      case 'awaitGmail':
+        
+      // Ensure node ID exists
+      if (!formData.id) setFormData({ ...formData, id: crypto.randomUUID() });
+      const webhookUrl = `http://localhost:3002/webhook/${nodeId}?workflowId=${formData.workflowId || ""}`;
+
+      return (
+        <div className="space-y-4  text-[hsl(var(--foreground))]">
+          <div>
+            <label className="block text-sm font-medium mb-2">Webhook URL</label>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                className="flex-1 px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg text-[hsl(var(--foreground))]"
+                readOnly
+                value={webhookUrl}
+              />
+          
+              <button
+                className="px-3 py-2 bg-[hsl(var(--primary))] text-[hsl(var(--foreground))] rounded-lg hover:bg-[hsl(var(--primary-hover))]"
+                onClick={() => navigator.clipboard.writeText(webhookUrl)}
+              >
+                Copy
+              </button>
+            </div>
           </div>
-        );
+
+          {/* Credentials */}
+          <div>
+            <label className="block text-sm font-medium mb-2">Credentials</label>
+            <select
+              className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg"
+              value={formData.credentialsId || ''}
+              onChange={e => {
+                const selectedId = e.target.value;
+                const selectedCred = credentials.find(c => c.id === selectedId);
+                setFormData({ ...formData, credentialsId: selectedId, credentialsLabel: selectedCred?.platform || "" });
+              }}
+            >
+              {renderCredentialOptions()}
+            </select>
+          </div>
+
+          {/* From */}
+          <div>
+            <label className="block text-sm font-medium mb-2">From</label>
+            <input
+              type="email"
+              className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg"
+              value={formData.from || ''}
+              onChange={e => setFormData({ ...formData, from: e.target.value })}
+              placeholder="sender@gmail.com"
+            />
+          </div>
+
+          {/* To */}
+          <div>
+            <label className="block text-sm font-medium mb-2">To</label>
+            <input
+              type="email"
+              className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg"
+              value={formData.to || ''}
+              onChange={e => setFormData({ ...formData, to: e.target.value })}
+              placeholder="recipient@email.com"
+            />
+          </div>
+
+          {/* Subject */}
+          <div>
+            <label className="block text-sm font-medium mb-2">Subject</label>
+            <input
+              type="text"
+              className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg"
+              value={formData.subject || ''}
+              onChange={e => setFormData({ ...formData, subject: e.target.value })}
+              placeholder="Email subject"
+            />
+          </div>
+
+          {/* Body */}
+          <div>
+            <label className="block text-sm font-medium mb-2">Body</label>
+            <textarea
+              className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg h-24"
+              value={formData.message || ''}
+              onChange={e => setFormData({ ...formData, message: e.target.value })}
+              placeholder="Email content..."
+            />
+          </div>
+
+          {/* Webhook */}
+          
+        </div>
+      );
+
+
+      case 'teligram':       
+      return (
+        <div className="space-y-4 scrollbar-y-auto max-h-[60vh] text-[hsl(var(--foreground))]">
+          {/* Credentials first */}
+          <div>
+            <label className="block text-sm font-medium mb-2">Credentials</label>
+            <select
+              className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg"
+              value={formData.credentialsId || ''}
+              onChange={e => {
+                const selectedId = e.target.value;
+                const selectedCred = credentials.find(c => c.id === selectedId);
+                setFormData({
+                  ...formData,
+                  credentialsId: selectedId,
+                  credentialsLabel: selectedCred?.platform || ""
+                });
+              }}
+            >
+              <option value="">Select Credential</option>
+              {credentials
+                .filter(c => c.platform === 'teligram')
+                .map(c => (
+                  <option key={c.id} value={c.id}>
+                    {c.type} - {c.title || c.name || c.label}
+                  </option>
+                ))}
+            </select>
+          </div>
+
+          {/* Checkbox for using previous node response */}
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={formData.usePreviousResponse || false}
+              onChange={e => setFormData({ ...formData, usePreviousResponse: e.target.checked })}
+              id="prevResponse"
+            />
+            <label htmlFor="prevResponse" className="text-sm font-medium">
+              Use Previous Node Response?
+            </label>
+          </div>
+
+          {/* Input for previous node ID only if checkbox is checked */}
+          {formData.usePreviousResponse && (
+            <div>
+              <label className="block text-sm font-medium mb-2">Previous Node ID</label>
+              <input
+                type="text"
+                className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg"
+                placeholder="Enter node ID"
+                value={formData.previousNodeId || ''}
+                onChange={e => setFormData({ ...formData, previousNodeId: e.target.value })}
+              />
+
+              {/* Optional dropdown to select from existing nodes */}
+              {previousNodes && previousNodes.length > 0 && (
+                <select
+                  className="w-full px-3 py-2 mt-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg"
+                  value={formData.previousNodeId || ''}
+                  onChange={e => setFormData({ ...formData, previousNodeId: e.target.value })}
+                >
+                  <option value="">Select from previous nodes</option>
+                  {previousNodes.map(node => (
+                    <option key={node.id} value={node.id}>
+                      {node.data.label || node.type} ({node.id})
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+          )}
+
+          {/* Message input if not using previous node response */}
+          {!formData.usePreviousResponse && (
+            <div>
+              <label className="block text-sm font-medium mb-2">Message</label>
+              <textarea
+                className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg h-24"
+                placeholder="Message to send..."
+                value={formData.message || ''}
+                onChange={e => setFormData({ ...formData, message: e.target.value })}
+              />
+            </div>
+          )}
+        </div>
+      );
+      default:
+        return <p className="text-[hsl(var(--foreground-muted))] text-center py-8">No configuration available.</p>;
     }
   };
 
   const getModalTitle = () => {
     switch (nodeType) {
       case 'gmail': return 'Configure Gmail';
-      case 'teligram': return 'Configure Telegram';
-      case 'aiagent': return 'Configure AI Agent';
-      case 'webhook': return 'Configure Webhook';
       case 'awaitGmail': return 'Configure Await Gmail';
+      case 'teligram': return 'Configure Teligram';
       default: return 'Configure Node';
     }
   };
@@ -241,22 +345,17 @@ const NodeConfigModal = ({ isOpen, nodeType, nodeData, onClose, onSave, previous
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="relative w-[500px] max-h-[80vh] bg-[hsl(var(--background-tertiary))] border border-[hsl(var(--border))] rounded-xl shadow-2xl overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
+            className="relative w-[500px] max-h-[100vh] bg-[hsl(var(--background-tertiary))] border border-[hsl(var(--border))] rounded-xl shadow-2xl overflow-y-auto"
+            onClick={e => e.stopPropagation()}
           >
             <div className="p-6 border-b border-[hsl(var(--border))] flex items-center justify-between">
               <h2 className="text-xl font-semibold text-[hsl(var(--foreground))]">{getModalTitle()}</h2>
-              <button
-                onClick={onClose}
-                className="p-2 hover:bg-[hsl(var(--surface-elevated))] rounded-lg transition-colors"
-              >
-                <svg className="w-5 h-5 text-[hsl(var(--foreground-muted))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+              <button onClick={onClose} className="p-2 hover:bg-[hsl(var(--surface-elevated))] rounded-lg transition-colors">
+                ✕
               </button>
             </div>
 
-            <div className="p-6 max-h-[60vh] overflow-y-auto min-h-0">{renderForm()}</div>
+            <div className="p-6 max-h-[80vh] overflow-y-auto min-h-0">{renderForm()}</div>
 
             <div className="p-6 border-t border-[hsl(var(--border))] flex justify-end gap-3">
               <button

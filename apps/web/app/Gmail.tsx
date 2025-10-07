@@ -114,6 +114,7 @@ export function Gmail({ id, data }: { id: string; data: any }) {
         isOpen={isModalOpen}
         nodeType="gmail"
         nodeData={data} // pass current node.data
+        nodeId={id}
         onClose={handleCloseModal}
         onSave={handleSaveModal}
       />

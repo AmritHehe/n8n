@@ -106,6 +106,7 @@ export function TeligramNode({ id, data }: { id: string; data: any }) {
         isOpen={isModalOpen}
         nodeType="teligram"
         nodeData={data}
+        nodeId={id}
         onClose={handleCloseModal}
         onSave={handleSaveModal}
       />
