@@ -38,7 +38,7 @@ import NodeConfigModal from "./components/NodeConfigModal";
 import Cross from "./components/cross";
 
 export function TeligramNode({ id, data }: { id: string; data: any }) {
-  const { setNodes, setEdges } = useReactFlow();
+  const { setNodes, setEdges, getNodes } = useReactFlow();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const deleteNode = () => {
@@ -53,7 +53,7 @@ export function TeligramNode({ id, data }: { id: string; data: any }) {
           n.id === id
             ? field
               ? { ...n, data: { ...n.data, [field]: value } }
-              : { ...n, data: value } // replace full data if field empty
+              : { ...n, data: value }
             : n
         )
       );
@@ -64,8 +64,11 @@ export function TeligramNode({ id, data }: { id: string; data: any }) {
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
   const handleSaveModal = (updatedData: any) => {
-    updateField("", updatedData); // save entire modal data
+    updateField("", updatedData);
   };
+
+  // ✅ Fetch all previous nodes for dropdown
+  const previousNodes = getNodes().filter((n) => n.id !== id);
 
   return (
     <>
@@ -80,7 +83,7 @@ export function TeligramNode({ id, data }: { id: string; data: any }) {
                 <path d="M2 10l16-5-5 16-3-5-3 5-5-16z" />
               </svg>
             </div>
-            <h3 className="font-semibold text-sm">{data?.label || "Teligram"}</h3>
+            <h3 className="font-semibold text-sm">{data?.label || "Telegram"}</h3>
           </div>
           <button
             onClick={(e) => {
@@ -107,9 +110,11 @@ export function TeligramNode({ id, data }: { id: string; data: any }) {
         nodeType="teligram"
         nodeData={data}
         nodeId={id}
+        previousNodes={previousNodes} // ✅ pass previous nodes here
         onClose={handleCloseModal}
         onSave={handleSaveModal}
       />
     </>
   );
 }
+

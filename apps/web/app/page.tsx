@@ -11,7 +11,7 @@ import { Gmail } from "./Gmail";
 import { Webhook } from "./Webhook";
 import axios from "axios";
 import { AwaitGmail } from "./AwaitGmail";
-
+import { AINode } from "./agent";
 
 const inititalNodes = [{ 
   id : '1' , 
@@ -25,7 +25,8 @@ const nodeTypes = {
   trigger : Trigger , 
   gmail : Gmail , 
   webhook : Webhook , 
-  awaitGmail : AwaitGmail
+  awaitGmail : AwaitGmail , 
+  agent : AINode
 }
 
 

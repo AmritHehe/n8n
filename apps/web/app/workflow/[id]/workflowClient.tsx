@@ -32,6 +32,7 @@ import { Gmail } from "../../Gmail";
 import { Webhook } from "../../Webhook";
 import axios from "axios";
 import { AwaitGmail } from "../../AwaitGmail";
+import { AINode } from '../../agent';
 // Import custom nodes
 
 
@@ -45,7 +46,7 @@ const nodeTypes = {
   gmail : Gmail , 
   webhook : Webhook , 
   awaitGmail : AwaitGmail,
-  aiagent: AwaitGmail,
+  aiagent: AINode,
 }
 
 interface WorkflowClientProps {
@@ -892,6 +893,8 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
         isOpen={configModal.isOpen}
         nodeType={configModal.nodeType || ''}
         nodeData={configModal.nodeData}
+
+        nodeId={configModal.nodeId}
         onClose={() => setConfigModal({ isOpen: false, nodeId: null, nodeType: null, nodeData: null })}
         onSave={saveNodeConfig}
       />
