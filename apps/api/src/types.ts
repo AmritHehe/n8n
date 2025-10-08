@@ -1,7 +1,7 @@
 export interface node { 
     id : number ;
     position : { x : number , y : number}
-    type : 'trigger' | 'telegram' | 'gmail' | 'agent' | 'webhook' | 'awaitGmail' ;
+    type : 'trigger' | 'telegram' | 'gmail' | 'agent' | 'webhook' | 'awaitGmail' | 'aiagent' ;
     data : { 
         label :  'trigger'| 'action'  ;
         webhook ?: boolean ;
@@ -13,7 +13,9 @@ export interface node {
         previousResponse ?: boolean ; 
         previousResponseFromWhichNode ?: number; 
         credentialsId : number;
-        chatId : string
+        chatId : string; 
+        // usePreviousResponse : Boolean; 
+        // previousNodeId ?: number | string
     };
     measured : { 
         width : number , 

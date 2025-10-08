@@ -246,6 +246,73 @@ export async function executeIt( payload : any , user :any  , workflowId : strin
     
                     }
                 }
+                else if (proces.type === 'aiagent') {
+                    const message = proces.data.message;
+                    const usePrevious = proces.data.previousResponse;
+                    const previousNodeId = proces.data.previousResponseFromWhichNode;
+
+                    logCallBack?.("executing agent");
+
+                    try {
+                        let finalPrompt = message || "";
+                        console.log("inside this ")
+                        // 🧩 If user selected a previous node response
+                        if (usePrevious && previousNodeId) {
+                        const previousData = await prismaClient.responses.findFirst({
+                            where: { workflowId },
+                        });
+                        console.log("previous data  " +     JSON.stringify(previousData))
+                        if (previousData && previousData.data) {
+                            console.log("inside this again")
+                            const parsed = JSON.parse(previousData.data);
+                            console.log("parsed data " + JSON.stringify(parsed))
+                            console.log("previous response id " + previousNodeId)
+                            const prevNodeResponse = parsed.find(
+                            (r: any) => r.outputNodeIndex == previousNodeId
+                            );
+                            console.log("previous data " + JSON.stringify(prevNodeResponse))
+                            if (prevNodeResponse?.data)
+                            finalPrompt += prevNodeResponse.data;
+                        }
+                        }
+
+                        if (finalPrompt.trim()) {
+                        const ai_response = await genai(finalPrompt);
+                        console.log("AI Response:", ai_response);
+
+                        const payloadToSend = {
+                            outputNodeIndex : proces.id,
+                            type: "agent",
+                            data : ai_response,
+                            timestamp: new Date().toISOString(),
+                        };
+
+                        // 💾 Store the AI response in responses table (like webhook logic)
+                        const oldData = await prismaClient.responses.findFirst({
+                            where: { workflowId },
+                        });
+
+                        if (oldData) {
+                            let newData;
+                            if (!oldData.data || oldData.data === "") {
+                            newData = [payloadToSend];
+                            } else {
+                            let parsedOldData = JSON.parse(oldData.data);
+                            newData = [...parsedOldData, payloadToSend];
+                            }
+
+                            await prismaClient.responses.update({
+                            where: { workflowId },
+                            data: { data: JSON.stringify(newData) },
+                            });
+                        }
+                        console.log("✅ AI response stored successfully");
+                        }
+                    } catch (err) {
+                        console.error("Error executing agent node:", err);
+                    }
+                }
+
                 else { 
                     console.log("wtf proces is this bhay" + JSON.stringify(proces))
                 }
