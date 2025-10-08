@@ -6,7 +6,7 @@ interface NodeConfigModalProps {
   isOpen: boolean;
   nodeType: string;
   nodeData: any;
-  nodeId : string | number;
+  nodeId : string | number | null;
   onClose: () => void;
   onSave: (data: any) => void;
   previousNodes?: any[];
@@ -227,81 +227,69 @@ const NodeConfigModal = ({ isOpen, nodeType, nodeData,  nodeId , onClose, onSave
       );
 
 
-      case 'teligram':       
-      return (
-        <div className="space-y-4 scrollbar-y-auto max-h-[60vh] text-[hsl(var(--foreground))]">
-          {/* Credentials first */}
-          <div>
-            <label className="block text-sm font-medium mb-2">Credentials</label>
-            <select
-              className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg"
-              value={formData.credentialsId || ''}
-              onChange={e => {
-                const selectedId = e.target.value;
-                const selectedCred = credentials.find(c => c.id === selectedId);
-                setFormData({
-                  ...formData,
-                  credentialsId: selectedId,
-                  credentialsLabel: selectedCred?.platform || ""
-                });
-              }}
-            >
-              <option value="">Select Credential</option>
-              {credentials
-                .filter(c => c.platform === 'teligram')
-                .map(c => (
-                  <option key={c.id} value={c.id}>
-                    {c.type} - {c.title || c.name || c.label}
-                  </option>
-                ))}
-            </select>
-          </div>
-
-          {/* Checkbox for using previous node response */}
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={formData.usePreviousResponse || false}
-              onChange={e => setFormData({ ...formData, usePreviousResponse: e.target.checked })}
-              id="prevResponse"
-            />
-            <label htmlFor="prevResponse" className="text-sm font-medium">
-              Use Previous Node Response?
-            </label>
-          </div>
-
-          {/* Input for previous node ID only if checkbox is checked */}
-          {formData.usePreviousResponse && (
+      case 'teligram':
+        return (
+          <div className="space-y-4 scrollbar-y-auto max-h-[60vh] text-[hsl(var(--foreground))]">
+            {/* Credentials */}
             <div>
-              <label className="block text-sm font-medium mb-2">Previous Node ID</label>
-              <input
-                type="text"
+              <label className="block text-sm font-medium mb-2">Credentials</label>
+              <select
                 className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg"
-                placeholder="Enter node ID"
-                value={formData.previousNodeId || ''}
-                onChange={e => setFormData({ ...formData, previousNodeId: e.target.value })}
-              />
+                value={formData.credentialsId || ''}
+                onChange={e => {
+                  const selectedId = e.target.value;
+                  const selectedCred = credentials.find(c => c.id === selectedId);
+                  setFormData({
+                    ...formData,
+                    credentialsId: selectedId,
+                    credentialsLabel: selectedCred?.platform || ""
+                  });
+                }}
+              >
+                <option value="">Select Credential</option>
+                {credentials
+                  .filter(c => c.platform === 'teligram')
+                  .map(c => (
+                    <option key={c.id} value={c.id}>
+                      {c.type} - {c.title || c.name || c.label}
+                    </option>
+                  ))}
+              </select>
+            </div>
 
-              {/* Optional dropdown to select from existing nodes */}
-              {previousNodes && previousNodes.length > 0 && (
+            {/* Use previous node response */}
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={formData.previousResponse || false}
+                onChange={e => setFormData({ ...formData, previousResponse: e.target.checked })}
+                id="prevResponse"
+              />
+              <label htmlFor="prevResponse" className="text-sm font-medium">
+                Use Response from Previous Node
+              </label>
+            </div>
+
+            {/* Select previous node */}
+            {formData.previousResponse && (
+              <div>
+                <label className="block text-sm font-medium mb-2">Select Previous Node</label>
                 <select
-                  className="w-full px-3 py-2 mt-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg"
-                  value={formData.previousNodeId || ''}
-                  onChange={e => setFormData({ ...formData, previousNodeId: e.target.value })}
+                  className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg"
+                  value={formData.previousResponseFromWhichNode || ''}
+                  onChange={e => setFormData({ ...formData, previousResponseFromWhichNode: e.target.value })}
                 >
                   <option value="">Select from previous nodes</option>
-                  {previousNodes.map(node => (
+                  {previousNodes?.map(node => (
                     <option key={node.id} value={node.id}>
                       {node.data.label || node.type} ({node.id})
                     </option>
                   ))}
                 </select>
-              )}
-            </div>
-          )}
+              </div>
+            )}
 
-          {/* Message input if not using previous node response */}
-          {!formData.usePreviousResponse && (
+            {/* Message (always available, can combine with prev response) */}
             <div>
               <label className="block text-sm font-medium mb-2">Message</label>
               <textarea
@@ -310,10 +298,94 @@ const NodeConfigModal = ({ isOpen, nodeType, nodeData,  nodeId , onClose, onSave
                 value={formData.message || ''}
                 onChange={e => setFormData({ ...formData, message: e.target.value })}
               />
+              <p className="text-xs text-[hsl(var(--foreground-muted))] mt-1">
+                If both message and previous node response are selected, both will be combined.
+              </p>
             </div>
-          )}
-        </div>
-      );
+          </div>
+        );
+
+      case 'agent':
+        return (
+          <div className="space-y-4 scrollbar-y-auto max-h-[60vh] text-[hsl(var(--foreground))]">
+            {/* Select LLM Model */}
+            <div>
+              <label className="block text-sm font-medium mb-2">LLM Model</label>
+              <select
+                className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg"
+                value={formData.model || 'gemini'}
+                onChange={e => setFormData({ ...formData, model: e.target.value })}
+              >
+                <option value="gemini">Gemini (Google Generative AI)</option>
+              </select>
+            </div>
+
+            {/* Checkbox for previous node response */}
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={formData.previousResponse || false}
+                onChange={e => setFormData({ ...formData, previousResponse: e.target.checked })}
+                id="usePrevResponse"
+              />
+              <label htmlFor="usePrevResponse" className="text-sm font-medium">
+                Use Response from Previous Node
+              </label>
+            </div>
+
+            {/* Select or input for previous node */}
+            {/* {formData.previousResponse && (
+              <div>
+                <label className="block text-sm font-medium mb-2">Previous Node ID</label>
+                <select
+                  className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg"
+                  value={formData.previousResponseFromWhichNode || ''}
+                  onChange={e => setFormData({ ...formData, previousResponseFromWhichNode: e.target.value })}
+                >
+                  <option value="">Select from previous nodes</option>
+                  {previousNodes?.map(node => (
+                    <option key={node.id} value={node.id}>
+                      {node.data.label || node.type} ({node.id})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )} */}
+                        {formData.previousResponse && (
+              <div>
+                <label className="block text-sm font-medium mb-2">Select Previous Node</label>
+                <select
+                  className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg"
+                  value={formData.previousResponseFromWhichNode || ''}
+                  onChange={e => setFormData({ ...formData, previousResponseFromWhichNode: e.target.value })}
+                >
+                  <option value="">Select from previous nodes</option>
+                  {previousNodes?.map(node => (
+                    <option key={node.id} value={node.id}>
+                      {node.data.label || node.type} ({node.id})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+
+            {/* Prompt message */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Prompt Message</label>
+              <textarea
+                className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg h-24"
+                placeholder="Enter your AI prompt..."
+                value={formData.message || ''}
+                onChange={e => setFormData({ ...formData, message: e.target.value })}
+              />
+              <p className="text-xs text-[hsl(var(--foreground-muted))] mt-1">
+                If both message and previous node response are provided, both will be combined before sending to AI.
+              </p>
+            </div>
+          </div>
+        );
+
       default:
         return <p className="text-[hsl(var(--foreground-muted))] text-center py-8">No configuration available.</p>;
     }
