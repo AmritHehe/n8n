@@ -182,7 +182,6 @@ export async function executeIt( payload : any , user :any  , workflowId : strin
                                 id : workflowId
                             }, 
                             data : { 
-                                title : "now it must work",
                                 nodes : JSON.stringify(nodes)
                             }
                         })
