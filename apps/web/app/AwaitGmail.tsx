@@ -99,7 +99,7 @@ export function AwaitGmail({ id, data }: { id: string; data: any }) {
                 <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
               </svg>
             </div>
-            <h3 className="font-semibold text-sm">{data?.label || "Await Gmail"}</h3>
+            <h3 className="font-semibold text-sm">{"send mail nd wait til res ," + " id : " + id|| "Await Gmail"}</h3>
           </div>
           <button
             onClick={(e) => {

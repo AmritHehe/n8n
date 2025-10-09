@@ -60,7 +60,7 @@ const { getNodes, getEdges } = useReactFlow();
             <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
               <Bot className="w-4 h-4 text-white" />
             </div>
-            <h3 className="font-semibold text-sm">{data?.label || "AI Node"}</h3>
+            <h3 className="font-semibold text-sm">{"AI agent, " + "id " +id || "AI Node"}</h3>
           </div>
 
           {/* Delete Button */}

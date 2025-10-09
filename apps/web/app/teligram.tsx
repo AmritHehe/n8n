@@ -83,7 +83,7 @@ export function TeligramNode({ id, data }: { id: string; data: any }) {
                 <path d="M2 10l16-5-5 16-3-5-3 5-5-16z" />
               </svg>
             </div>
-            <h3 className="font-semibold text-sm">{data?.label || "Telegram"}</h3>
+            <h3 className="font-semibold text-sm">{"send telegram msg, "  +"id :  "+ id|| `Telegram  + ${id}`}</h3>
           </div>
           <button
             onClick={(e) => {

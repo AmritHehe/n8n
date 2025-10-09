@@ -76,7 +76,7 @@ export function Webhook({ id, data }: { id: string; data: any }) {
     <div className="relative w-80 bg-zinc-900 rounded-2xl shadow-lg border border-zinc-700 p-4 flex flex-col gap-3">
       {/* Header */}
       <div className="flex justify-between items-center border-b border-zinc-700 pb-2">
-        <span className="font-semibold text-white">Webhook</span>
+        <span className="font-semibold text-white">Webhook, id :  {id}</span>
         <button
           onClick={deleteNode}
           className="p-1 rounded hover:bg-zinc-800 transition-colors"
