@@ -33,6 +33,7 @@ import { Webhook } from "../../nodes/Webhook";
 import axios from "axios";
 import { AwaitGmail } from "../../nodes/AwaitGmail";
 import { AINode } from '../../nodes/agent';
+import { parse } from 'path';
 // Import custom nodes
 
 
@@ -122,7 +123,8 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
         
         
         
-  }, [])
+  }, [ ])
+  useEffect(()=>{},[])
   // Navigation with save warning
   const handleNavigation = (path: string) => {
     if (hasUnsavedChanges) {
@@ -233,6 +235,29 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
     );
   };
 
+  useEffect(() => {
+    // Trigger re-render by updating nodes reference
+    console.log("hi hello ")
+    setNodes((prevNodes) =>
+      prevNodes.map((node) => ({
+        ...node,
+        data: {
+          ...node.data,
+          refreshedAt: Date.now(), // dummy field to force re-render
+        },
+      }))
+    );
+
+    setEdges((prevEdges) =>
+      prevEdges.map((edge) => ({
+        ...edge,
+        refreshedAt: Date.now(), // optional, if you want edges to refresh
+      }))
+    );
+    
+  }, [executingNodeId , hasUnsavedChanges , isExecuting , setMessage , message , ] ); // or [someTrigger] if you want to control when to refresh
+
+  
   // Simulate workflow execution
   const simulateExecution = async () => {
     if (nodes.length === 0) return;
@@ -261,7 +286,7 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
     
     // Clear executing state
     setNodes((nds) => 
-      nds.map((n) => ({ ...n, data: { ...n.data, isExecuting: false } }))
+      nds.map((n) => ({ ...n, data: { ...n.data, isExecuting: false  } }))
     );
     setExecutingNodeId(null);
     setIsExecuting(false);
@@ -329,22 +354,84 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
     setMessage("Started workflow execution...\n"); // reset message
 
     try {
-      // Open SSE connection to backend logs
       console.log("worflow Id : " + workflowId)
       const eventSource = new EventSource(`http://localhost:3002/execute/logs/${workflowId}?token=${token}`);
 
       eventSource.onmessage = (event) => {
-        console.log("agar yaha tk agye fir kuch to gadbd hai daya")
-        // append each incoming log to message
-        setMessage((prev) => prev + event.data + "\n");
-        console.log("message aya message aya  " + event.data)
-
+        // console.log(event.data)
         if (event.data === "done") {
             console.log("Workflow finished!");
-            setMessage((prev) => (prev ? prev + "\n" : "") + "Execution completed!");
+            setMessage( "Execution completed!");
             eventSource.close(); // close SSE connection
             setLoading(false);
+             setNodes((nds) => 
+              nds.map((n) => ({ ...n, data: { ...n.data, isExecuting: false } }))
+            );
+            setExecutingNodeId(null);
+            setIsExecuting(false);
+            setMessage('Workflow execution completed!');
+            saveWorkflow();
+            setTimeout(() => setMessage(null), 3000);
+            
           }
+        let parsed = JSON.parse(event.data);
+        console.log("parsed Data " + parsed)
+       
+        
+
+        console.log("message are coming  + " + parsed)
+        console.log(" node iD " + parsed.nodeId)
+        if (parsed.type === "nodeExecuting") {
+          const nodeId = parsed.nodeId;
+          console.log("node ID " + nodeId)
+          setExecutingNodeId(nodeId);
+          setNodes((nds) =>
+            nds.map((n) =>
+              n.id === nodeId
+                ? { ...n, data: { ...n.data, isExecuting: true } }
+                : { ...n, data: { ...n.data, isExecuting: false } }
+            )
+          );
+
+          setMessage((prev) => prev + `⚙️ Executing node: ${nodeId}\n`);
+        }
+        
+        else if (parsed.type === "nodeCompleted") {
+          const nodeId = parsed.nodeId;
+          setNodes((nds) =>
+            nds.map((n) =>
+              n.id === nodeId
+                ? { ...n, data: { ...n.data, isExecuting: false, isCompleted: true } }
+                : n
+            )
+          );
+          // setMessage((prev) => prev + `✅ Node ${nodeId} completed\n`);
+        }
+
+        // else if (parsed.type === "workflowCompleted") {
+        //   setNodes((nds) =>
+        //     nds.map((n) => ({ ...n, data: { ...n.data, isExecuting: false } }))
+        //   );
+        //   setLoading(false);
+        //   setMessage((prev) => prev + "🎉 Workflow execution completed!\n");
+        //   eventSource.close();
+        //    setNodes((nds) => 
+        //     nds.map((n) => ({ ...n, data: { ...n.data, isExecuting: false } }))
+        //   );
+        //   setExecutingNodeId(null);
+        //   setIsExecuting(false);
+        //   setMessage('Workflow execution completed!');
+        //   setTimeout(() => setMessage(null), 3000);
+        // }
+
+        // Fallback: plain text logs
+        else if (typeof event.data === "string" || typeof event == "string" ||!parsed.type) {
+          
+          setMessage((prev) => prev + event.data + "\n");
+        }
+        console.log("message aya message aya  " + event.data)
+
+        
 
       };
 
