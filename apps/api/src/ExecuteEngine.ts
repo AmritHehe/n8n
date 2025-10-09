@@ -5,7 +5,7 @@ import { telegramBot } from "./ExecuteNodes/ExecuteTeligram.js";
 import { gmail } from "./ExecuteNodes/ExecuteGmail.js";
 import { genai } from "./ExecuteNodes/ExecuteAiAgent.js";
 
-export async function executeIt( payload : any , user :any  , workflowId : string , indexToStartWith ?: number , ExecutedFirstIndex ?: boolean , logCallBack ?: (msg : string)=> void){ 
+export async function executeIt( payload : any , user :string  , workflowId : string , indexToStartWith ?: number , ExecutedFirstIndex ?: boolean , logCallBack ?: (msg : string)=> void){ 
         const nodes = JSON.parse(payload.nodes); 
         const connections = (payload.connections);
         const sortedArray = preOrderTraversal(connections) ; 
@@ -57,6 +57,7 @@ export async function executeIt( payload : any , user :any  , workflowId : strin
                     const message = proces.data.message!
                     console.log("reached inside telegram")
                     logCallBack?.("executing telegram")
+                    logCallBack?.(`${JSON.stringify({ type: "nodeExecuting", nodeId: proces.id })}`);
                     let oldResponses;
                     try { 
                         try{ 
@@ -67,7 +68,7 @@ export async function executeIt( payload : any , user :any  , workflowId : strin
                             })
                         }
                         catch(err){ 
-                            console.error("prismaClient Serch Failed")
+                            console.error("prismaClient old responses Serch Failed")
                         }
                         const credId = proces.data.credentialsId; 
                         const chatId = proces.data.chatId;
@@ -86,7 +87,7 @@ export async function executeIt( payload : any , user :any  , workflowId : strin
                         // }
                         
                         // console.log("data chat id : " + data.chatId)
-                        console.log('credentials data' + JSON.stringify(data))
+                        // console.log('credentials data' + JSON.stringify(data))
                         if(proces.data.previousResponse){ 
                             if(oldResponses){ 
                                 console.log("hi bhai ji bhai")
@@ -103,7 +104,7 @@ export async function executeIt( payload : any , user :any  , workflowId : strin
                                     console.log(" data : " + JSON.stringify(dataa)) ; 
                                     console.log(" message "  + Message)
                                     await telegramBot(data , Message )
-
+                                    logCallBack?.(`${JSON.stringify({ type: "nodeCompleted", nodeId: proces.id })}`);
                                 }
                                 
                                 
@@ -112,7 +113,9 @@ export async function executeIt( payload : any , user :any  , workflowId : strin
                             
                         }
                         else { 
-                            await telegramBot(data ,message)
+                            await telegramBot(data ,message);
+                            logCallBack?.(`${JSON.stringify({ type: "nodeCompleted", nodeId: proces.id })}`);
+
                         } 
                     }
                     catch(e) { 
@@ -130,7 +133,8 @@ export async function executeIt( payload : any , user :any  , workflowId : strin
                     const to = proces.data.to!
                     try{ 
                         console.log('inside gmail execution part ')
-                        logCallBack?.("executing gmail")
+                        // logCallBack?.("executing gmail")
+                        logCallBack?.(`${JSON.stringify({ type: "nodeExecuting", nodeId: proces.id })}`);
                         const credentials = await prismaClient.credentials.findFirst({
                             where : { 
                                 userId : userId,
@@ -140,7 +144,48 @@ export async function executeIt( payload : any , user :any  , workflowId : strin
                         
                         const data = credentials!.data
                         console.log('credentials data' + data)
-                        await gmail(data ,to ,  subject , message , false)
+                        let oldResponses;
+                        try{ 
+                            oldResponses = await prismaClient.responses.findFirst({ 
+                                where : { 
+                                    workflowId : workflowId
+                                }
+                            })
+                        }
+                        catch(err){ 
+                            console.error("prismaClient old responses Serch Failed")
+                        }
+                        if(proces.data.previousResponse){ 
+                            console.log("hello from here ")
+                            if(oldResponses){ 
+                                console.log("hi bhai ji bhai")
+                                console.log(" old responses" + JSON.stringify(oldResponses))
+                                let oldResponsesData = JSON.parse(oldResponses.data);
+                                let whichNodePreviousData = proces.data.previousResponseFromWhichNode; 
+                                console.log("old responses data  : " + JSON.stringify(oldResponsesData))
+                                if(whichNodePreviousData){ 
+                                    console.log("which node previous data : " + whichNodePreviousData)
+                                    let dataa = oldResponsesData.find((i : any) => i.outputNodeIndex == whichNodePreviousData)
+                                    console.log(" dataa"+ JSON.stringify(dataa))
+                                    let Message = dataa.data
+                                    console.log("message "+ Message)
+                                    console.log(" data : " + JSON.stringify(dataa)) ; 
+                                    console.log(" message "  + Message)
+                                    await gmail(data ,to ,  subject , Message , false , proces.id , workflowId)
+                                    logCallBack?.(`${JSON.stringify({ type: "nodeCompleted", nodeId: proces.id })}`);
+
+                                }
+                                
+                                
+
+                            }
+                            
+                        }
+                        else { 
+                            await gmail(data ,to ,  subject , message , false , proces.id , workflowId)
+                            logCallBack?.(`${JSON.stringify({ type: "nodeCompleted", nodeId: proces.id })}`);
+
+                        } 
                         // res.json('send the mail bhosdu yayaya')
                     }
                     catch(err){ 
@@ -156,7 +201,8 @@ export async function executeIt( payload : any , user :any  , workflowId : strin
                 else if(proces.type == 'agent'){ 
                     const message = proces.data.message; 
                     console.log("reached till here agent 1")
-                    logCallBack?.("executing agent")
+                    // logCallBack?.("executing agent")
+                    logCallBack?.(`${JSON.stringify({ type: "nodeExecuting", nodeId: proces.id })}`);
                     try { 
                         if(message){ 
                             const ai_response = await genai(message); 
@@ -173,7 +219,8 @@ export async function executeIt( payload : any , user :any  , workflowId : strin
                 else if(proces.type == 'webhook'){ 
                     if (proces.data.webhook==false){ 
                         console.log("waiting for webhook execution")
-                        logCallBack?.("waiting for webhook execution ! ")
+                        logCallBack?.(`${JSON.stringify({ type: "nodeExecuting", nodeId: proces.id })}`);
+                        logCallBack?.("waiting for webhook execution ! ")                 
                         proces.data.afterPlayNodes = i + 1;
                         proces.data.isExecuting = true;
                         nodes[processtoexecute-1].data.isExecuting = true;
@@ -191,6 +238,8 @@ export async function executeIt( payload : any , user :any  , workflowId : strin
                     }
                     else { 
                         console.log("webhook executed")
+                        logCallBack?.(`${JSON.stringify({ type: "nodeCompleted", nodeId: proces.id })}`);
+
                         // logCallBack?.("webhook exceuted")
                     }
 
@@ -201,7 +250,9 @@ export async function executeIt( payload : any , user :any  , workflowId : strin
                     const to = proces.data.to!
                     try{ 
                         console.log('inside gmail execution part ')
-                        logCallBack?.("executing  awaitGmail")
+                        logCallBack?.(`${JSON.stringify({ type: "nodeExecuting", nodeId: proces.id })}`);
+
+                        // logCallBack?.("executing  awaitGmail")
                         const credentials = await prismaClient.credentials.findFirst({
                             where : { 
                                 userId : userId,
@@ -211,7 +262,46 @@ export async function executeIt( payload : any , user :any  , workflowId : strin
                         
                         const data = credentials!.data
                         console.log('credentials data' + data)
-                        await gmail(data ,to ,  subject , message , true , proces.id )
+                        let oldResponses;
+                        try{ 
+                            oldResponses = await prismaClient.responses.findFirst({ 
+                                where : { 
+                                    workflowId : workflowId
+                                }
+                            })
+                        }
+                        catch(err){ 
+                            console.error("prismaClient old responses Serch Failed")
+                        }
+                        if(proces.data.previousResponse){ 
+                            if(oldResponses){ 
+                                console.log("hi bhai ji bhai")
+                                console.log(" old responses" + JSON.stringify(oldResponses))
+                                let oldResponsesData = JSON.parse(oldResponses.data);
+                                let whichNodePreviousData = proces.data.previousResponseFromWhichNode; 
+                                console.log("old responses data  : " + JSON.stringify(oldResponsesData))
+                                if(whichNodePreviousData){ 
+                                    console.log("which node previous data : " + whichNodePreviousData)
+                                    let dataa = oldResponsesData.find((i : any) => i.outputNodeIndex == whichNodePreviousData)
+                                    console.log(" dataa"+ JSON.stringify(dataa))
+                                    let Message = dataa.data
+                                    console.log("message "+ Message)
+                                    console.log(" data : " + JSON.stringify(dataa)) ; 
+                                    console.log(" message "  + Message)
+                                    await gmail(data ,to ,  subject , Message , true , proces.id  , workflowId)
+
+                                }
+                                
+                                
+
+                            }
+                            
+                        }
+                        else { 
+                            await gmail(data ,to ,  subject , message , true , proces.id , workflowId )
+
+                        } 
+                        
                         if (proces.data.webhook==false){ 
                             console.log("waiting for user to respond ")
                             logCallBack?.("awaiting gmail response")
@@ -234,6 +324,8 @@ export async function executeIt( payload : any , user :any  , workflowId : strin
                         else { 
                             console.log("webhook executed")
                             logCallBack?.("response arrived ")
+                            logCallBack?.(`${JSON.stringify({ type: "nodeCompleted", nodeId: proces.id })}`);
+
                         }
 
                         // res.json('send the mail bhosdu yayaya')
@@ -251,7 +343,7 @@ export async function executeIt( payload : any , user :any  , workflowId : strin
                     const previousNodeId = proces.data.previousResponseFromWhichNode;
 
                     logCallBack?.("executing agent");
-
+                    logCallBack?.(`${JSON.stringify({ type: "nodeExecuting", nodeId: proces.id })}`);
                     try {
                         let finalPrompt = message || "";
                         console.log("inside this ")
@@ -306,6 +398,7 @@ export async function executeIt( payload : any , user :any  , workflowId : strin
                             });
                         }
                         console.log("✅ AI response stored successfully");
+                        logCallBack?.(`${JSON.stringify({ type: "nodeCompleted", nodeId: proces.id })}`);
                         }
                     } catch (err) {
                         console.error("Error executing agent node:", err);
