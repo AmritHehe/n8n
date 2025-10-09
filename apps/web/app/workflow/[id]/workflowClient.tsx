@@ -26,13 +26,13 @@ declare global {
   }
 }
 
-import { TeligramNode } from "../../teligram";
-import { Trigger } from "../../Trigger";
-import { Gmail } from "../../Gmail";
-import { Webhook } from "../../Webhook";
+import { TeligramNode } from "../../nodes/teligram";
+import { Trigger } from "../../nodes/Trigger";
+import { Gmail } from "../../nodes/Gmail";
+import { Webhook } from "../../nodes/Webhook";
 import axios from "axios";
-import { AwaitGmail } from "../../AwaitGmail";
-import { AINode } from '../../agent';
+import { AwaitGmail } from "../../nodes/AwaitGmail";
+import { AINode } from '../../nodes/agent';
 // Import custom nodes
 
 

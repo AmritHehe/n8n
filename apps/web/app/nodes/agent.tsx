@@ -2,8 +2,8 @@ import React from "react";
 import { Handle, Position, useReactFlow } from "@xyflow/react";
 import { useState, useCallback } from "react";
 import { Bot } from "lucide-react";
-import NodeConfigModal from "./components/NodeConfigModal";
-import Cross from "./components/cross";
+import NodeConfigModal from "../components/NodeConfigModal";
+import Cross from "../components/cross";
 
 export function AINode({ id, data }: { id: string; data: any }) {
   const { setNodes } = useReactFlow();
@@ -104,12 +104,12 @@ const { getNodes, getEdges } = useReactFlow();
         <Handle
           type="target"
           position={Position.Left}
-          className="!bg-white !w-3 !h-3"
+          className="!bg-white !w-4 !h-4 hover:scale-125 transition-transform"
         />
         <Handle
           type="source"
           position={Position.Right}
-          className="!bg-white !w-3 !h-3"
+          className="!bg-white !w-4 !h-4 hover:scale-125 transition-transform"
         />
       </div>
 

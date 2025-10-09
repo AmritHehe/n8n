@@ -39,7 +39,7 @@
 //     </>
 // }
 import { Handle, Position, useEdges, useReactFlow } from "@xyflow/react";
-import Cross from "./components/cross";
+import Cross from "../components/cross";
 import { useState, useCallback } from "react";
 
 export function Webhook({ id, data }: { id: string; data: any }) {
@@ -117,8 +117,8 @@ export function Webhook({ id, data }: { id: string; data: any }) {
       )}
 
       {/* React Flow Handles */}
-      <Handle type="source" position={Position.Right} />
-      <Handle type="target" position={Position.Left} />
+      <Handle type="source" position={Position.Right} className="!bg-white !w-4 !h-4 hover:scale-125 transition-transform" />
+      <Handle type="target" position={Position.Left} className="!bg-white !w-4 !h-4 hover:scale-125 transition-transform" />
     </div>
   );
 }

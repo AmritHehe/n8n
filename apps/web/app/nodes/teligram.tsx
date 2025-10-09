@@ -34,8 +34,8 @@
 // }
 import { Handle, Position, useReactFlow } from "@xyflow/react";
 import { useState, useCallback } from "react";
-import NodeConfigModal from "./components/NodeConfigModal";
-import Cross from "./components/cross";
+import NodeConfigModal from "../components/NodeConfigModal";
+import Cross from "../components/cross";
 
 export function TeligramNode({ id, data }: { id: string; data: any }) {
   const { setNodes, setEdges, getNodes } = useReactFlow();
@@ -98,10 +98,8 @@ export function TeligramNode({ id, data }: { id: string; data: any }) {
 
         <p className="text-xs text-white/80 p-4">{data?.description || "Send message via Telegram"}</p>
 
-        <div className="flex items-center justify-center shadow-zinc-600 bg-zinc-300 px-6 py-4 rounded-xl">
-          <Handle type="source" position={Position.Right} className="w-3 h-3 bg-white" />
-          <Handle type="target" position={Position.Left} className="w-3 h-3 bg-white" />
-        </div>
+          <Handle type="source" position={Position.Right} className="!bg-white !w-4 !h-4 hover:scale-125 transition-transform" />
+          <Handle type="target" position={Position.Left} className="!bg-white !w-4 !h-4 hover:scale-125 transition-transform" />
       </div>
 
       {/* Node configuration modal */}
@@ -110,7 +108,7 @@ export function TeligramNode({ id, data }: { id: string; data: any }) {
         nodeType="teligram"
         nodeData={data}
         nodeId={id}
-        previousNodes={previousNodes} // ✅ pass previous nodes here
+        previousNodes={previousNodes} 
         onClose={handleCloseModal}
         onSave={handleSaveModal}
       />

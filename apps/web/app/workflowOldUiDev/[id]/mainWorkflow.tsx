@@ -3,12 +3,12 @@ import React  from "react";
 import { useState, useCallback, useEffect } from 'react';
 import { ReactFlow, applyNodeChanges, applyEdgeChanges, addEdge  , Background , Controls, Position, useReactFlow, useNodesState, useEdgesState } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { TeligramNode } from "../../teligram";
-import { Trigger } from "../../Trigger";
-import { Gmail } from "../../Gmail";
-import { Webhook } from "../../Webhook";
+import { TeligramNode } from "../../nodes/teligram";
+import { Trigger } from "../../nodes/Trigger";
+import { Gmail } from "../../nodes/Gmail";
+import { Webhook } from "../../nodes/Webhook";
 import axios from "axios";
-import { AwaitGmail } from "../../AwaitGmail";
+import { AwaitGmail } from "../../nodes/AwaitGmail";
 
 
 const inititalNodes = [{ 
