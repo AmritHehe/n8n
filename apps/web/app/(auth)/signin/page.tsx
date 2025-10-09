@@ -1,10 +1,9 @@
 "use client"
 import { useState } from "react";
-import { AuthCard } from "../components/auth";
+import { AuthCard } from "../../components/auth";
 import { useRouter } from "next/navigation";
-import { useToast , ToastProvider} from "../components/toast"
-import { AuthButton } from "../components/AuthButton";
-import {FormInput} from "../components/FormInput"
+import { AuthButton } from "../../components/AuthButton";
+import {FormInput} from "../../components/FormInput"
 import Link from "next/link";
 import axios from "axios";
 // import FormInput from "@/components/FormInput";
