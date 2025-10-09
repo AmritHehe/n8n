@@ -1,7 +1,6 @@
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { tool } from "@langchain/core/tools";
-import { z } from "zod"; 
 import type { MessageContent } from "@langchain/core/messages";
 export async function genai (message : string){ 
     const model = new ChatGoogleGenerativeAI({ 
