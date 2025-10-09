@@ -5,7 +5,7 @@ function calculateSum(a:any , b : any){
 }
 
 const ai = new GoogleGenAI({
-    apiKey : 'AIzaSyDAkCFSVi9NjaaVg2HTc5Fm8qb_jgSx_Qw'
+    apiKey : ''
 })
 
 

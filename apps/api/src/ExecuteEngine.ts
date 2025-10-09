@@ -1,9 +1,9 @@
 import { preOrderTraversal } from "./veryBigBrain.js";
 import  type { node } from "./types.js";
 import { prismaClient }  from '@repo/database/client'; 
-import { telegramBot } from "./ExecuteTeligram.js";
-import { gmail } from "./ExecuteGmail.js";
-import { genai } from "./ExecuteAiAgent.js";
+import { telegramBot } from "./ExecuteNodes/ExecuteTeligram.js";
+import { gmail } from "./ExecuteNodes/ExecuteGmail.js";
+import { genai } from "./ExecuteNodes/ExecuteAiAgent.js";
 
 export async function executeIt( payload : any , user :any  , workflowId : string , indexToStartWith ?: number , ExecutedFirstIndex ?: boolean , logCallBack ?: (msg : string)=> void){ 
         const nodes = JSON.parse(payload.nodes); 
