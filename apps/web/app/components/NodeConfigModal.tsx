@@ -53,15 +53,15 @@ const NodeConfigModal = ({ isOpen, nodeType, nodeData,  nodeId , onClose, onSave
               {c.type} - {c.title || c.name || c.label}
             </option>
           ))}
-        {previousNodes && previousNodes.length > 0 && (
+        {/* {previousNodes && previousNodes.length > 0 && (
           <optgroup label="From Previous Nodes">
             {previousNodes.map(node => (
               <option key={node.id} value={`prevNode:${node.id}`}>
-                {node.label || node.type} ({node.id})
+                {node.type} ({node.id})
               </option>
             ))}
           </optgroup>
-        )}
+        )} */}
       </>
     );
   };
@@ -85,7 +85,37 @@ const NodeConfigModal = ({ isOpen, nodeType, nodeData,  nodeId , onClose, onSave
                 {renderCredentialOptions()}
               </select>
             </div>
+            {/* Use previous node response */}
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={formData.previousResponse || false}
+                onChange={e => setFormData({ ...formData, previousResponse: e.target.checked })}
+                id="prevResponse"
+              />
+              <label htmlFor="prevResponse" className="text-sm font-medium">
+                Use Response from Previous Node
+              </label>
+            </div>
 
+            {/* Select previous node */}
+            {formData.previousResponse && (
+              <div>
+                <label className="block text-sm font-medium mb-2">Select Previous Node</label>
+                <select
+                  className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg"
+                  value={formData.previousResponseFromWhichNode || ''}
+                  onChange={e => setFormData({ ...formData, previousResponseFromWhichNode: e.target.value })}
+                >
+                  <option value="">Select from previous nodes</option>
+                  {previousNodes?.map(node => (
+                    <option key={node.id} value={node.id}>
+                      { node.type} ({node.id})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
             <div>
               <label className="block text-sm font-medium mb-2">From</label>
               <input
@@ -173,7 +203,39 @@ const NodeConfigModal = ({ isOpen, nodeType, nodeData,  nodeId , onClose, onSave
               {renderCredentialOptions()}
             </select>
           </div>
+          {/* Use previous node response */}
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={formData.previousResponse || false}
+                onChange={e => setFormData({ ...formData, previousResponse: e.target.checked })}
+                id="prevResponse"
+              />
+              <label htmlFor="prevResponse" className="text-sm font-medium">
+                Use Response from Previous Node
+              </label>
+            </div>
 
+            {/* Select previous node */}
+             {formData.previousResponse && (
+              <div>
+                <label className="block text-sm font-medium mb-2">Select Previous Node</label>
+                <select
+                  className="w-full px-3 py-2 bg-[hsl(var(--surface))] border border-[hsl(var(--border))] rounded-lg"
+                  value={formData.previousResponseFromWhichNode?.toString() || ''}
+                  onChange={e =>
+                    setFormData({ ...formData, previousResponseFromWhichNode: e.target.value })
+                  }
+                >
+                  <option value="">Select from previous nodes</option>
+                  {previousNodes?.map(node => (
+                    <option key={node.id} value={node.id.toString()}>
+                      {node.type} ({node.id})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           {/* From */}
           <div>
             <label className="block text-sm font-medium mb-2">From</label>
@@ -282,7 +344,7 @@ const NodeConfigModal = ({ isOpen, nodeType, nodeData,  nodeId , onClose, onSave
                   <option value="">Select from previous nodes</option>
                   {previousNodes?.map(node => (
                     <option key={node.id} value={node.id}>
-                      {node.data.label || node.type} ({node.id})
+                      { node.type} ({node.id})
                     </option>
                   ))}
                 </select>
@@ -351,7 +413,7 @@ const NodeConfigModal = ({ isOpen, nodeType, nodeData,  nodeId , onClose, onSave
                 </select>
               </div>
             )} */}
-                        {formData.previousResponse && (
+            {formData.previousResponse && (
               <div>
                 <label className="block text-sm font-medium mb-2">Select Previous Node</label>
                 <select
@@ -362,7 +424,7 @@ const NodeConfigModal = ({ isOpen, nodeType, nodeData,  nodeId , onClose, onSave
                   <option value="">Select from previous nodes</option>
                   {previousNodes?.map(node => (
                     <option key={node.id} value={node.id}>
-                      {node.data.label || node.type} ({node.id})
+                      {node.type} ({node.id})
                     </option>
                   ))}
                 </select>
