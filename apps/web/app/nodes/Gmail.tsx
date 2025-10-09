@@ -43,7 +43,7 @@ import NodeConfigModal from "../components/NodeConfigModal";
 import Cross from "../components/cross";
 
 export function Gmail({ id, data }: { id: string; data: any }) {
-  const { setNodes } = useReactFlow();
+  const { setNodes   , getNodes} = useReactFlow();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Update node.data directly
@@ -62,6 +62,8 @@ export function Gmail({ id, data }: { id: string; data: any }) {
   [id, setNodes]
 );  
   // Modal handlers
+    const previousNodes = getNodes().filter((n) => n.id !== id);
+
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
   const handleSaveModal = (updatedData: any) => {
@@ -115,6 +117,7 @@ export function Gmail({ id, data }: { id: string; data: any }) {
         nodeType="gmail"
         nodeData={data} // pass current node.data
         nodeId={id}
+        previousNodes={previousNodes} 
         onClose={handleCloseModal}
         onSave={handleSaveModal}
       />

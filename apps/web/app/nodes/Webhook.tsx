@@ -73,7 +73,12 @@ export function Webhook({ id, data }: { id: string; data: any }) {
   );
 
   return (
-    <div className="relative w-80 bg-zinc-900 rounded-2xl shadow-lg border border-zinc-700 p-4 flex flex-col gap-3">
+    <div 
+    className={`relative w-80 bg-zinc-900 rounded-2xl shadow-lg border border-zinc-700 p-4 flex flex-col gap-3 ${
+          data?.isExecuting
+            ? "animate-[pulse_1.2s_ease-in-out_infinite] shadow-black-400/30 shadow-lg ring-4 ring-red-400/20"
+            : ""
+        }`}>
       {/* Header */}
       <div className="flex justify-between items-center border-b border-zinc-700 pb-2">
         <span className="font-semibold text-white">Webhook, id :  {id}</span>

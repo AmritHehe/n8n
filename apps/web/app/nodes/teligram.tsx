@@ -74,7 +74,11 @@ export function TeligramNode({ id, data }: { id: string; data: any }) {
     <>
       <div
         onClick={handleOpenModal}
-        className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg shadow-lg min-w-[400px] border-2 border-blue-400 relative cursor-pointer hover:shadow-xl transition-all duration-200"
+        className={`bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg shadow-lg min-w-[400px] border-2 border-blue-400 relative cursor-pointer hover:shadow-xl transition-all duration-200 ${
+          data?.isExecuting
+            ? "animate-[pulse_1.2s_ease-in-out_infinite] shadow-blue-400/30 shadow-lg ring-4 ring-red-400/20"
+            : ""
+        }`}
       >
         <div className="p-4 flex items-center justify-between">
           <div className="flex items-center gap-2">

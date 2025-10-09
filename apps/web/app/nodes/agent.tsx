@@ -1,15 +1,19 @@
-import React from "react";
-import { Handle, Position, useReactFlow } from "@xyflow/react";
+import React, { useEffect } from "react";
+import { Handle, Position, useEdges, useReactFlow } from "@xyflow/react";
 import { useState, useCallback } from "react";
 import { Bot } from "lucide-react";
 import NodeConfigModal from "../components/NodeConfigModal";
 import Cross from "../components/cross";
 
 export function AINode({ id, data }: { id: string; data: any }) {
-  const { setNodes } = useReactFlow();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   
-const { getNodes, getEdges } = useReactFlow();
+  const { setNodes ,getNodes , getEdges} = useReactFlow();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isExecuting , setIsExecuting ] = useState(false)
+  useEffect(()=>{
+    setIsExecuting(data.isExecuting)
+    console.log("hello " + isExecuting)
+  },[setNodes , getNodes , getEdges, ])
 
 // const previousNodes = React.useMemo(() => {
 //   const edges = getEdges() ?? [];
@@ -49,7 +53,7 @@ const { getNodes, getEdges } = useReactFlow();
       <div
         onClick={handleOpenModal}
         className={`relative cursor-pointer bg-gradient-to-br from-purple-600 to-indigo-700 text-white rounded-2xl shadow-lg border-2 border-purple-400 min-w-[400px] transition-all duration-300 hover:shadow-xl ${
-          data?.isExecuting
+          isExecuting
             ? "animate-[pulse_1.2s_ease-in-out_infinite] shadow-purple-400/40 ring-4 ring-purple-400/30"
             : ""
         }`}

@@ -40,14 +40,19 @@
 //     </>
 // }
 import { Handle, Position, useReactFlow } from "@xyflow/react";
+import { useEffect } from "react";
 import { useState, useCallback } from "react";
 import NodeConfigModal from "../components/NodeConfigModal";
 import Cross from "../components/cross";
 
 export function AwaitGmail({ id, data }: { id: string; data: any }) {
-  const { setNodes, setEdges } = useReactFlow();
+  const { setNodes, setEdges , getNodes } = useReactFlow();
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [isExecuting , setIsExecuting] = useState(false)
+ useEffect(()=>{
+     setIsExecuting(data.isExecuting)
+     console.log("hello  bhai hi" + isExecuting)
+   },[setNodes , getNodes ,data.isExecuting, ])
   // updateField works exactly like Gmail
   const updateField = useCallback(
     (field: string, value: any) => {
@@ -63,6 +68,7 @@ export function AwaitGmail({ id, data }: { id: string; data: any }) {
     },
     [id, setNodes]
   );
+  const previousNodes = getNodes().filter((n) => n.id !== id);
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
@@ -76,15 +82,16 @@ export function AwaitGmail({ id, data }: { id: string; data: any }) {
     setEdges((eds) => eds.filter((e) => e.target !== id));
   };
 
+
   return (
     <>
       <div
         onClick={handleOpenModal}
         className={`bg-gradient-to-br from-amber-500 to-amber-600 text-white rounded-lg shadow-lg min-w-[400px] border-2 border-amber-400 relative cursor-pointer hover:shadow-xl transition-all duration-200 ${
-        //   data?.isExecuting
-        //     ? "animate-[pulse_1.2s_ease-in-out_infinite] shadow-amber-400/30 shadow-lg ring-4 ring-amber-400/20"
-        //     : ""
-        ""
+          isExecuting
+            ? "animate-[pulse_1.2s_ease-in-out_infinite] shadow-amber-400/30 shadow-lg ring-4 ring-amber-400/20"
+            : ""
+      
         }`}
       >
         <div className="p-4 flex items-center justify-between">
@@ -128,6 +135,7 @@ export function AwaitGmail({ id, data }: { id: string; data: any }) {
         nodeType="awaitGmail"
         nodeData={data}
         nodeId={id}
+        previousNodes={previousNodes}
         onClose={handleCloseModal}
         onSave={handleSaveModal}
       />
