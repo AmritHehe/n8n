@@ -115,6 +115,11 @@ app.get('/workflow' , Usemiddleware ,async (req  : Request, res : Response)=> {
 app.delete('/workflow' , Usemiddleware , async(req : Request , res : Response) => { 
     const id = req.body.id; 
     try{ 
+        await prismaClient.responses.delete({ 
+            where: { 
+                workflowId : id
+            }
+        })
         const data = await prismaClient.workflow.delete({ 
             where : { 
                 id : id
@@ -195,7 +200,6 @@ app.put('/workflow/:id' , Usemiddleware ,async (req : Request , res : Response)=
             } , 
             data : { 
                //add new data here 
-               title : "updated data" , 
                //JSON stringify is only for backend , as our frontend already send the data in string only 
                nodes :  JSON.stringify(FilteredNodes), 
                Connections :(data.connections) , 
@@ -280,7 +284,6 @@ app.all('/webhook/:id' ,Usemiddleware ,  async(req : Request , res : Response) =
                             id : workflowId
                         } , 
                         data : { 
-                            title : "changed the webhook " ,
                             nodes : JSON.stringify(nodes)
                         }
                     })
