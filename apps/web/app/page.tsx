@@ -81,7 +81,7 @@
                 <span className="relative text-white">
                     Automate{" "}
                     <span className="bg-gradient-to-r from-[hsl(var(--primary))]  to-[#e6ccdb] bg-clip-text text-transparent animate-gradient-x">
-                    Everything
+                    Anything
                     </span>{" "}
                     Effortlessly
                     {/* Glowing shadow effect */}
