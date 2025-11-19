@@ -6,6 +6,7 @@ import { AuthButton } from "../../components/AuthButton";
 import {FormInput} from "../../components/FormInput"
 import Link from "next/link";
 import axios from "axios";
+import api from "../../apiClient";
 
 export default function  SignUp () {
   const router = useRouter();
@@ -57,14 +58,13 @@ export default function  SignUp () {
     setLoading(true);
     
     try {
-      const res = await axios.post("http://localhost:3002/api/v1/signup", { 
+      const res = await api.post("/api/v1/signup", { 
         name: email, 
         pass: password
       });
 
       console.log("response"+ res);
 
-      // ✅ redirect to main page on success
       router.push("/signin");  
 
     } catch (err) {

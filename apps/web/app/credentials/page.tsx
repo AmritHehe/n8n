@@ -51,11 +51,7 @@ const Credentials = () => {
     }
     setLoading("telegram");
     try {
-      const res = await axios.post("http://localhost:3002/api/v1/credentials", { title: "Telegram Send Message", platform: "teligram", data: telegramData } , {  headers : { 
-        authorization : token
-
-      } } 
-    );
+      const res = await api.post("/api/v1/credentials", { title: "Telegram Send Message", platform: "teligram", data: telegramData });
       setMessage("Telegram credentials saved successfully!");
       setTelegramData({ token: "", chatId: ""  });
       setShowCreateForm(null);
@@ -74,12 +70,7 @@ const Credentials = () => {
     }
     setLoading("smtp");
     try {
-      await axios.post("http://localhost:3002/api/v1/credentials", { title: "SMTP Account", platform: "smtp", data: smtpData } , { 
-        headers  : { 
-          authorization : token
-
-        }
-      });
+      await api.post("/api/v1/credentials", { title: "SMTP Account", platform: "smtp", data: smtpData });
       setMessage("SMTP credentials saved successfully!");
       setSmtpData({ HOST: "", PORT: "", username: "", password: "" });
       setShowCreateForm(null);
@@ -95,11 +86,8 @@ const Credentials = () => {
     setLoading(id);
     console.log("token")
     try {
-      await axios.delete("http://localhost:3002/api/v1/credentials",{ 
-        headers : { 
-          authorization : token
-
-        }, 
+      await api.delete("/api/v1/credentials",{ 
+ 
         data : { 
           id : id
         }

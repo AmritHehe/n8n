@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
 import { redirect } from 'next/navigation';
+import api from '../apiClient';
 const Workflows = () => {
   const [workflows, setWorkflows] = useState<any[]>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -27,11 +28,7 @@ const Workflows = () => {
   const fetchWorkflows = async () => {
     try {
       const token = localStorage.getItem('token')
-      const response = await axios.get('http://localhost:3002/workflow' , { 
-        headers : { 
-          authorization : token 
-        }
-      });
+      const response = await api.get('/workflow');
       const data = response.data;
       console.log("incoming data " + JSON.stringify(data))
       setWorkflows(Array.isArray(data) ? data : []);
@@ -45,11 +42,7 @@ const Workflows = () => {
     setLoading(true);
     console.log("token")
     try {
-      await axios.delete("http://localhost:3002/workflow",{ 
-        headers : { 
-          authorization : token
-
-        }, 
+      await api.delete("/workflow",{ 
         data : { 
           id : id
         }
@@ -71,14 +64,10 @@ const Workflows = () => {
 
     setLoading(true);
     try {
-      await axios.post('http://localhost:3002/workflow', {
+      await api.post('/workflow', {
         title: newWorkflowTitle,
         nodes: [],
         connections: []
-      } , { 
-        headers : { 
-          authorization : token
-        }
       });
       setMessage('Workflow created successfully!');
       setNewWorkflowTitle('');

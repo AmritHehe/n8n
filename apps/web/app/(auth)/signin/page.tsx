@@ -6,6 +6,7 @@ import { AuthButton } from "../../components/AuthButton";
 import {FormInput} from "../../components/FormInput"
 import Link from "next/link";
 import axios from "axios";
+import api from "../../apiClient";
 // import FormInput from "@/components/FormInput";
 
 export default function SignIn() {
@@ -43,7 +44,7 @@ export default function SignIn() {
      setLoading(true);
     
     try {
-      const res = await axios.post("http://localhost:3002/api/v1/signin", { 
+      const res = await api.post("/api/v1/signin", { 
         name: email, 
         pass: password
       });

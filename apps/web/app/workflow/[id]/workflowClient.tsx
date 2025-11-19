@@ -30,10 +30,11 @@ import { TeligramNode } from "../../nodes/teligram";
 import { Trigger } from "../../nodes/Trigger";
 import { Gmail } from "../../nodes/Gmail";
 import { Webhook } from "../../nodes/Webhook";
-import axios from "axios";
+// import axios from "axios";
 import { AwaitGmail } from "../../nodes/AwaitGmail";
 import { AINode } from '../../nodes/agent';
 import { parse } from 'path';
+import api from '../../apiClient';
 // Import custom nodes
 
 
@@ -97,13 +98,7 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
         console.log("token " + tokenn )
         let data 
         async function datacall(){ 
-        data = await axios.get(`http://localhost:3002/workflow/${workflowId}` , { 
-        
-            headers : {  
-            authorization  : tokenn
-            }
-        
-        })
+        data = await api.get(`/workflow/${workflowId}`)
         
         console.log("got the data")
         // console.log("data" + JSON.stringify(data.data))
@@ -298,17 +293,12 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
   const saveWorkflow = async () => {
     setLoading(true);
     try {
-        const res = await axios.put(`http://localhost:3002/workflow/${workflowId}` ,  { 
+        const res = await api.put(`/workflow/${workflowId}` ,  { 
             data : { 
             nodes : JSON.stringify(nodes) , 
             connections : JSON.stringify(edges) ,  
             }
-        } , 
-        { 
-            headers : {  
-            authorization  : token
-            }
-        }
+        } 
         )
         console.log("response " + res);
       
@@ -355,7 +345,8 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
 
     try {
       console.log("worflow Id : " + workflowId)
-      const eventSource = new EventSource(`http://localhost:3002/execute/logs/${workflowId}?token=${token}`);
+      const base = process.env.NEXT_PUBLIC_BACKEND_API;
+      const eventSource = new EventSource(`${base}/execute/logs/${workflowId}?token=${token}`);
 
       eventSource.onmessage = (event) => {
         // console.log(event.data)
@@ -449,12 +440,10 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
           }
       } )
       // Trigger backend execution separately (so logs start streaming)
-      await axios.post(`http://localhost:3002/execute`, {
+      await api.post(`/execute`, {
         nodes: JSON.stringify(nodes),
         connections: JSON.stringify(edges),
         id: workflowId
-      }, {
-        headers: { authorization: token },
       });
 
     } catch (error) {
@@ -479,14 +468,10 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
       };
 
       // Simulate API call and then run demo execution
-      const response = await axios.post(`http://localhost:3002/execute`, {
+      const response = await api.post(`execute`, {
         nodes : JSON.stringify(nodes) , 
         connections : JSON.stringify(edges) ,
         id : workflowId
-        } ,{ 
-        headers : { 
-            authorization : token
-        }
         })
       console.log("response " + response)
       setTimeout(() => simulateExecution(), 500);
@@ -511,11 +496,7 @@ export default function WorkflowClient ({ workflowId }: WorkflowClientProps) {
   const fetchWorkflows = async () => {
     try {
       const token = localStorage.getItem('token')
-      const response = await axios.get('http://localhost:3002/workflow' , { 
-        headers : { 
-          authorization : token 
-        }
-      });
+      const response = await api.get('/workflow');
       const data = response.data;
       console.log("incoming data " + JSON.stringify(data))
       setWorkflows(Array.isArray(data) ? data : []);
