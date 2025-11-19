@@ -6,6 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx tsc -b  && node --env-file=.env ./dist/index.js",
+    "build": "npx tsc -b",
+    "start": "node --env-file=.env ./dist/index.js",
     "langchain": "npx tsc -b && node --env-file = .env ./dist/langchain.js"
   },
   "keywords": [],
