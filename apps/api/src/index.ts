@@ -9,7 +9,12 @@ import cors from 'cors';
 import { executeIt } from './ExecuteEngine.js';
 const app  = express() ; 
 app.use(express.json()); 
-app.use(cors())
+app.use(cors({
+  origin: ["http://localhost:3000", "http://3.108.225.113:3000", "https://n8n.amrithehe.com"], // allowed frontend origins
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}))
 const workflowLogStreams: { [workflowId: string]: ((msg: string) => void) | undefined } = {};
 
 const JWT_SECRET  : string = process.env.JWT_SECRET!;
@@ -470,6 +475,6 @@ app.delete('/api/v1/credentials' , Usemiddleware ,async(req :Request, res : Resp
 
 })
         
-app.listen(3002 , ()=> { 
+app.listen(3002 , "0.0.0.0", ()=> { 
     console.log("listening to port 3002")
 })
