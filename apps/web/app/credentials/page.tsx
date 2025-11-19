@@ -6,6 +6,7 @@ import CredentialInput from "../components/CredentialInput";
 import CredentialCard from "../components/CredentialCard";
 import { redirect } from "next/navigation";
 import jwt from 'jsonwebtoken';
+import api from "../apiClient";
 
 const Credentials = () => {
   const [existingCredentials, setExistingCredentials] = useState<any[]>([]);
@@ -30,14 +31,10 @@ const Credentials = () => {
     // console.log("token " + token )
   }
   const fetchCredentials = async () => {
-    const token = localStorage.getItem('token')
-    console.log("token inside fetch credentials " + token )
+    // const token = localStorage.getItem('token')
+    // console.log("token inside fetch credentials " + token )
     try {
-      const response = await axios.get("http://localhost:3002/api/v1/credentials", { 
-        headers : { 
-          authorization : token
-        }
-      });
+      const response = await api.get("/api/v1/credentials");
       const data = response.data;
       console.log("data : + " + JSON.stringify(data))
       setExistingCredentials(Array.isArray(data) ? data : []);
