@@ -49,7 +49,7 @@ export function Webhook({ id, data }: { id: string; data: any }) {
   const [copySuccess, setCopySuccess] = useState("");
 
   const workflowId = data.workflowId;
-  const webhookUrl = `http://localhost:3002/webhook/${id}?workflowId=${workflowId}`;
+  const webhookUrl = `https://api-n8n.amrithehe.com/webhook/${id}?workflowId=${workflowId}`;
 
   const deleteNode = () => {
     setNodes((nds) => nds.filter((n) => n.id !== id));
