@@ -247,13 +247,43 @@ app.get('/workflow/:id' , Usemiddleware , async(req  : Request, res : Response) 
     }
 
 })
-app.all('/webhook/:id' ,Usemiddleware ,  async(req : Request , res : Response) => { 
+app.all('/webhook/:id' ,  async(req : Request , res : Response) => { 
     const id  :number = Number( req.params.id ); 
     //@ts-ignore
     //ADD userId and workflow Id in params too
-    const userId = req.userId;
-    const ResponseData = req.body.message;
+    // let userId = req.userId;
+    let userId = "";
+    let ResponseData = " ";
+    try{ 
+        if(req.body.message){ 
+            console.log("fuckin inside this")
+            ResponseData = req.body.message;
+        }
+    }
+    catch(e){ 
+        console.log("cant read message " + e)
+    }
+    
     const workflowId :string  = (req.query.workflowId) as string;
+    try { 
+        const data = await prismaClient.workflow.findFirst({ 
+            where : { 
+                id : workflowId
+            }
+        })
+        if (data) { 
+            if(!data.userId){ 
+                console.log("corrupted data ")
+            }
+            console.log("webhook details " + JSON.stringify(data))
+            //@ts-ignore
+            userId = data.userId
+        }
+        
+    }
+    catch(e) { 
+        console.log("cant find the user ID , db error , please try again" + e)
+    }
     console.log("workflow Id " + workflowId)
     console.log(" here is the workflow id " + workflowId)
     //we need workflowID here , assuming that there is one workflow only
