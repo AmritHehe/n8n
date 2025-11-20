@@ -69,7 +69,8 @@ export default function MainWorkFlow({id} : {id : number}){
       console.log("token " + tokenn )
       let data 
       async function datacall(){ 
-        data = await axios.get(`http://localhost:3002/workflow/${id}` , { 
+        const base = process.env.NEXT_PUBLIC_BACKEND_API;
+        data = await axios.get(`${base}/workflow/${id}` , { 
         
           headers : {  
             authorization  : tokenn
@@ -103,7 +104,8 @@ export default function MainWorkFlow({id} : {id : number}){
     console.log("inside savegraph function ");
     console.log("nodes " + nodes + "edges" + edges)
     console.log( " id from same graph " + id)
-    const res = await axios.put(`http://localhost:3002/workflow/${id}` ,  { 
+    const base = process.env.NEXT_PUBLIC_BACKEND_API;
+    const res = await axios.put(`${base}/${id}` ,  { 
         data : { 
           nodes : JSON.stringify(nodes) , 
           connections : JSON.stringify(edges) ,  
@@ -119,7 +121,8 @@ export default function MainWorkFlow({id} : {id : number}){
     
   }
   async function  execute() {
-    const response = await axios.post('http://localhost:3002/execute', { 
+    const base = process.env.NEXT_PUBLIC_BACKEND_API;
+    const response = await axios.post(`${base}/execute`, { 
       nodes : JSON.stringify(nodes) , 
       connections : JSON.stringify(edges) ,
       id : id
