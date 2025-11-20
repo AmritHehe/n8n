@@ -16,7 +16,7 @@ export async  function gmail(data : any , to : string, subject : string, message
                 from: 'onboarding@resend.dev',
                 to: to,
                 subject: subject,
-                html: `<strong>${message} please go on the following link to respond to the message http://localhost:3002/webhook/${id}?workflowId=${workflowId} </strong>`,
+                html: `<strong>${message} please go on the following link to respond to the message https://api-n8n.amrithehe.com/webhook/${id}?workflowId=${workflowId} </strong>`,
                 
             });
             console.log('Message sent: %s', info.messageId);
