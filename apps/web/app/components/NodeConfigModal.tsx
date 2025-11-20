@@ -20,8 +20,9 @@ const NodeConfigModal = ({ isOpen, nodeType, nodeData,  nodeId , onClose, onSave
   useEffect(() => {
     async function fetchCredentials() {
       try {
+        const base = process.env.NEXT_PUBLIC_BACKEND_API;
         const token = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:3002/api/v1/credentials', {
+        const res = await axios.get(`${base}/api/v1/credentials`, {
           headers: { authorization: token },
         });
         //@ts-ignore
@@ -165,7 +166,8 @@ const NodeConfigModal = ({ isOpen, nodeType, nodeData,  nodeId , onClose, onSave
         
       // Ensure node ID exists
       if (!formData.id) setFormData({ ...formData, id: crypto.randomUUID() });
-      const webhookUrl = `http://localhost:3002/webhook/${nodeId}?workflowId=${formData.workflowId || ""}`;
+      const base = process.env.NEXT_PUBLIC_BACKEND_API;
+      const webhookUrl = `${base}/webhook/${nodeId}?workflowId=${formData.workflowId || ""}`;
 
       return (
         <div className="space-y-4  text-[hsl(var(--foreground))]">
