@@ -23,15 +23,8 @@ The system supports stateful execution, response chaining between nodes, credent
 ---
 
 ## Architecture Overview
- ┌───────────────┐       ┌──────────────┐        ┌───────────────┐
- │  React Flow UI │ ---> │  Express API │ -----> │ PostgreSQL DB  │
- └───────▲────────┘       └──────┬──────┘        └──────▲────────┘
-         │                        │                       │
-         │   Websocket Logs       │                       │
-         │                        │                       │
-         │                        ▼                       │
-         └──────────── Executions Engine ─────────────────┘
-                      (Node-by-node traversal)
+
+![Autm8n Architecture](./packages/assets/architecture.png)
 
 Workflows saved as JSON (nodes + connections)
 
@@ -90,18 +83,24 @@ npm install
 
 Create `.env` in:
 
-* `/apps/backend`
+* `/apps/api`
+* `/apps/web`
 * `/packages/database`
 
 Required values:
 
 ```
+
+packages/db
 DATABASE_URL="postgresql://..."
+
+apps/api
 JWT_SECRET="any_secret_value"
-TELEGRAM_BOT_TOKEN="..."
-GOOGLE_CLIENT_ID="..."
-GOOGLE_CLIENT_SECRET="..."
-AI_API_KEY="..."
+GOOGLE_API_KEY="..."
+
+
+apps/web
+NEXT_PUBLIC_BACKEND_API ="YOUR_BACKEND_API_URL"
 ```
 
 ### Run locally
