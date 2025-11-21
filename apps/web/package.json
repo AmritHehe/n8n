@@ -14,6 +14,7 @@
     "@repo/ui": "*",
     "@tailwindcss/postcss": "^4.1.13",
     "@types/axios": "^0.9.36",
+    "@vercel/analytics": "^1.5.0",
     "@xyflow/react": "^12.8.4",
     "axios": "^1.12.2",
     "lucide": "^0.544.0",
