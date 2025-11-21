@@ -10,7 +10,7 @@ import { executeIt } from './ExecuteEngine.js';
 const app  = express() ; 
 app.use(express.json()); 
 app.use(cors({
-  origin: ["http://localhost:3000", "http://3.108.225.113:3000", "https://n8n.amrithehe.com" , "https://api-n8n.amrithehe.com" ], // allowed frontend origins
+  origin: ["http://localhost:3000", "http://3.108.225.113:3000", "https://n8n.amrithehe.com" , "https://api-n8n.amrithehe.com" , "https://autm8n.amrithehe.com"], // allowed frontend origins
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
