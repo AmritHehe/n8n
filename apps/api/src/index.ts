@@ -13,10 +13,10 @@ app.use(cors({
   origin: ["http://localhost:3000", "http://3.108.225.113:3000", "https://n8n.amrithehe.com" , "https://api-n8n.amrithehe.com" ], // allowed frontend origins
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  allowedHeaders: ["Content-Type", "Authorization"],
+  exposedHeaders: ["Content-Type", "Cache-Control", "Expires"]
 }))
 const workflowLogStreams: { [workflowId: string]: ((msg: string) => void) | undefined } = {};
-
 const JWT_SECRET  : string = process.env.JWT_SECRET!;
 
 
@@ -424,6 +424,7 @@ app.get('/execute/logs/:workflowId', async (req : Request , res :Response) => {
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
+  res.setHeader("X-Accel-Buffering",'no')
   res.flushHeaders();
 
   console.log("arrived till here" )
