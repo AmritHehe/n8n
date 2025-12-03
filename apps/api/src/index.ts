@@ -7,6 +7,8 @@ import type { users } from './types.js';
 import {Usemiddleware } from './middleware.js';
 import cors from 'cors';
 import { executeIt } from './ExecuteEngine.js';
+import bcrypt from "bcrypt";
+
 const app  = express() ; 
 app.use(express.json()); 
 app.use(cors({
@@ -26,15 +28,21 @@ app.post('/api/v1/signup' , async (req , res)=> {
     const name : string= payload.name ; 
     const pass : string = payload.pass ; 
     
-    await prismaClient.user.create({
-        data : { 
-            name : name , 
-            pass : pass
-        }
-    })
+    const hashedPass =  await bcrypt.hash(pass , 10) ; 
 
-    res.json("user created")
-
+    try{ 
+        await prismaClient.user.create({
+            data : { 
+                name : name , 
+                pass : hashedPass
+            }
+        })
+        res.status(200).json("user created")
+        
+    }
+    catch(e){ 
+        res.status(500).json("database is down !")
+    }
 })
 app.post('/api/v1/signin' ,async (req : Request, res :Response)=> { 
     console.log('hitted the endpoint ?')
@@ -42,21 +50,26 @@ app.post('/api/v1/signin' ,async (req : Request, res :Response)=> {
     const name = payload.name ; 
     const pass = payload.pass ; 
     
-    
     const user  : users | null = await prismaClient.user.findFirst({
         where : { 
             name : name, 
-            pass : pass
         }
     })
 
     if(user) {
-        const token  = jwt.sign({ 
-            id : user.id
-        }, JWT_SECRET)
-        res.status(200).json({ 
-            token : token
-        })
+        const checkPass = await bcrypt.compare(user?.pass , pass )
+            if(checkPass){ 
+                const token  = jwt.sign({ 
+                    id : user.id
+                }, JWT_SECRET)
+                res.status(200).json({ 
+                    token : token
+                })
+            }   
+            else { 
+                res.status(401).json("wrong pass , please try again")
+            }
+
     }
     else { 
         res.status(403).json("please sign up first")
