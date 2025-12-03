@@ -4,6 +4,7 @@ import { prismaClient }  from '@repo/database/client';
 import { telegramBot } from "./ExecuteNodes/ExecuteTeligram.js";
 import { gmail } from "./ExecuteNodes/ExecuteGmail.js";
 import { genai } from "./ExecuteNodes/ExecuteAiAgent.js";
+import { safeDecrypt } from "./utls/crypto.js";
 
 export async function executeIt( payload : any , user :string  , workflowId : string , indexToStartWith ?: number , ExecutedFirstIndex ?: boolean , logCallBack ?: (msg : string)=> void){ 
         const nodes = JSON.parse(payload.nodes); 
@@ -80,7 +81,7 @@ export async function executeIt( payload : any , user :string  , workflowId : st
                         })
                         console.log("user Id " + userId)
                         console.log("credentials " + credentials)
-                        const data :any = credentials!.data
+                        const data :any = safeDecrypt(credentials!.data)
                         // if(chatId != null || chatId != "" || chatId !=undefined){ 
                         //     // console.log("yha araha hu bhai why ")
                         //     // data.chatId = chatId
@@ -142,7 +143,7 @@ export async function executeIt( payload : any , user :string  , workflowId : st
                             }
                         })
                         
-                        const data = credentials!.data
+                        const data = safeDecrypt(credentials!.data)
                         console.log('credentials data' + data)
                         let oldResponses;
                         try{ 
@@ -260,7 +261,7 @@ export async function executeIt( payload : any , user :string  , workflowId : st
                             }
                         })
                         
-                        const data = credentials!.data
+                        const data =  safeDecrypt(credentials!.data)
                         console.log('credentials data' + data)
                         let oldResponses;
                         try{ 
@@ -347,7 +348,6 @@ export async function executeIt( payload : any , user :string  , workflowId : st
                     try {
                         let finalPrompt = message || "";
                         console.log("inside this ")
-                        // 🧩 If user selected a previous node response
                         if (usePrevious && previousNodeId) {
                         const previousData = await prismaClient.responses.findFirst({
                             where: { workflowId },

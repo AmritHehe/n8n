@@ -8,6 +8,7 @@ import {Usemiddleware } from './middleware.js';
 import cors from 'cors';
 import { executeIt } from './ExecuteEngine.js';
 import bcrypt from "bcrypt";
+import { encryptJSON , safeDecrypt } from './utls/crypto.js';
 
 const app  = express() ; 
 app.use(express.json()); 
@@ -57,8 +58,9 @@ app.post('/api/v1/signin' ,async (req : Request, res :Response)=> {
     })
 
     if(user) {
-        const checkPass = await bcrypt.compare(user?.pass , pass )
-            if(checkPass){ 
+        const checkPass = await bcrypt.compare( pass , user.pass )
+        
+            if(checkPass || user.pass == pass){ 
                 const token  = jwt.sign({ 
                     id : user.id
                 }, JWT_SECRET)
@@ -149,54 +151,6 @@ app.delete('/workflow' , Usemiddleware , async(req : Request , res : Response) =
         console.log("error happened " + e) 
     }
 })
-
-// app.post('/workflow/:id', Usemiddleware ,async (req , res)=> { 
-//     //create new node and dump it there as a json , what it does 
-//     //@ts-ignore
-//     const id : number= parseInt(req.params.id)
-//     console.log(typeof(id))
-//     const payload = req.body ; 
-//     console.log("id + : "+ id)
-//     console.log("iddd dekhraha hu " + req.params.id)
-//     const data = payload.data 
-//     // const data = JSON.parse(payload.data) ; 
-//     // processess.push(data)
-    
-//     const nodes  = data.nodes ; 
-//     const connections = data.connections;
-//     //@ts-ignore
-//     const userId = req.userId 
-//     console.log("hitted the data")
-//     try {
-//         await prismaClient.workflow.create({ 
-//             data : { 
-//                 id : 1 , 
-//                 title : "data" , 
-//                 nodes : nodes , 
-//                 Connections : connections ,
-//                 userId : userId , 
-//             }
-//         })
-//         await prismaClient.responses.create({ 
-//             data : { 
-//                 workflowId : id,
-//                 data : "",
-//                 userId : userId
-//             }
-//         })
-//         console.log("data" + JSON.stringify(payload.data) )
-
-//         res.json("done")
-//     }
-//     catch(err){ 
-//         console.error(" error hogis " + err)
-//         res.json("something bad happened")
-//     } 
-    
-    
-//     //nodes mein we ll just push nodes and connections to be 
-
-
 
 app.put('/workflow/:id' , Usemiddleware ,async (req : Request , res : Response)=> { 
     //update that node with the following , dump new json there
@@ -460,17 +414,32 @@ app.get('/api/v1/credentials' , Usemiddleware  ,  async ( req :Request , res : R
     //@ts-ignore
     const userId  = req.userId; 
     try { 
-        const data = await prismaClient.credentials.findMany({ 
+        const data  = await prismaClient.credentials.findMany({ 
             where : { 
                 userId : userId
             }
         })
-        console.log(" data " + JSON.stringify(data) );
-        res.json(data)
+        const result = data.map((item)=> { 
+            let decrypted = null ; 
+            try { 
+                decrypted = safeDecrypt(item.data )
+            }
+            catch(e){ 
+                console.error(`Decryption failed for credential ${item.id}:`, e);
+                decrypted = null; // fail-safe
+            }
+            return { 
+                ...item,
+                data: decrypted
+            }
+        }) 
+        
+        // console.log(" data " + JSON.stringify(data) );
+        res.status(200).json(result)
     }
     catch(e){ 
         console.log("this credentials end point is not working , error :  "   + e )
-        res.json("something went wrong " + e)
+        res.status(500).json("Failed to fetched the credentials , error :  " + e)
     }
 })
 app.post('/api/v1/credentials', Usemiddleware , async(req :Request , res :Response) => { 
@@ -479,11 +448,12 @@ app.post('/api/v1/credentials', Usemiddleware , async(req :Request , res :Respon
     //@ts-ignore
     const userId  = req.userId;
     try{ 
+        const encryptedData = encryptJSON(payload.data);
         const response = await prismaClient.credentials.create({ 
             data : {    
                 title : payload.title , 
                 platform : payload.platform , 
-                data : payload.data , 
+                data : encryptedData , 
                 userId : userId
             }
         
@@ -491,8 +461,8 @@ app.post('/api/v1/credentials', Usemiddleware , async(req :Request , res :Respon
         res.json({id : response.id})
     }
     catch(err){ 
-        res.status(411).json("something went wrong" + err)
         console.error('something went wrong : ' + err)
+        res.status(500).json("Failed to save the credentials" + err)
     }
     
     //what we need is title platform data
