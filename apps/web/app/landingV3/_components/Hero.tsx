@@ -1,7 +1,8 @@
 "use client";
 
 import { motion, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 // Floating node decoration
 function FloatingNode({
@@ -47,11 +48,26 @@ function FloatingNode({
 
 export default function Hero() {
     const containerRef = useRef<HTMLDivElement>(null);
+    const router = useRouter();
     const { scrollY } = useScroll();
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
     const smoothX = useSpring(mouseX, { stiffness: 50, damping: 20 });
     const smoothY = useSpring(mouseY, { stiffness: 50, damping: 20 });
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        setIsLoggedIn(!!token);
+    }, []);
+
+    const handleGetStarted = () => {
+        if (isLoggedIn) {
+            router.push("/landingV3/workflows");
+        } else {
+            router.push("/landingV3/signup");
+        }
+    };
 
     const handleMouseMove = (e: React.MouseEvent) => {
         const rect = containerRef.current?.getBoundingClientRect();
@@ -145,15 +161,15 @@ export default function Hero() {
                     transition={{ duration: 0.6, delay: 0.5 }}
                     className="flex flex-col sm:flex-row items-center justify-center gap-3"
                 >
-                    <button className="group relative px-7 py-3.5 bg-white text-black rounded-full font-semibold text-sm overflow-hidden hover:scale-[1.02] active:scale-[0.98] transition-transform">
+                    <button onClick={handleGetStarted} className="group relative px-7 py-3.5 bg-white text-black rounded-full font-semibold text-sm overflow-hidden hover:scale-[1.02] active:scale-[0.98] transition-transform">
                         <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         <span className="relative z-10 flex items-center gap-2 group-hover:text-white transition-colors">
-                            Start Building Free
+                            {isLoggedIn ? "Go to Dashboard" : "Start Building Free"}
                             <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                         </span>
                     </button>
                     <button className="px-7 py-3.5 bg-white/[0.05] hover:bg-white/[0.1] text-white/70 hover:text-white rounded-full font-medium text-sm border border-white/[0.1] backdrop-blur-xl transition-all">
-                        Github 
+                        Github
                     </button>
                 </motion.div>
             </motion.div>

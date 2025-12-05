@@ -42,7 +42,7 @@ function Particles({ active }: { active: boolean }) {
                 vx: (Math.random() - 0.5) * 2,
                 vy: (Math.random() - 0.5) * 2,
                 life: 1,
-                color: colors[Math.floor(Math.random() * colors.length)]
+                color: colors[Math.floor(Math.random() * colors.length)]!
             });
         };
 
@@ -53,6 +53,7 @@ function Particles({ active }: { active: boolean }) {
 
             for (let i = particles.length - 1; i >= 0; i--) {
                 const p = particles[i];
+                if (!p) continue;
                 p.x += p.vx;
                 p.y += p.vy;
                 p.life -= 0.01;
@@ -72,14 +73,18 @@ function Particles({ active }: { active: boolean }) {
             ctx.strokeStyle = "rgba(255,255,255,0.05)";
             ctx.lineWidth = 1;
             for (let i = 0; i < particles.length; i++) {
+                const pi = particles[i];
+                if (!pi) continue;
                 for (let j = i + 1; j < particles.length; j++) {
-                    const dx = particles[i].x - particles[j].x;
-                    const dy = particles[i].y - particles[j].y;
+                    const pj = particles[j];
+                    if (!pj) continue;
+                    const dx = pi.x - pj.x;
+                    const dy = pi.y - pj.y;
                     const dist = Math.sqrt(dx * dx + dy * dy);
                     if (dist < 80) {
                         ctx.beginPath();
-                        ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.moveTo(pi.x, pi.y);
+                        ctx.lineTo(pj.x, pj.y);
                         ctx.stroke();
                     }
                 }
@@ -138,7 +143,7 @@ function BezierConnections({ phase }: { phase: number }) {
 
     const radius = 160;
     const paths = introNodes.map((node, i) => {
-        const nextNode = introNodes[(i + 1) % introNodes.length];
+        const nextNode = introNodes[(i + 1) % introNodes.length]!;
         const angle1 = (node.angle * Math.PI) / 180;
         const angle2 = (nextNode.angle * Math.PI) / 180;
         const x1 = Math.cos(angle1) * radius;
