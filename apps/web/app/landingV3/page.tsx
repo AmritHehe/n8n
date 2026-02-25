@@ -29,7 +29,6 @@ export default function LandingV3() {
 
                     <div className="relative z-10">
                         <Hero />
-                        <SocialProof />
                         <WorkflowAnimation />
                     </div>
 
