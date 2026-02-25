@@ -99,8 +99,8 @@ export default function WorkflowsPage() {
         <div className="min-h-screen bg-[#030303] text-white overflow-hidden">
             {/* Ambient Background */}
             <div className="fixed inset-0 pointer-events-none">
-                <div className="absolute top-0 left-1/4 w-[800px] h-[800px] rounded-full blur-[200px] bg-teal-500/10" />
-                <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] rounded-full blur-[180px] bg-emerald-500/8" />
+                <div className="absolute top-0 left-1/4 w-[800px] h-[800px] rounded-full blur-[200px] bg-blue-300/10" />
+                <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] rounded-full blur-[180px] bg-blue-300/8" />
                 <div className="absolute top-1/2 right-0 w-[400px] h-[400px] rounded-full blur-[150px] bg-cyan-500/6" />
             </div>
 
@@ -121,7 +121,7 @@ export default function WorkflowsPage() {
                         animate={{ opacity: 1, y: 0, x: "-50%" }}
                         exit={{ opacity: 0, y: -20, x: "-50%" }}
                         className={`fixed top-6 left-1/2 z-50 px-6 py-3 rounded-full backdrop-blur-xl border ${message.type === "success"
-                            ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-300"
+                            ? "bg-blue-300/20 border-blue-300/40 text-blue-300"
                             : "bg-red-500/20 border-red-500/40 text-red-300"
                             }`}
                     >
@@ -161,7 +161,7 @@ export default function WorkflowsPage() {
                                 placeholder="Search workflows..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-11 pr-5 py-2.5 w-64 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-teal-500/50 focus:bg-white/8 transition-all duration-300"
+                                className="pl-11 pr-5 py-2.5 w-64 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-blue-300/50 focus:bg-white/8 transition-all duration-300"
                             />
                         </div>
 
@@ -169,13 +169,13 @@ export default function WorkflowsPage() {
                         <div className="flex bg-white/5 border border-white/10 rounded-xl p-1">
                             <button
                                 onClick={() => setViewMode("grid")}
-                                className={`p-2 rounded-lg transition-all duration-300 ${viewMode === "grid" ? "bg-teal-500/20 text-teal-400" : "text-white/40 hover:text-white/60"}`}
+                                className={`p-2 rounded-lg transition-all duration-300 ${viewMode === "grid" ? "bg-blue-300/20 text-blue-200" : "text-white/40 hover:text-white/60"}`}
                             >
                                 <Grid3X3 className="w-4 h-4" />
                             </button>
                             <button
                                 onClick={() => setViewMode("list")}
-                                className={`p-2 rounded-lg transition-all duration-300 ${viewMode === "list" ? "bg-teal-500/20 text-teal-400" : "text-white/40 hover:text-white/60"}`}
+                                className={`p-2 rounded-lg transition-all duration-300 ${viewMode === "list" ? "bg-blue-300/20 text-blue-200" : "text-white/40 hover:text-white/60"}`}
                             >
                                 <List className="w-4 h-4" />
                             </button>
@@ -186,7 +186,7 @@ export default function WorkflowsPage() {
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={() => setShowCreateModal(true)}
-                            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-xl font-medium hover:shadow-lg hover:shadow-teal-500/20 transition-all duration-300"
+                            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-300 to-blue-300 rounded-xl font-medium hover:shadow-lg hover:shadow-blue-300/20 transition-all duration-300"
                         >
                             <Plus className="w-4 h-4" />
                             Create Workflow
@@ -197,7 +197,7 @@ export default function WorkflowsPage() {
                 {/* Loading State */}
                 {loading ? (
                     <div className="flex items-center justify-center py-32">
-                        <div className="w-8 h-8 border-2 border-teal-500/30 border-t-teal-500 rounded-full animate-spin" />
+                        <div className="w-8 h-8 border-2 border-blue-300/30 border-t-blue-300 rounded-full animate-spin" />
                     </div>
                 ) : filteredWorkflows.length === 0 ? (
                     /* Empty State */
@@ -206,8 +206,8 @@ export default function WorkflowsPage() {
                         animate={{ opacity: 1, y: 0 }}
                         className="flex flex-col items-center justify-center py-32"
                     >
-                        <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-teal-500/20 to-emerald-500/10 flex items-center justify-center mb-6 border border-teal-500/20">
-                            <Sparkles className="w-10 h-10 text-teal-400" />
+                        <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-blue-300/20 to-blue-300/10 flex items-center justify-center mb-6 border border-blue-300/20">
+                            <Sparkles className="w-10 h-10 text-blue-200" />
                         </div>
                         <h3 className="text-2xl font-semibold mb-2">No workflows yet</h3>
                         <p className="text-white/40 mb-8 text-center max-w-md">
@@ -215,7 +215,7 @@ export default function WorkflowsPage() {
                         </p>
                         <button
                             onClick={() => setShowCreateModal(true)}
-                            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-xl font-medium hover:shadow-lg hover:shadow-teal-500/20 transition-all duration-300"
+                            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-300 to-blue-300 rounded-xl font-medium hover:shadow-lg hover:shadow-blue-300/20 transition-all duration-300"
                         >
                             <Plus className="w-5 h-5" />
                             Create Your First Workflow
@@ -240,26 +240,26 @@ export default function WorkflowsPage() {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.05 }}
-                                    className={`group relative bg-white/[0.03] backdrop-blur-sm border border-white/10 rounded-2xl hover:border-teal-500/30 hover:bg-white/[0.05] transition-all duration-500 ${viewMode === "list" ? "flex items-center justify-between p-4" : "p-6"
+                                    className={`group relative bg-white/[0.03] backdrop-blur-sm border border-white/10 rounded-2xl hover:border-blue-300/30 hover:bg-white/[0.05] transition-all duration-500 ${viewMode === "list" ? "flex items-center justify-between p-4" : "p-6"
                                         }`}
                                 >
                                     {/* Hover glow */}
-                                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-teal-500/10 to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-300/10 to-blue-300/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
                                     <Link href={`/landingV3/workflow/${workflow.id}`} className="relative z-10 flex-1">
                                         <div className={viewMode === "list" ? "flex items-center gap-4" : ""}>
                                             {/* Icon */}
-                                            <div className={`${viewMode === "list" ? "" : "mb-4"} w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500/20 to-cyan-500/10 flex items-center justify-center border border-teal-500/20 group-hover:border-teal-500/40 transition-colors duration-300`}>
-                                                <Zap className="w-5 h-5 text-teal-400" />
+                                            <div className={`${viewMode === "list" ? "" : "mb-4"} w-12 h-12 rounded-xl bg-gradient-to-br from-blue-300/20 to-cyan-500/10 flex items-center justify-center border border-blue-300/20 group-hover:border-blue-300/40 transition-colors duration-300`}>
+                                                <Zap className="w-5 h-5 text-blue-200" />
                                             </div>
 
                                             <div>
-                                                <h3 className="font-semibold text-lg text-white group-hover:text-teal-300 transition-colors duration-300">
+                                                <h3 className="font-semibold text-lg text-white group-hover:text-blue-300 transition-colors duration-300">
                                                     {workflow.title || "Untitled Workflow"}
                                                 </h3>
                                                 <div className={`flex items-center gap-4 ${viewMode === "list" ? "" : "mt-2"} text-sm text-white/40`}>
                                                     <span className="flex items-center gap-1.5">
-                                                        <div className="w-1.5 h-1.5 rounded-full bg-teal-500" />
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-blue-300" />
                                                         {nodeCount} node{nodeCount !== 1 ? "s" : ""}
                                                     </span>
                                                     <span className="flex items-center gap-1.5">
@@ -275,7 +275,7 @@ export default function WorkflowsPage() {
                                     <div className={`relative z-10 flex items-center gap-2 ${viewMode === "list" ? "" : "mt-5 pt-4 border-t border-white/5"}`}>
                                         <Link
                                             href={`/landingV3/workflow/${workflow.id}`}
-                                            className="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-white/5 hover:bg-teal-500/20 text-white/60 hover:text-teal-300 transition-all duration-300 text-sm font-medium"
+                                            className="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-white/5 hover:bg-blue-300/20 text-white/60 hover:text-blue-300 transition-all duration-300 text-sm font-medium"
                                         >
                                             <Play className="w-3.5 h-3.5" />
                                             {viewMode === "list" ? "" : "Open"}
@@ -347,7 +347,7 @@ export default function WorkflowsPage() {
                             className="relative w-full max-w-lg bg-[#0a0a0a] border border-white/10 rounded-3xl p-8"
                         >
                             {/* Glow */}
-                            <div className="absolute -inset-1 bg-gradient-to-r from-teal-500/20 to-emerald-500/20 rounded-3xl blur-xl opacity-50" />
+                            <div className="absolute -inset-1 bg-gradient-to-r from-blue-300/20 to-blue-300/20 rounded-3xl blur-xl opacity-50" />
 
                             <div className="relative">
                                 <h2 className="text-2xl font-bold mb-2">Create New Workflow</h2>
@@ -360,7 +360,7 @@ export default function WorkflowsPage() {
                                     onChange={(e) => setNewTitle(e.target.value)}
                                     onKeyDown={(e) => e.key === "Enter" && createWorkflow()}
                                     autoFocus
-                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-teal-500/50 focus:ring-2 focus:ring-teal-500/20 transition-all duration-300 text-lg"
+                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-blue-300/50 focus:ring-2 focus:ring-blue-300/20 transition-all duration-300 text-lg"
                                 />
 
                                 <div className="flex gap-3 mt-6">
@@ -372,7 +372,7 @@ export default function WorkflowsPage() {
                                     </button>
                                     <button
                                         onClick={createWorkflow}
-                                        className="flex-1 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-medium hover:shadow-lg hover:shadow-teal-500/20 transition-all duration-300"
+                                        className="flex-1 py-3 rounded-xl bg-gradient-to-r from-blue-300 to-blue-300 text-white font-medium hover:shadow-lg hover:shadow-blue-300/20 transition-all duration-300"
                                     >
                                         Create Workflow
                                     </button>

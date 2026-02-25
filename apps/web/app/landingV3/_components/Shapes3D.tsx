@@ -23,7 +23,7 @@ export default function Shapes3D() {
                     transformStyle: "preserve-3d",
                 }}
             >
-                <div className="w-full h-full bg-gradient-to-br from-purple-500/30 to-blue-500/30 backdrop-blur-xl border border-white/20 rounded-xl shadow-[0_0_50px_rgba(120,50,255,0.3)]" />
+                <div className="w-full h-full bg-gradient-to-br from-blue-400/30 to-blue-300/30 backdrop-blur-xl border border-white/20 rounded-xl shadow-[0_0_50px_rgba(96,165,250,0.3)]" />
             </motion.div>
 
             {/* Abstract Sphere/Blob */}
@@ -37,7 +37,7 @@ export default function Shapes3D() {
                     repeat: Infinity,
                     ease: "easeInOut",
                 }}
-                className="absolute top-1/3 right-1/4 w-64 h-64 rounded-full bg-gradient-to-tr from-pink-500/20 to-orange-500/20 blur-3xl mix-blend-screen"
+                className="absolute top-1/3 right-1/4 w-64 h-64 rounded-full bg-gradient-to-tr from-blue-400/20 to-blue-300/20 blur-3xl mix-blend-screen"
             />
 
             {/* Another Glass Element */}

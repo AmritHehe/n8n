@@ -19,28 +19,27 @@ export default function LandingV3() {
     }, []);
 
     return (
-        <main className="relative min-h-screen w-full bg-[#030303] text-white selection:bg-purple-500/30 antialiased">
-            {/* Intro Animation */}
+        <main className="relative min-h-screen w-full bg-[#030303] text-white selection:bg-blue-400/30 antialiased">
+
             <AnimatePresence>
                 {showIntro && <IntroAnimation onComplete={handleIntroComplete} />}
             </AnimatePresence>
 
-            {/* Main content */}
             {!showIntro && (
                 <>
                     <FluidBackground />
 
-                    {/* Hero section */}
+
                     <div className="relative z-10">
                         <Hero />
                         <SocialProof />
                         <WorkflowAnimation />
                     </div>
 
-                    {/* ScrollSection needs to be outside the z-10 div for sticky to work */}
+
                     <ScrollSection />
 
-                    {/* Rest of content */}
+
                     <div className="relative z-10">
                         <BentoGrid />
                         <Footer />

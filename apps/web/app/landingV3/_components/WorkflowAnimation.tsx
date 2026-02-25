@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 
-// Unified color palette
+// Unified teal palette — slight brightness variation per node for subtle differentiation
 const workflowNodes = [
     {
         id: "trigger",
@@ -15,7 +15,7 @@ const workflowNodes = [
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
         ),
-        color: "#a855f7", // purple
+        color: "#60a5fa",
     },
     {
         id: "webhook",
@@ -26,7 +26,7 @@ const workflowNodes = [
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
         ),
-        color: "#3b82f6", // blue
+        color: "#93c5fd",
     },
     {
         id: "ai",
@@ -37,7 +37,7 @@ const workflowNodes = [
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
         ),
-        color: "#ec4899", // pink
+        color: "#60a5fa",
     },
     {
         id: "smtp",
@@ -48,7 +48,7 @@ const workflowNodes = [
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
         ),
-        color: "#06b6d4", // cyan
+        color: "#93c5fd",
     },
     {
         id: "telegram",
@@ -59,7 +59,7 @@ const workflowNodes = [
                 <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
             </svg>
         ),
-        color: "#8b5cf6", // violet
+        color: "#93c5fd",
     },
     {
         id: "wait",
@@ -70,7 +70,7 @@ const workflowNodes = [
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
         ),
-        color: "#06b6d4", // cyan
+        color: "#60a5fa",
     },
 ];
 
@@ -175,8 +175,8 @@ export default function WorkflowAnimation() {
 
     return (
         <section className="relative py-28 overflow-hidden">
-            {/* Background glow - unified palette */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-gradient-to-r from-purple-600/10 via-pink-600/10 to-cyan-600/10 rounded-full blur-[150px]" />
+            {/* Background glow — teal only */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-blue-400/10 rounded-full blur-[150px]" />
 
             <div className="container mx-auto px-4 relative z-10">
                 {/* Header */}
@@ -186,9 +186,9 @@ export default function WorkflowAnimation() {
                     viewport={{ once: true }}
                     className="text-center mb-16"
                 >
-                    <p className="text-sm font-medium text-purple-400 uppercase tracking-widest mb-3">Live Workflow</p>
+                    <p className="text-sm font-medium text-blue-400 uppercase tracking-widest mb-3">Live Workflow</p>
                     <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
-                        See it in <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">action</span>
+                        See it in <span className="bg-gradient-to-r from-blue-300 to-blue-400 bg-clip-text text-transparent">action</span>
                     </h2>
                     <p className="text-base text-white/50 max-w-lg mx-auto">
                         A real workflow that receives webhooks, processes with AI, and sends notifications.
@@ -227,9 +227,9 @@ export default function WorkflowAnimation() {
                             transition={{ delay: 0.6 }}
                             className="mt-8 flex items-center justify-center gap-4"
                         >
-                            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 backdrop-blur-xl">
-                                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                                <span className="text-sm text-emerald-400">Execution Successful</span>
+                            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-400/10 border border-blue-400/20 backdrop-blur-xl">
+                                <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                                <span className="text-sm text-blue-400">Execution Successful</span>
                             </div>
                             <span className="text-white/30 text-sm">32ms</span>
                         </motion.div>

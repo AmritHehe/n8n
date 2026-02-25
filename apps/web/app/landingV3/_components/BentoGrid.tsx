@@ -63,20 +63,20 @@ function MiniWorkflow() {
 export default function BentoGrid() {
     return (
         <section className="relative py-28 overflow-hidden">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-purple-600/10 rounded-full blur-[180px] pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-blue-400/10 rounded-full blur-[180px] pointer-events-none" />
 
             <div className="container mx-auto px-4 relative z-10">
                 <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
-                    <p className="text-sm font-medium text-purple-400 uppercase tracking-widest mb-3">Why Autm8n</p>
+                    <p className="text-sm font-medium text-blue-400 uppercase tracking-widest mb-3">Why Autm8n</p>
                     <h2 className="text-4xl md:text-6xl font-bold text-white mb-5 tracking-tight">
-                        Built for <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">power users</span>
+                        Built for <span className="bg-gradient-to-r from-blue-300 to-blue-400 bg-clip-text text-transparent">power users</span>
                     </h2>
                     <p className="text-lg text-white/50 max-w-xl mx-auto">Everything you need to automate at scale. No compromises.</p>
                 </motion.div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 max-w-6xl mx-auto" style={{ perspective: "1000px" }}>
-                    <BentoItem className="md:col-span-2 lg:row-span-2" gradient="bg-gradient-to-br from-amber-500/20 to-orange-500/20" delay={0.1}>
-                        <motion.div animate={{ filter: ["drop-shadow(0 0 8px rgba(251,191,36,0.4))", "drop-shadow(0 0 15px rgba(251,191,36,0.6))", "drop-shadow(0 0 8px rgba(251,191,36,0.4))"] }} transition={{ duration: 2, repeat: Infinity }} className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/25">
+                    <BentoItem className="md:col-span-2 lg:row-span-2" gradient="bg-gradient-to-br from-blue-400/20 to-blue-300/20" delay={0.1}>
+                        <motion.div animate={{ filter: ["drop-shadow(0 0 8px rgba(96,165,250,0.4))", "drop-shadow(0 0 15px rgba(96,165,250,0.6))", "drop-shadow(0 0 8px rgba(96,165,250,0.4))"] }} transition={{ duration: 2, repeat: Infinity }} className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-300 to-blue-400 flex items-center justify-center shadow-lg shadow-blue-400/25">
                             <Zap className="w-6 h-6 text-white" />
                         </motion.div>
                         <h3 className="text-xl font-bold text-white mt-5 mb-2">Lightning Fast Execution</h3>
@@ -84,20 +84,20 @@ export default function BentoGrid() {
                         <MiniWorkflow />
                     </BentoItem>
 
-                    <BentoItem gradient="bg-gradient-to-br from-violet-500/20 to-purple-500/20" delay={0.15}>
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/25">
+                    <BentoItem gradient="bg-gradient-to-br from-blue-400/20 to-blue-300/20" delay={0.15}>
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-300 to-blue-400 flex items-center justify-center shadow-lg shadow-blue-400/25">
                             <Code className="w-6 h-6 text-white" />
                         </div>
                         <h3 className="text-lg font-bold text-white mt-5 mb-2">Code When You Need It</h3>
                         <p className="text-white/50 text-sm leading-relaxed">Write JavaScript or Python directly in nodes.</p>
-                        <div className="mt-4 bg-black/30 rounded-lg p-3 font-mono text-[11px] text-green-400/80">
+                        <div className="mt-4 bg-black/30 rounded-lg p-3 font-mono text-[11px] text-blue-400/80">
                             <div className="text-white/25">// Transform</div>
-                            <div><span className="text-purple-400">const</span> r = items.<span className="text-cyan-400">map</span>(i =&gt; &#123;...&#125;);</div>
+                            <div><span className="text-white/60">const</span> r = items.<span className="text-white/40">map</span>(i =&gt; &#123;...&#125;);</div>
                         </div>
                     </BentoItem>
 
-                    <BentoItem gradient="bg-gradient-to-br from-cyan-500/20 to-blue-500/20" delay={0.2}>
-                        <motion.div animate={{ rotate: [0, 3, -3, 0] }} transition={{ duration: 4, repeat: Infinity }} className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/25">
+                    <BentoItem gradient="bg-gradient-to-br from-blue-400/20 to-blue-300/20" delay={0.2}>
+                        <motion.div animate={{ rotate: [0, 3, -3, 0] }} transition={{ duration: 4, repeat: Infinity }} className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-300 to-blue-400 flex items-center justify-center shadow-lg shadow-blue-400/25">
                             <Grid3X3 className="w-6 h-6 text-white" />
                         </motion.div>
                         <h3 className="text-lg font-bold text-white mt-5 mb-2">500+ Ready Nodes</h3>
@@ -109,10 +109,10 @@ export default function BentoGrid() {
                         </div>
                     </BentoItem>
 
-                    <BentoItem className="lg:col-span-2" gradient="bg-gradient-to-br from-pink-500/20 to-rose-500/20" delay={0.25}>
+                    <BentoItem className="lg:col-span-2" gradient="bg-gradient-to-br from-blue-400/20 to-blue-300/20" delay={0.25}>
                         <div className="flex flex-col md:flex-row md:items-start gap-6">
                             <div className="flex-1">
-                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center shadow-lg shadow-pink-500/25 relative overflow-hidden">
+                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-300 to-blue-400 flex items-center justify-center shadow-lg shadow-blue-400/25 relative overflow-hidden">
                                     <motion.div animate={{ rotate: 360 }} transition={{ duration: 8, repeat: Infinity, ease: "linear" }} className="absolute inset-0 opacity-30" style={{ background: "conic-gradient(from 0deg, transparent, white, transparent)" }} />
                                     <Sparkles className="w-6 h-6 text-white relative z-10" />
                                 </div>
@@ -121,12 +121,12 @@ export default function BentoGrid() {
                             </div>
                             <div className="flex-1 relative h-32 flex items-center justify-center">
                                 <motion.div animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 3, repeat: Infinity }} className="relative">
-                                    <div className="w-16 h-16 rounded-full bg-gradient-to-r from-pink-500/30 to-rose-500/30 blur-xl absolute inset-0" />
+                                    <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-400/30 to-blue-300/30 blur-xl absolute inset-0" />
                                     <div className="relative text-4xl">🤖</div>
                                 </motion.div>
                                 {[0, 1, 2].map((i) => (
                                     <motion.div key={i} animate={{ rotate: 360 }} transition={{ duration: 7 + i * 2, repeat: Infinity, ease: "linear" }} className="absolute" style={{ width: `${80 + i * 30}px`, height: `${80 + i * 30}px` }}>
-                                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-pink-400/50" />
+                                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-blue-200/50" />
                                     </motion.div>
                                 ))}
                             </div>

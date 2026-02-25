@@ -4,11 +4,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 
 const introNodes = [
-    { id: "trigger", label: "Manual Trigger", emoji: "▶️", color: "#22c55e", angle: -144 },
-    { id: "webhook", label: "Webhook", emoji: "⚡", color: "#f59e0b", angle: -72 },
-    { id: "ai", label: "AI Agent", emoji: "🧠", color: "#a855f7", angle: 0 },
-    { id: "smtp", label: "SMTP", emoji: "✉️", color: "#3b82f6", angle: 72 },
-    { id: "telegram", label: "Telegram", emoji: "✈️", color: "#06b6d4", angle: 144 },
+    { id: "trigger", label: "Manual Trigger", emoji: "▶️", color: "#60a5fa", angle: -144 },
+    { id: "webhook", label: "Webhook", emoji: "⚡", color: "#93c5fd", angle: -72 },
+    { id: "ai", label: "AI Agent", emoji: "🧠", color: "#60a5fa", angle: 0 },
+    { id: "smtp", label: "SMTP", emoji: "✉️", color: "#93c5fd", angle: 72 },
+    { id: "telegram", label: "Telegram", emoji: "✈️", color: "#60a5fa", angle: 144 },
 ];
 
 // Particle system
@@ -27,7 +27,7 @@ function Particles({ active }: { active: boolean }) {
         canvas.height = window.innerHeight;
 
         const particles: { x: number; y: number; vx: number; vy: number; life: number; color: string }[] = [];
-        const colors = ["#a855f7", "#3b82f6", "#ec4899", "#06b6d4"];
+        const colors = ["#60a5fa", "#93c5fd", "#60a5fa", "#ffffff"];
         let animationId: number;
 
         const createParticle = () => {
@@ -161,9 +161,9 @@ function BezierConnections({ phase }: { phase: number }) {
         <svg className="absolute pointer-events-none" style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)", width: 500, height: 500, overflow: "visible" }} viewBox="-250 -250 500 500">
             <defs>
                 <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#a855f7" stopOpacity="0.6" />
-                    <stop offset="50%" stopColor="#ec4899" stopOpacity="0.8" />
-                    <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.6" />
+                    <stop offset="0%" stopColor="#60a5fa" stopOpacity="0.6" />
+                    <stop offset="50%" stopColor="#93c5fd" stopOpacity="0.8" />
+                    <stop offset="100%" stopColor="#60a5fa" stopOpacity="0.6" />
                 </linearGradient>
             </defs>
             {paths.map((d, i) => (
@@ -189,7 +189,7 @@ export default function IntroAnimation({ onComplete }: { onComplete: () => void 
     return (
         <motion.div className="fixed inset-0 z-50 bg-[#030303] flex items-center justify-center overflow-hidden" exit={{ opacity: 0 }} transition={{ duration: 0.8 }}>
             <Particles active={showParticles} />
-            <motion.div initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: phase >= 1 ? 0.5 : 0, scale: phase >= 2 ? 1.5 : 1 }} transition={{ duration: 1 }} className="absolute w-[400px] h-[400px] rounded-full bg-gradient-to-r from-purple-600/30 via-pink-600/30 to-cyan-600/30 blur-[100px]" />
+            <motion.div initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: phase >= 1 ? 0.5 : 0, scale: phase >= 2 ? 1.5 : 1 }} transition={{ duration: 1 }} className="absolute w-[400px] h-[400px] rounded-full bg-blue-400/30 blur-[100px]" />
             <div className="relative">
                 <BezierConnections phase={phase} />
                 {introNodes.map((node) => <IntroNode key={node.id} node={node} phase={phase} />)}
@@ -197,7 +197,7 @@ export default function IntroAnimation({ onComplete }: { onComplete: () => void 
                     {showText && (
                         <motion.div initial={{ opacity: 0, scale: 0.8, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center whitespace-nowrap">
                             <h1 className="text-[clamp(2.5rem,10vw,6rem)] font-bold tracking-[-0.04em] leading-[1] text-white pb-2">Automate</h1>
-                            <h1 className="text-[clamp(2.5rem,10vw,6rem)] font-bold tracking-[-0.04em] leading-[1] bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">Everything</h1>
+                            <h1 className="text-[clamp(2.5rem,10vw,6rem)] font-bold tracking-[-0.04em] leading-[1] bg-gradient-to-r from-blue-300 to-blue-400 bg-clip-text text-transparent">Everything</h1>
                         </motion.div>
                     )}
                 </AnimatePresence>

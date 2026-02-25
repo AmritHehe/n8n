@@ -60,12 +60,12 @@ export default function FluidBackground() {
             }
         }
 
-        // Purple/pink/cyan palette matching the gradient
+        // Monochromatic blue palette
         const blobs = [
-            new Blob(canvas.width * 0.2, canvas.height * 0.3, 450, "rgba(168, 85, 247, 0.08)"),
-            new Blob(canvas.width * 0.8, canvas.height * 0.2, 400, "rgba(6, 182, 212, 0.06)"),
-            new Blob(canvas.width * 0.5, canvas.height * 0.7, 500, "rgba(236, 72, 153, 0.05)"),
-            new Blob(canvas.width * 0.3, canvas.height * 0.8, 350, "rgba(59, 130, 246, 0.06)"),
+            new Blob(canvas.width * 0.2, canvas.height * 0.3, 450, "rgba(96, 165, 250, 0.07)"),
+            new Blob(canvas.width * 0.8, canvas.height * 0.2, 400, "rgba(96, 165, 250, 0.05)"),
+            new Blob(canvas.width * 0.5, canvas.height * 0.7, 500, "rgba(96, 165, 250, 0.04)"),
+            new Blob(canvas.width * 0.3, canvas.height * 0.8, 350, "rgba(96, 165, 250, 0.05)"),
         ];
 
         const draw = () => {

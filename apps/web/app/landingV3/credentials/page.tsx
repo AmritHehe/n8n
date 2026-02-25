@@ -131,8 +131,8 @@ export default function CredentialsPage() {
         <div className="min-h-screen bg-[#030303] text-white overflow-hidden">
             {/* Ambient Background */}
             <div className="fixed inset-0 pointer-events-none">
-                <div className="absolute top-0 right-1/4 w-[800px] h-[800px] rounded-full blur-[200px] bg-emerald-500/10" />
-                <div className="absolute bottom-0 left-1/4 w-[600px] h-[600px] rounded-full blur-[180px] bg-teal-500/8" />
+                <div className="absolute top-0 right-1/4 w-[800px] h-[800px] rounded-full blur-[200px] bg-blue-300/10" />
+                <div className="absolute bottom-0 left-1/4 w-[600px] h-[600px] rounded-full blur-[180px] bg-blue-300/8" />
                 <div className="absolute top-1/2 left-0 w-[400px] h-[400px] rounded-full blur-[150px] bg-cyan-500/6" />
             </div>
 
@@ -153,7 +153,7 @@ export default function CredentialsPage() {
                         animate={{ opacity: 1, y: 0, x: "-50%" }}
                         exit={{ opacity: 0, y: -20, x: "-50%" }}
                         className={`fixed top-6 left-1/2 z-50 px-6 py-3 rounded-full backdrop-blur-xl border ${message.type === "success"
-                                ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-300"
+                                ? "bg-blue-300/20 border-blue-300/40 text-blue-300"
                                 : "bg-red-500/20 border-red-500/40 text-red-300"
                             }`}
                     >
@@ -191,13 +191,13 @@ export default function CredentialsPage() {
                     className="mb-12"
                 >
                     <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                        <Shield className="w-5 h-5 text-teal-400" />
+                        <Shield className="w-5 h-5 text-blue-200" />
                         Your Credentials
                     </h2>
 
                     {loading ? (
                         <div className="flex items-center justify-center py-16">
-                            <div className="w-8 h-8 border-2 border-teal-500/30 border-t-teal-500 rounded-full animate-spin" />
+                            <div className="w-8 h-8 border-2 border-blue-300/30 border-t-blue-300 rounded-full animate-spin" />
                         </div>
                     ) : credentials.length === 0 ? (
                         <div className="text-center py-12 bg-white/[0.02] border border-white/10 rounded-2xl">
@@ -212,21 +212,21 @@ export default function CredentialsPage() {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.05 }}
-                                    className="group relative bg-white/[0.03] backdrop-blur-sm border border-white/10 rounded-2xl p-5 hover:border-teal-500/30 hover:bg-white/[0.05] transition-all duration-500"
+                                    className="group relative bg-white/[0.03] backdrop-blur-sm border border-white/10 rounded-2xl p-5 hover:border-blue-300/30 hover:bg-white/[0.05] transition-all duration-500"
                                 >
-                                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-teal-500/10 to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-300/10 to-blue-300/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
                                     <div className="relative z-10 flex items-center justify-between">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500/20 to-cyan-500/10 flex items-center justify-center border border-teal-500/20">
+                                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-300/20 to-cyan-500/10 flex items-center justify-center border border-blue-300/20">
                                                 {cred.platform === "teligram" ? (
-                                                    <Send className="w-5 h-5 text-teal-400" />
+                                                    <Send className="w-5 h-5 text-blue-200" />
                                                 ) : (
-                                                    <Mail className="w-5 h-5 text-teal-400" />
+                                                    <Mail className="w-5 h-5 text-blue-200" />
                                                 )}
                                             </div>
                                             <div>
-                                                <h3 className="font-medium text-white group-hover:text-teal-300 transition-colors">
+                                                <h3 className="font-medium text-white group-hover:text-blue-300 transition-colors">
                                                     {cred.title}
                                                 </h3>
                                                 <p className="text-sm text-white/40 capitalize">{cred.platform}</p>
@@ -281,7 +281,7 @@ export default function CredentialsPage() {
                     transition={{ delay: 0.2 }}
                 >
                     <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                        <Plus className="w-5 h-5 text-emerald-400" />
+                        <Plus className="w-5 h-5 text-blue-300" />
                         Add New Credential
                     </h2>
 
@@ -292,14 +292,14 @@ export default function CredentialsPage() {
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={() => setShowCreateForm("telegram")}
-                                className="group p-6 bg-white/[0.03] border border-white/10 rounded-2xl hover:border-teal-500/30 transition-all duration-300 text-left"
+                                className="group p-6 bg-white/[0.03] border border-white/10 rounded-2xl hover:border-blue-300/30 transition-all duration-300 text-left"
                             >
                                 <div className="flex items-center gap-4">
-                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-500/20 to-cyan-500/10 flex items-center justify-center border border-teal-500/20 group-hover:border-teal-500/40 transition-colors">
-                                        <Send className="w-6 h-6 text-teal-400" />
+                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-300/20 to-cyan-500/10 flex items-center justify-center border border-blue-300/20 group-hover:border-blue-300/40 transition-colors">
+                                        <Send className="w-6 h-6 text-blue-200" />
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold text-lg text-white group-hover:text-teal-300 transition-colors">
+                                        <h3 className="font-semibold text-lg text-white group-hover:text-blue-300 transition-colors">
                                             Telegram Bot
                                         </h3>
                                         <p className="text-sm text-white/40">Send messages via Telegram</p>
@@ -312,14 +312,14 @@ export default function CredentialsPage() {
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={() => setShowCreateForm("smtp")}
-                                className="group p-6 bg-white/[0.03] border border-white/10 rounded-2xl hover:border-emerald-500/30 transition-all duration-300 text-left"
+                                className="group p-6 bg-white/[0.03] border border-white/10 rounded-2xl hover:border-blue-300/30 transition-all duration-300 text-left"
                             >
                                 <div className="flex items-center gap-4">
-                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 flex items-center justify-center border border-emerald-500/20 group-hover:border-emerald-500/40 transition-colors">
-                                        <Mail className="w-6 h-6 text-emerald-400" />
+                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-300/20 to-blue-300/10 flex items-center justify-center border border-blue-300/20 group-hover:border-blue-300/40 transition-colors">
+                                        <Mail className="w-6 h-6 text-blue-300" />
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold text-lg text-white group-hover:text-emerald-300 transition-colors">
+                                        <h3 className="font-semibold text-lg text-white group-hover:text-blue-300 transition-colors">
                                             SMTP Account
                                         </h3>
                                         <p className="text-sm text-white/40">Send emails via SMTP</p>
@@ -335,11 +335,11 @@ export default function CredentialsPage() {
                         >
                             <div className="flex items-center justify-between mb-6">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500/20 to-cyan-500/10 flex items-center justify-center">
+                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-300/20 to-cyan-500/10 flex items-center justify-center">
                                         {showCreateForm === "telegram" ? (
-                                            <Send className="w-5 h-5 text-teal-400" />
+                                            <Send className="w-5 h-5 text-blue-200" />
                                         ) : (
-                                            <Mail className="w-5 h-5 text-emerald-400" />
+                                            <Mail className="w-5 h-5 text-blue-300" />
                                         )}
                                     </div>
                                     <h3 className="font-semibold text-lg">
@@ -364,7 +364,7 @@ export default function CredentialsPage() {
                                                 placeholder="Enter your bot token"
                                                 value={telegramData.token}
                                                 onChange={(e) => setTelegramData(prev => ({ ...prev, token: e.target.value }))}
-                                                className="w-full px-4 py-3 pr-12 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-teal-500/50 transition-all"
+                                                className="w-full px-4 py-3 pr-12 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-blue-300/50 transition-all"
                                             />
                                             <button
                                                 type="button"
@@ -382,13 +382,13 @@ export default function CredentialsPage() {
                                             placeholder="Enter chat ID"
                                             value={telegramData.chatId}
                                             onChange={(e) => setTelegramData(prev => ({ ...prev, chatId: e.target.value }))}
-                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-teal-500/50 transition-all"
+                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-blue-300/50 transition-all"
                                         />
                                     </div>
                                     <button
                                         onClick={saveTelegramCredential}
                                         disabled={saving}
-                                        className="w-full py-3 mt-2 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-medium hover:shadow-lg hover:shadow-teal-500/20 disabled:opacity-50 transition-all"
+                                        className="w-full py-3 mt-2 rounded-xl bg-gradient-to-r from-blue-300 to-cyan-500 text-white font-medium hover:shadow-lg hover:shadow-blue-300/20 disabled:opacity-50 transition-all"
                                     >
                                         {saving ? "Saving..." : "Save Telegram Credential"}
                                     </button>
@@ -403,7 +403,7 @@ export default function CredentialsPage() {
                                                 placeholder="smtp.gmail.com"
                                                 value={smtpData.HOST}
                                                 onChange={(e) => setSmtpData(prev => ({ ...prev, HOST: e.target.value }))}
-                                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-emerald-500/50 transition-all"
+                                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-blue-300/50 transition-all"
                                             />
                                         </div>
                                         <div>
@@ -413,7 +413,7 @@ export default function CredentialsPage() {
                                                 placeholder="587"
                                                 value={smtpData.PORT}
                                                 onChange={(e) => setSmtpData(prev => ({ ...prev, PORT: e.target.value }))}
-                                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-emerald-500/50 transition-all"
+                                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-blue-300/50 transition-all"
                                             />
                                         </div>
                                     </div>
@@ -424,7 +424,7 @@ export default function CredentialsPage() {
                                             placeholder="your-email@gmail.com"
                                             value={smtpData.username}
                                             onChange={(e) => setSmtpData(prev => ({ ...prev, username: e.target.value }))}
-                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-emerald-500/50 transition-all"
+                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-blue-300/50 transition-all"
                                         />
                                     </div>
                                     <div>
@@ -435,7 +435,7 @@ export default function CredentialsPage() {
                                                 placeholder="Enter your password"
                                                 value={smtpData.password}
                                                 onChange={(e) => setSmtpData(prev => ({ ...prev, password: e.target.value }))}
-                                                className="w-full px-4 py-3 pr-12 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-emerald-500/50 transition-all"
+                                                className="w-full px-4 py-3 pr-12 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-blue-300/50 transition-all"
                                             />
                                             <button
                                                 type="button"
@@ -449,7 +449,7 @@ export default function CredentialsPage() {
                                     <button
                                         onClick={saveSMTPCredential}
                                         disabled={saving}
-                                        className="w-full py-3 mt-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-medium hover:shadow-lg hover:shadow-emerald-500/20 disabled:opacity-50 transition-all"
+                                        className="w-full py-3 mt-2 rounded-xl bg-gradient-to-r from-blue-300 to-blue-300 text-white font-medium hover:shadow-lg hover:shadow-blue-300/20 disabled:opacity-50 transition-all"
                                     >
                                         {saving ? "Saving..." : "Save SMTP Credential"}
                                     </button>

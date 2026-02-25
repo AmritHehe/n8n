@@ -17,28 +17,28 @@ const features: Feature[] = [
         title: "Connect Anything",
         description: "Integrate with any app, database, or API. If it has an API, you can connect to it.",
         icon: Globe,
-        color: "#14b8a6", // teal-500
+        color: "#60a5fa",
     },
     {
         id: 2,
         title: "AI-Native Workflows",
         description: "Build autonomous agents with LangChain integration. Let AI handle the complexity.",
         icon: Cpu,
-        color: "#06b6d4", // cyan-500
+        color: "#60a5fa",
     },
     {
         id: 3,
         title: "Enterprise Security",
         description: "Self-host for complete control. SOC2 compliant, RBAC, and audit logs built-in.",
         icon: Shield,
-        color: "#10b981", // emerald-500
+        color: "#60a5fa",
     },
     {
         id: 4,
         title: "Blazing Fast",
         description: "Execute thousands of workflows per second. Built for scale from day one.",
         icon: Zap,
-        color: "#0d9488", // teal-600
+        color: "#60a5fa",
     },
 ];
 

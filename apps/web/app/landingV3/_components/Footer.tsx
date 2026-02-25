@@ -12,9 +12,9 @@ export default function Footer() {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="relative max-w-4xl mx-auto text-center p-12 rounded-3xl bg-gradient-to-br from-purple-500/10 to-cyan-500/10 border border-white/[0.08] overflow-hidden"
+                    className="relative max-w-4xl mx-auto text-center p-12 rounded-3xl bg-blue-400/[0.06] border border-white/[0.08] overflow-hidden"
                 >
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 via-transparent to-cyan-600/20 blur-3xl" />
+                    <div className="absolute inset-0 bg-blue-400/15 blur-3xl" />
                     <div className="relative z-10">
                         <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
                             Ready to automate everything?
@@ -39,7 +39,7 @@ export default function Footer() {
             <div className="container mx-auto px-4">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-300 to-blue-400 flex items-center justify-center">
                             <span className="text-white font-bold text-sm">A</span>
                         </div>
                         <span className="font-semibold text-white">Autm8n</span>
