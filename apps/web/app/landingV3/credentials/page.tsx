@@ -14,10 +14,7 @@ import {
     Eye,
     EyeOff,
     Shield,
-    Server,
-    Check,
     X,
-    Sparkles
 } from "lucide-react";
 import api from "../../apiClient";
 
@@ -153,8 +150,8 @@ export default function CredentialsPage() {
                         animate={{ opacity: 1, y: 0, x: "-50%" }}
                         exit={{ opacity: 0, y: -20, x: "-50%" }}
                         className={`fixed top-6 left-1/2 z-50 px-6 py-3 rounded-full backdrop-blur-xl border ${message.type === "success"
-                                ? "bg-blue-300/20 border-blue-300/40 text-blue-300"
-                                : "bg-red-500/20 border-red-500/40 text-red-300"
+                            ? "bg-blue-300/20 border-blue-300/40 text-blue-300"
+                            : "bg-red-500/20 border-red-500/40 text-red-300"
                             }`}
                     >
                         {message.text}
@@ -176,7 +173,7 @@ export default function CredentialsPage() {
                         <ArrowLeft className="w-5 h-5" />
                     </Link>
                     <div>
-                        <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-white to-white/60 bg-clip-text text-transparent">
+                        <h1 className="text-4xl font-bold bg-linear-to-r from-white via-white to-white/60 bg-clip-text text-transparent">
                             Credentials
                         </h1>
                         <p className="text-white/40 mt-1">Securely manage your integration credentials</p>
@@ -214,11 +211,11 @@ export default function CredentialsPage() {
                                     transition={{ delay: index * 0.05 }}
                                     className="group relative bg-white/[0.03] backdrop-blur-sm border border-white/10 rounded-2xl p-5 hover:border-blue-300/30 hover:bg-white/[0.05] transition-all duration-500"
                                 >
-                                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-300/10 to-blue-300/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                                    <div className="absolute inset-0 rounded-2xl bg-linear-to-r from-blue-300/10 to-blue-300/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
                                     <div className="relative z-10 flex items-center justify-between">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-300/20 to-cyan-500/10 flex items-center justify-center border border-blue-300/20">
+                                            <div className="w-12 h-12 rounded-xl bg-linear-to-r from-blue-300/20 to-cyan-500/10 flex items-center justify-center border border-blue-300/20">
                                                 {cred.platform === "teligram" ? (
                                                     <Send className="w-5 h-5 text-blue-200" />
                                                 ) : (
@@ -295,7 +292,7 @@ export default function CredentialsPage() {
                                 className="group p-6 bg-white/[0.03] border border-white/10 rounded-2xl hover:border-blue-300/30 transition-all duration-300 text-left"
                             >
                                 <div className="flex items-center gap-4">
-                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-300/20 to-cyan-500/10 flex items-center justify-center border border-blue-300/20 group-hover:border-blue-300/40 transition-colors">
+                                    <div className="w-14 h-14 rounded-2xl bg-linear-to-r from-blue-300/20 to-cyan-500/10 flex items-center justify-center border border-blue-300/20 group-hover:border-blue-300/40 transition-colors">
                                         <Send className="w-6 h-6 text-blue-200" />
                                     </div>
                                     <div>
@@ -315,7 +312,7 @@ export default function CredentialsPage() {
                                 className="group p-6 bg-white/[0.03] border border-white/10 rounded-2xl hover:border-blue-300/30 transition-all duration-300 text-left"
                             >
                                 <div className="flex items-center gap-4">
-                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-300/20 to-blue-300/10 flex items-center justify-center border border-blue-300/20 group-hover:border-blue-300/40 transition-colors">
+                                    <div className="w-14 h-14 rounded-2xl bg-linear-to-r from-blue-300/20 to-blue-300/10 flex items-center justify-center border border-blue-300/20 group-hover:border-blue-300/40 transition-colors">
                                         <Mail className="w-6 h-6 text-blue-300" />
                                     </div>
                                     <div>
@@ -335,7 +332,7 @@ export default function CredentialsPage() {
                         >
                             <div className="flex items-center justify-between mb-6">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-300/20 to-cyan-500/10 flex items-center justify-center">
+                                    <div className="w-10 h-10 rounded-xl bg-linear-to-r from-blue-300/20 to-cyan-500/10 flex items-center justify-center">
                                         {showCreateForm === "telegram" ? (
                                             <Send className="w-5 h-5 text-blue-200" />
                                         ) : (
@@ -388,7 +385,7 @@ export default function CredentialsPage() {
                                     <button
                                         onClick={saveTelegramCredential}
                                         disabled={saving}
-                                        className="w-full py-3 mt-2 rounded-xl bg-gradient-to-r from-blue-300 to-cyan-500 text-white font-medium hover:shadow-lg hover:shadow-blue-300/20 disabled:opacity-50 transition-all"
+                                        className="w-full py-3 mt-2 rounded-xl bg-linear-to-r from-blue-300 to-cyan-500 text-white font-medium hover:shadow-lg hover:shadow-blue-300/20 disabled:opacity-50 transition-all"
                                     >
                                         {saving ? "Saving..." : "Save Telegram Credential"}
                                     </button>
@@ -449,7 +446,7 @@ export default function CredentialsPage() {
                                     <button
                                         onClick={saveSMTPCredential}
                                         disabled={saving}
-                                        className="w-full py-3 mt-2 rounded-xl bg-gradient-to-r from-blue-300 to-blue-300 text-white font-medium hover:shadow-lg hover:shadow-blue-300/20 disabled:opacity-50 transition-all"
+                                        className="w-full py-3 mt-2 rounded-xl bg-linear-to-r from-blue-300 to-blue-300 text-white font-medium hover:shadow-lg hover:shadow-blue-300/20 disabled:opacity-50 transition-all"
                                     >
                                         {saving ? "Saving..." : "Save SMTP Credential"}
                                     </button>

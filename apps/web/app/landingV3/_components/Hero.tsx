@@ -3,6 +3,9 @@
 import { motion, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
+import { Github, Star, Webhook } from "lucide-react";
 
 // Floating node decoration
 function FloatingNode({
@@ -87,19 +90,22 @@ export default function Hero() {
             style={{ opacity, y, scale }}
             className="relative min-h-screen flex flex-col items-center justify-center overflow-visible pt-16"
         >
-            {/* Floating nodes */}
+            {/* Floating nodes — real node type icons */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                {/* Telegram */}
                 <FloatingNode delay={0.2} position={{ x: "12%", y: "22%" }}
-                    icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3" /></svg>}
+                    icon={<Image src="/telegram.svg" alt="Telegram" width={20} height={20} className="invert opacity-80" />}
                 />
+                {/* Webhook */}
                 <FloatingNode delay={0.35} position={{ x: "82%", y: "18%" }}
-                    icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7" /></svg>}
-                />
+                    icon={<Webhook className="flex items-center justify-center opacity-80"/>} />
+                {/* Send Mail */}
                 <FloatingNode delay={0.5} position={{ x: "8%", y: "68%" }}
-                    icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>}
+                    icon={<Image src="/sendmail.svg" alt="Send Mail" width={20} height={20} className="invert opacity-80" />}
                 />
+                {/* AI Agent */}
                 <FloatingNode delay={0.65} position={{ x: "85%", y: "62%" }}
-                    icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18" /></svg>}
+                    icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" /></svg>}
                 />
             </div>
 
@@ -153,13 +159,18 @@ export default function Hero() {
                             <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                         </span>
                     </button>
-                    <button className="px-7 py-3.5 bg-white/[0.05] hover:bg-white/[0.1] text-white/70 hover:text-white rounded-full font-medium text-sm border border-white/[0.1] backdrop-blur-xl transition-all">
-                        Github
-                    </button>
+                    <Link
+                        href="https://github.com/amrithehe/n8n"
+                        target="_blank"
+                        className="group relative p-4 bg-white/5 hover:bg-white/10 rounded-full font-medium text-sm border border-white/10 backdrop-blur-xl transition-all flex items-center justify-center overflow-hidden"
+                    >
+                        <Github className="w-5 h-5 text-white/70 transition-all duration-300 group-hover:opacity-0 group-hover:scale-75" />
+                        <Star className="w-5 h-5 text-yellow-100 absolute transition-all duration-300 opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100" />
+                    </Link>
                 </motion.div>
             </motion.div>
 
-            {/* Scroll Indicator */}
+
 
         </motion.section>
     );

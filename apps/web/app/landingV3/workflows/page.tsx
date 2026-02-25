@@ -2,21 +2,20 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Plus,
     Zap,
-    MoreHorizontal,
     Trash2,
-    Edit3,
     Play,
     Clock,
     ArrowLeft,
     Search,
     Grid3X3,
     List,
-    Sparkles
+    Workflow,
 } from "lucide-react";
 import api from "../../apiClient";
 
@@ -145,7 +144,7 @@ export default function WorkflowsPage() {
                             <ArrowLeft className="w-5 h-5" />
                         </Link>
                         <div>
-                            <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-white to-white/60 bg-clip-text text-transparent">
+                            <h1 className="text-4xl font-bold bg-linear-to-r from-white via-white to-white/60 bg-clip-text text-transparent">
                                 Workflows
                             </h1>
                             <p className="text-white/40 mt-1">Manage your automation workflows</p>
@@ -186,7 +185,7 @@ export default function WorkflowsPage() {
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={() => setShowCreateModal(true)}
-                            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-300 to-blue-300 rounded-xl font-medium hover:shadow-lg hover:shadow-blue-300/20 transition-all duration-300"
+                            className="flex items-center gap-2 px-5 py-2.5 bg-linear-to-r from-blue-300 to-blue-300 rounded-xl font-medium hover:shadow-lg hover:shadow-blue-300/20 transition-all duration-300"
                         >
                             <Plus className="w-4 h-4" />
                             Create Workflow
@@ -206,8 +205,8 @@ export default function WorkflowsPage() {
                         animate={{ opacity: 1, y: 0 }}
                         className="flex flex-col items-center justify-center py-32"
                     >
-                        <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-blue-300/20 to-blue-300/10 flex items-center justify-center mb-6 border border-blue-300/20">
-                            <Sparkles className="w-10 h-10 text-blue-200" />
+                        <div className="w-24 h-24 rounded-3xl bg-linear-to-r from-blue-300/20 to-blue-300/10 flex items-center justify-center mb-6 border border-blue-300/20">
+                            <Zap className="w-10 h-10 text-blue-200" />
                         </div>
                         <h3 className="text-2xl font-semibold mb-2">No workflows yet</h3>
                         <p className="text-white/40 mb-8 text-center max-w-md">
@@ -215,7 +214,7 @@ export default function WorkflowsPage() {
                         </p>
                         <button
                             onClick={() => setShowCreateModal(true)}
-                            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-300 to-blue-300 rounded-xl font-medium hover:shadow-lg hover:shadow-blue-300/20 transition-all duration-300"
+                            className="flex items-center gap-2 px-6 py-3 bg-linear-to-r from-blue-300 to-blue-300 rounded-xl font-medium hover:shadow-lg hover:shadow-blue-300/20 transition-all duration-300"
                         >
                             <Plus className="w-5 h-5" />
                             Create Your First Workflow
@@ -244,13 +243,13 @@ export default function WorkflowsPage() {
                                         }`}
                                 >
                                     {/* Hover glow */}
-                                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-300/10 to-blue-300/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                                    <div className="absolute inset-0 rounded-2xl bg-linear-to-r from-blue-300/10 to-blue-300/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
                                     <Link href={`/landingV3/workflow/${workflow.id}`} className="relative z-10 flex-1">
                                         <div className={viewMode === "list" ? "flex items-center gap-4" : ""}>
                                             {/* Icon */}
-                                            <div className={`${viewMode === "list" ? "" : "mb-4"} w-12 h-12 rounded-xl bg-gradient-to-br from-blue-300/20 to-cyan-500/10 flex items-center justify-center border border-blue-300/20 group-hover:border-blue-300/40 transition-colors duration-300`}>
-                                                <Zap className="w-5 h-5 text-blue-200" />
+                                            <div className={`${viewMode === "list" ? "" : "mb-4"} w-12 h-12 rounded-xl bg-linear-to-r from-blue-300/20 to-cyan-500/10 flex items-center justify-center border border-blue-300/20 group-hover:border-blue-300/40 transition-colors duration-300`}>
+                                                 <Image src="/workflow.svg" alt="Send Mail" width={28} height={28} className="invert opacity-90" />
                                             </div>
 
                                             <div>
@@ -347,7 +346,7 @@ export default function WorkflowsPage() {
                             className="relative w-full max-w-lg bg-[#0a0a0a] border border-white/10 rounded-3xl p-8"
                         >
                             {/* Glow */}
-                            <div className="absolute -inset-1 bg-gradient-to-r from-blue-300/20 to-blue-300/20 rounded-3xl blur-xl opacity-50" />
+                            <div className="absolute -inset-1 bg-linear-to-r from-blue-300/20 to-blue-300/20 rounded-3xl blur-xl opacity-50" />
 
                             <div className="relative">
                                 <h2 className="text-2xl font-bold mb-2">Create New Workflow</h2>
@@ -372,7 +371,7 @@ export default function WorkflowsPage() {
                                     </button>
                                     <button
                                         onClick={createWorkflow}
-                                        className="flex-1 py-3 rounded-xl bg-gradient-to-r from-blue-300 to-blue-300 text-white font-medium hover:shadow-lg hover:shadow-blue-300/20 transition-all duration-300"
+                                        className="flex-1 py-3 rounded-xl bg-linear-to-r from-blue-300 to-blue-300 text-white font-medium hover:shadow-lg hover:shadow-blue-300/20 transition-all duration-300"
                                     >
                                         Create Workflow
                                     </button>

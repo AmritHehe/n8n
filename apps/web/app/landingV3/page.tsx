@@ -21,13 +21,10 @@ export default function LandingV3() {
     return (
         <main className="relative min-h-screen w-full bg-[#030303] text-white selection:bg-blue-400/30 antialiased">
 
-            <AnimatePresence>
-                {showIntro && <IntroAnimation onComplete={handleIntroComplete} />}
-            </AnimatePresence>
+          
 
-            {!showIntro && (
-                <>
-                    <FluidBackground />
+                <AnimatePresence>
+                    {/* <FluidBackground /> */}
 
 
                     <div className="relative z-10">
@@ -44,8 +41,8 @@ export default function LandingV3() {
                         <BentoGrid />
                         <Footer />
                     </div>
-                </>
-            )}
+                </AnimatePresence>
+         
         </main>
     );
 }

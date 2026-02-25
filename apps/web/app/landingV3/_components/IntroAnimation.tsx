@@ -197,7 +197,7 @@ export default function IntroAnimation({ onComplete }: { onComplete: () => void 
                     {showText && (
                         <motion.div initial={{ opacity: 0, scale: 0.8, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center whitespace-nowrap">
                             <h1 className="text-[clamp(2.5rem,10vw,6rem)] font-bold tracking-[-0.04em] leading-[1] text-white pb-2">Automate</h1>
-                            <h1 className="text-[clamp(2.5rem,10vw,6rem)] font-bold tracking-[-0.04em] leading-[1] bg-gradient-to-r from-blue-300 to-blue-400 bg-clip-text text-transparent">Everything</h1>
+                            <h1 className="text-[clamp(2.5rem,10vw,6rem)] font-bold tracking-[-0.04em] leading-[1] bg-linear-to-r from-blue-300 to-blue-400 bg-clip-text text-transparent">Everything</h1>
                         </motion.div>
                     )}
                 </AnimatePresence>

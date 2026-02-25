@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { Globe, Cpu, Shield, Zap, LucideIcon } from "lucide-react";
+import { LayoutGrid, Settings, Play, Webhook, LucideIcon } from "lucide-react";
 
 interface Feature {
     id: number;
@@ -14,42 +14,39 @@ interface Feature {
 const features: Feature[] = [
     {
         id: 1,
-        title: "Connect Anything",
-        description: "Integrate with any app, database, or API. If it has an API, you can connect to it.",
-        icon: Globe,
+        title: "Build Your Workflow",
+        description: "Drag nodes onto a visual canvas and connect them with edges. Powered by React Flow.",
+        icon: LayoutGrid,
         color: "#60a5fa",
     },
     {
         id: 2,
-        title: "AI-Native Workflows",
-        description: "Build autonomous agents with LangChain integration. Let AI handle the complexity.",
-        icon: Cpu,
+        title: "Configure Each Node",
+        description: "Set messages, pick credentials, and chain outputs between nodes. Every node has its own config panel.",
+        icon: Settings,
         color: "#60a5fa",
     },
     {
         id: 3,
-        title: "Enterprise Security",
-        description: "Self-host for complete control. SOC2 compliant, RBAC, and audit logs built-in.",
-        icon: Shield,
+        title: "Execute & Monitor",
+        description: "Hit play and watch real-time logs stream in via SSE. Nodes light up as they execute sequentially.",
+        icon: Play,
         color: "#60a5fa",
     },
     {
         id: 4,
-        title: "Blazing Fast",
-        description: "Execute thousands of workflows per second. Built for scale from day one.",
-        icon: Zap,
+        title: "Webhooks & Await",
+        description: "Workflows can pause at webhook and await nodes, then resume when an external event arrives.",
+        icon: Webhook,
         color: "#60a5fa",
     },
 ];
 
-// Safe feature getter
+
 const getFeature = (index: number): Feature => features[index % features.length]!;
 
-// Bezier curve path
-function generateBezierPath(startX: number, startY: number, endX: number, endY: number): string {
-    const midX = (startX + endX) / 2;
-    return `M ${startX} ${startY} C ${midX} ${startY}, ${midX} ${endY}, ${endX} ${endY}`;
-}
+
+
 
 export default function ScrollSection() {
     const sectionRef = useRef<HTMLDivElement>(null);
@@ -104,37 +101,12 @@ export default function ScrollSection() {
 
     return (
         <section ref={sectionRef} className="relative h-[400vh] bg-[#030303]">
-            {/* Dynamic gradient background */}
-            <div
-                className="fixed inset-0 pointer-events-none transition-opacity duration-1000"
-                style={{ opacity: gradientOpacity }}
-            >
-                <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] rounded-full blur-[150px]"
-                    style={{ background: `radial-gradient(circle, ${activeFeature.color}40, transparent 70%)` }}
-                />
-                <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] rounded-full blur-[120px]"
-                    style={{ background: `radial-gradient(circle, ${nextFeature.color}30, transparent 70%)` }}
-                />
-            </div>
+           
 
             {/* Sticky container */}
             <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden">
-                {/* Floating particles */}
-                <div className="absolute inset-0 overflow-hidden">
-                    {[...Array(20)].map((_, i) => (
-                        <div
-                            key={i}
-                            className="absolute w-1 h-1 rounded-full bg-white/20"
-                            style={{
-                                left: `${10 + (i * 4.5) % 80}%`,
-                                top: `${15 + (i * 7) % 70}%`,
-                                opacity: 0.1 + (smoothProgress * 0.3),
-                                transform: `translateY(${Math.sin((smoothProgress * 10) + i) * 20}px) scale(${0.5 + smoothProgress * 0.5})`,
-                                transition: 'transform 0.5s ease-out, opacity 0.5s ease-out',
-                            }}
-                        />
-                    ))}
-                </div>
+  
+               
 
                 <div className="container mx-auto px-4 relative z-10">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -142,7 +114,7 @@ export default function ScrollSection() {
                         {/* Left: Text */}
                         <div className="space-y-6">
                             {/* Node progress indicator */}
-                            <div className="flex items-center gap-3 mb-8">
+                            {/* <div className="flex items-center gap-3 mb-8">
                                 {features.map((feature, i) => (
                                     <div key={i} className="flex items-center">
                                         <div
@@ -183,7 +155,7 @@ export default function ScrollSection() {
                                         )}
                                     </div>
                                 ))}
-                            </div>
+                            </div> */}
 
                             {/* Title */}
                             <div className="relative h-[120px] overflow-hidden">
@@ -201,8 +173,6 @@ export default function ScrollSection() {
                                     </h2>
                                 ))}
                             </div>
-
-                            {/* Description */}
                             <div className="relative h-[80px] overflow-hidden">
                                 {features.map((feature, i) => (
                                     <p
@@ -220,7 +190,7 @@ export default function ScrollSection() {
                             </div>
 
                             {/* CTA */}
-                            <button
+                            {/* <button
                                 className="group flex items-center gap-2 px-6 py-3 rounded-full transition-all duration-500 mt-4"
                                 style={{
                                     background: `linear-gradient(135deg, ${activeFeature.color}20, transparent)`,
@@ -231,7 +201,7 @@ export default function ScrollSection() {
                                 <svg className="w-4 h-4 text-white/60 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                                 </svg>
-                            </button>
+                            </button> */}
                         </div>
 
                         {/* Right: 3D Node */}
@@ -244,25 +214,7 @@ export default function ScrollSection() {
                                     transformStyle: 'preserve-3d',
                                 }}
                             >
-                                {/* SVG connections */}
-                                <svg className="absolute -inset-20 w-[calc(100%+160px)] h-[calc(100%+160px)] pointer-events-none" style={{ transform: 'translateZ(-20px)' }}>
-                                    <defs>
-                                        <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                            <stop offset="0%" stopColor={activeFeature.color} stopOpacity={0.6} />
-                                            <stop offset="100%" stopColor={nextFeature.color} stopOpacity={0.3} />
-                                        </linearGradient>
-                                        <filter id="glow">
-                                            <feGaussianBlur stdDeviation="3" result="blur" />
-                                            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-                                        </filter>
-                                    </defs>
-                                    <path d={generateBezierPath(20, 80, 80, 20)} fill="none" stroke="url(#lineGrad)" strokeWidth="2" filter="url(#glow)"
-                                        style={{ opacity: smoothProgress * 0.8, strokeDasharray: 200, strokeDashoffset: 200 - (smoothProgress * 200) }} />
-                                    <path d={generateBezierPath(80, 180, 180, 80)} fill="none" stroke="url(#lineGrad)" strokeWidth="2" filter="url(#glow)"
-                                        style={{ opacity: smoothProgress * 0.6, strokeDasharray: 200, strokeDashoffset: 200 - (smoothProgress * 200) }} />
-                                    <path d={generateBezierPath(160, 40, 220, 120)} fill="none" stroke="url(#lineGrad)" strokeWidth="2" filter="url(#glow)"
-                                        style={{ opacity: smoothProgress * 0.5, strokeDasharray: 200, strokeDashoffset: 200 - (smoothProgress * 200) }} />
-                                </svg>
+                               
 
                                 {/* Outer ring */}
                                 <div
@@ -285,16 +237,16 @@ export default function ScrollSection() {
 
                                 {/* Glow */}
                                 <div
-                                    className="absolute inset-0 rounded-[32px] blur-2xl scale-125 transition-all duration-700"
-                                    style={{ background: `${activeFeature.color}25` }}
+                                    // className="absolute inset-0 rounded-[32px] blur-2xl scale-125 transition-all duration-700"
+                                    // style={{ background: `${activeFeature.color}25` }}
                                 />
 
                                 {/* Main card */}
                                 <div
                                     className="relative w-44 h-44 rounded-[32px] flex items-center justify-center"
                                     style={{
-                                        background: `linear-gradient(135deg, ${activeFeature.color}15 0%, #0f1f1f 50%, #0a1a1a 100%)`,
-                                        boxShadow: `0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.1), 0 0 60px -20px ${activeFeature.color}40`,
+                                        // background: `linear-gradient(135deg, ${activeFeature.color}15 0%, #0f1f1f 50%, #0a1a1a 100%)`,
+                                        // boxShadow: `0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.1), 0 0 60px -20px ${activeFeature.color}40`,
                                         border: `1px solid ${activeFeature.color}30`,
                                         transition: 'all 0.7s cubic-bezier(0.16, 1, 0.3, 1)',
                                         transform: 'translateZ(40px)',
@@ -303,7 +255,7 @@ export default function ScrollSection() {
                                     {features.map((feature, i) => {
                                         // Calculate rotation based on index difference
                                         const indexDiff = i - activeIndex;
-                                        const rotateY3D = indexDiff * 90;
+                                        const rotateY3D = indexDiff * 100;
                                         const rotateZ = i === activeIndex ? 0 : (i < activeIndex ? -180 : 180);
 
                                         return (
@@ -329,7 +281,7 @@ export default function ScrollSection() {
                                 </div>
 
                                 {/* Orbiting nodes */}
-                                {[0, 1, 2].map((i) => {
+                                {/* {[0, 1, 2].map((i) => {
                                     const orbitFeature = getFeature(activeIndex + i);
                                     return (
                                         <div
@@ -345,36 +297,13 @@ export default function ScrollSection() {
                                             }}
                                         />
                                     );
-                                })}
+                                })} */}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Progress bar - only visible when section is in view */}
-            <div
-                className="fixed right-8 top-1/2 -translate-y-1/2 w-1.5 h-40 bg-white/10 rounded-full overflow-hidden hidden lg:block transition-opacity duration-500"
-                style={{ opacity: isInView ? 1 : 0, pointerEvents: isInView ? 'auto' : 'none' }}
-            >
-                <div
-                    className="w-full rounded-full transition-all duration-300"
-                    style={{
-                        height: `${smoothProgress * 100}%`,
-                        background: `linear-gradient(to bottom, ${getFeature(0).color}, ${getFeature(3).color})`,
-                        boxShadow: `0 0 10px ${activeFeature.color}60`,
-                    }}
-                />
-                <div
-                    className="absolute left-1/2 -translate-x-1/2 w-3 h-3 rounded-full transition-all duration-300"
-                    style={{
-                        top: `${smoothProgress * 100}%`,
-                        background: activeFeature.color,
-                        boxShadow: `0 0 15px ${activeFeature.color}`,
-                        transform: 'translate(-50%, -50%)',
-                    }}
-                />
-            </div>
         </section>
     );
 }

@@ -24,7 +24,7 @@ export default function SocialProof() {
                             transition={{ delay: index * 0.08 }}
                             className="text-center py-6 px-4 rounded-xl bg-white/[0.01] border border-white/[0.04]"
                         >
-                            <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent mb-1">
+                            <div className="text-3xl md:text-4xl font-bold bg-linear-to-r from-white to-white/70 bg-clip-text text-transparent mb-1">
                                 {stat.value}
                             </div>
                             <div className="text-xs text-white/40">{stat.label}</div>

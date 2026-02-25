@@ -3,6 +3,7 @@
 import { useCallback, useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import Image from "next/image";
 import {
     ReactFlow,
     Background,
@@ -20,7 +21,6 @@ import {
     Position,
     useReactFlow,
     ReactFlowProvider,
-    MarkerType,
     getBezierPath,
     EdgeProps,
 } from "@xyflow/react";
@@ -31,17 +31,15 @@ import {
     Save,
     Play,
     X,
-    Zap,
-    Mail,
-    Send,
-    Globe,
+    MousePointerClick,
+    Webhook,
     Bot,
-    Clock,
     Sparkles,
     Trash2,
     Copy,
     Check,
     Loader2,
+    Workflow,
 } from "lucide-react";
 import api from "../../../apiClient";
 
@@ -189,7 +187,7 @@ function PremiumNode({
                             className="w-10 h-10 rounded-xl flex items-center justify-center"
                             style={{ background: `${color}30` }}
                         >
-                            <Icon className="w-5 h-5" style={{ color }} />
+                            {Icon}
                         </div>
                         <div className="flex-1 min-w-0">
                             <h3 className="font-semibold text-white text-sm truncate">{title}</h3>
@@ -243,7 +241,7 @@ function PremiumNode({
                         <div className="p-4 pt-0 border-t border-white/5 mt-2">
                             <button
                                 onClick={handleSave}
-                                className="w-full py-2.5 rounded-lg bg-gradient-to-r from-blue-300 to-blue-300 text-white font-medium text-sm hover:shadow-lg hover:shadow-blue-300/20 transition-all flex items-center justify-center gap-2"
+                                className="w-full py-2.5 rounded-lg bg-linear-to-r from-blue-300 to-blue-300 text-white font-medium text-sm hover:shadow-lg hover:shadow-blue-300/20 transition-all flex items-center justify-center gap-2"
                             >
                                 <Save className="w-4 h-4" />
                                 Save Configuration
@@ -266,7 +264,7 @@ function TriggerNode({ id, data }: { id: string; data: any }) {
         <PremiumNode
             id={id}
             data={data}
-            icon={Zap}
+            icon={<MousePointerClick className="w-5 h-5" style={{ color: "#60a5fa" }} />}
             color="#60a5fa"
             title="Manual Trigger"
             subtitle="Click Execute to start"
@@ -293,7 +291,7 @@ function WebhookNode({ id, data }: { id: string; data: any }) {
         <PremiumNode
             id={id}
             data={data}
-            icon={Globe}
+            icon={<Webhook className="w-5 h-5" style={{ color: "#8b5cf6" }} />}
             color="#8b5cf6"
             title={isTrigger ? "Webhook Trigger" : "Webhook Action"}
             subtitle="HTTP endpoint"
@@ -352,7 +350,7 @@ function TelegramNode({ id, data }: { id: string; data: any }) {
         <PremiumNode
             id={id}
             data={data}
-            icon={Send}
+            icon={<Image src="/telegram.svg" alt="Telegram" width={20} height={20} className="invert" />}
             color="#0ea5e9"
             title="Send Telegram"
             subtitle={data?.message ? `"${data.message.slice(0, 20)}..."` : "Configure message"}
@@ -435,7 +433,7 @@ function GmailNode({ id, data }: { id: string; data: any }) {
         <PremiumNode
             id={id}
             data={data}
-            icon={Mail}
+            icon={<Image src="/sendmail.svg" alt="Send Mail" width={20} height={20} className="invert" />}
             color="#ef4444"
             title="Send Email"
             subtitle={data?.to ? `To: ${data.to}` : "Configure email"}
@@ -505,7 +503,7 @@ function AwaitGmailNode({ id, data }: { id: string; data: any }) {
         <PremiumNode
             id={id}
             data={data}
-            icon={Clock}
+            icon={<Image src="/sendMail&wait.svg" alt="Send Mail & Wait" width={20} height={20} className="invert" />}
             color="#f97316"
             title="Await Gmail Reply"
             subtitle="Wait for email response"
@@ -558,7 +556,7 @@ function AIAgentNode({ id, data }: { id: string; data: any }) {
         <PremiumNode
             id={id}
             data={data}
-            icon={Bot}
+            icon={<Bot className="w-5 h-5" style={{ color: "#a855f7" }} />}
             color="#a855f7"
             title="AI Agent"
             subtitle={data?.message ? "Prompt configured" : "Configure AI prompt"}
@@ -875,16 +873,16 @@ function WorkflowEditorInner({ workflowId }: WorkflowClientProps) {
     }
 
     const triggerNodes = [
-        { type: "trigger", icon: Zap, label: "Manual Trigger", color: "#60a5fa" },
-        { type: "webhook", icon: Globe, label: "Webhook Trigger", color: "#8b5cf6", isTrigger: true },
+        { type: "trigger", icon: <MousePointerClick className="w-4 h-4" style={{ color: "#60a5fa" }} />, label: "Manual Trigger", color: "#60a5fa" },
+        { type: "webhook", icon: <Webhook className="w-4 h-4" style={{ color: "#8b5cf6" }} />, label: "Webhook Trigger", color: "#8b5cf6", isTrigger: true },
     ];
 
     const actionNodes = [
-        { type: "telegram", icon: Send, label: "Telegram", color: "#0ea5e9" },
-        { type: "gmail", icon: Mail, label: "Gmail", color: "#ef4444" },
-        { type: "webhook", icon: Globe, label: "Webhook (Wait)", color: "#8b5cf6", isTrigger: false },
-        { type: "awaitGmail", icon: Clock, label: "Await Gmail", color: "#f97316" },
-        { type: "aiagent", icon: Bot, label: "AI Agent", color: "#a855f7" },
+        { type: "telegram", icon: <Image src="/telegram.svg" alt="Telegram" width={16} height={16} className="invert" />, label: "Telegram", color: "#0ea5e9" },
+        { type: "gmail", icon: <Image src="/sendmail.svg" alt="Gmail" width={16} height={16} className="invert" />, label: "Gmail", color: "#ef4444" },
+        { type: "webhook", icon: <Webhook className="w-4 h-4" style={{ color: "#8b5cf6" }} />, label: "Webhook (Wait)", color: "#8b5cf6", isTrigger: false },
+        { type: "awaitGmail", icon: <Image src="/sendMail&wait.svg" alt="Await Gmail" width={16} height={16} className="invert" />, label: "Await Gmail", color: "#f97316" },
+        { type: "aiagent", icon: <Bot className="w-4 h-4" style={{ color: "#a855f7" }} />, label: "AI Agent", color: "#a855f7" },
     ];
 
     // Add node with correct label based on trigger/action
@@ -971,7 +969,7 @@ function WorkflowEditorInner({ workflowId }: WorkflowClientProps) {
                                             className="w-8 h-8 rounded-lg flex items-center justify-center"
                                             style={{ background: `${opt.color}20` }}
                                         >
-                                            <opt.icon className="w-4 h-4" style={{ color: opt.color }} />
+                                            {opt.icon}
                                         </div>
                                         <span className="text-sm text-white/80 group-hover:text-white">{opt.label}</span>
                                     </button>
@@ -995,7 +993,7 @@ function WorkflowEditorInner({ workflowId }: WorkflowClientProps) {
                                             className="w-8 h-8 rounded-lg flex items-center justify-center"
                                             style={{ background: `${opt.color}20` }}
                                         >
-                                            <opt.icon className="w-4 h-4" style={{ color: opt.color }} />
+                                            {opt.icon}
                                         </div>
                                         <span className="text-sm text-white/80 group-hover:text-white">{opt.label}</span>
                                     </button>
@@ -1038,7 +1036,7 @@ function WorkflowEditorInner({ workflowId }: WorkflowClientProps) {
                 >
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2 text-white/40">
-                            <Sparkles className="w-4 h-4 text-blue-200" />
+
                             <span className="text-sm">{nodes.length} nodes</span>
                         </div>
                     </div>
@@ -1056,7 +1054,7 @@ function WorkflowEditorInner({ workflowId }: WorkflowClientProps) {
                         <button
                             onClick={executeWorkflow}
                             disabled={executing || nodes.length === 0}
-                            className="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-blue-300 to-blue-300 rounded-xl text-white font-medium hover:shadow-lg hover:shadow-blue-300/20 transition-all disabled:opacity-50"
+                            className="flex items-center gap-2 px-5 py-2 bg-linear-to-r from-blue-400 to-blue-300 rounded-xl text-white font-medium hover:shadow-lg hover:shadow-blue-300/20 transition-all disabled:opacity-50"
                         >
                             {executing ? (
                                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -1077,7 +1075,7 @@ function WorkflowEditorInner({ workflowId }: WorkflowClientProps) {
                                 animate={{ opacity: 1, y: 0 }}
                                 className="text-center"
                             >
-                                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-300/20 to-blue-300/10 flex items-center justify-center mx-auto mb-6 border border-blue-300/20">
+                                <div className="w-20 h-20 rounded-2xl bg-linear-to-r from-blue-300/20 to-blue-300/10 flex items-center justify-center mx-auto mb-6 border border-blue-300/20">
                                     <Sparkles className="w-8 h-8 text-blue-200" />
                                 </div>
                                 <h3 className="text-xl font-semibold text-white mb-2">Start Building</h3>
