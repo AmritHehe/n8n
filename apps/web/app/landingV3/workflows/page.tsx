@@ -239,7 +239,7 @@ export default function WorkflowsPage() {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.05 }}
-                                    className={`group relative bg-white/[0.03] backdrop-blur-sm border border-white/10 rounded-2xl hover:border-blue-300/30 hover:bg-white/[0.05] transition-all duration-500 ${viewMode === "list" ? "flex items-center justify-between p-4" : "p-6"
+                                    className={`group relative bg-white/3 backdrop-blur-sm border border-white/10 rounded-2xl hover:border-blue-300/30 hover:bg-white/5 transition-all duration-500 ${viewMode === "list" ? "flex items-center justify-between p-4" : "p-6"
                                         }`}
                                 >
                                     {/* Hover glow */}
@@ -249,7 +249,7 @@ export default function WorkflowsPage() {
                                         <div className={viewMode === "list" ? "flex items-center gap-4" : ""}>
                                             {/* Icon */}
                                             <div className={`${viewMode === "list" ? "" : "mb-4"} w-12 h-12 rounded-xl bg-linear-to-r from-blue-300/20 to-cyan-500/10 flex items-center justify-center border border-blue-300/20 group-hover:border-blue-300/40 transition-colors duration-300`}>
-                                                 <Image src="/workflow.svg" alt="Send Mail" width={28} height={28} className="invert opacity-90" />
+                                                 <Image src="/Workflow.svg" alt="Send Mail" width={28} height={28} className="invert opacity-90" />
                                             </div>
 
                                             <div>
