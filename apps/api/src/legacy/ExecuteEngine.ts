@@ -1,5 +1,5 @@
 import { preOrderTraversal } from "../services/veryBigBrain.js";
-import  type { node } from "../types.js";
+import  type { node } from "../types/types.js";
 import { prismaClient }  from '@repo/database/client'; 
 import { telegramBot } from "../ExecuteNodes/ExecuteTeligram.js";
 import { gmail } from "../ExecuteNodes/ExecuteGmail.js";

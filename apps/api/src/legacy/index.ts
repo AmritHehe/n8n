@@ -1,8 +1,8 @@
 import express, {  type Request, type Response } from 'express' ; 
 import jwt  from 'jsonwebtoken' ; 
 import { prismaClient }  from '@repo/database/client'; 
-import type { node } from '../types.js';
-import type { users } from '../types.js';
+import type { node } from '../types/types.js';
+import type { users } from '../types/types.js';
 // import { processess } from './processess.js';
 import {authMiddleware } from '../middlewares/middleware.js';
 import cors from 'cors';

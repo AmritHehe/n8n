@@ -1,6 +1,6 @@
 import {  type Request, type Response } from 'express' ; 
 import { prismaClient }  from '@repo/database/client'; 
-import type { node } from '../types.js';
+import type { node } from '../types/types.js';
 import { executeIt } from '../services/executeIt.js';
 import { workflowLogStreams } from './sse.controllers.js';
 import { ExecuteSchema } from '../validators/execution.validator.js';

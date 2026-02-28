@@ -1,5 +1,5 @@
 import { gmail } from "../ExecuteNodes/ExecuteGmail.js";
-import  type { node } from "../types.js";
+import  type { node } from "../types/types.js";
 import fetchCredentials from "./fetchCredentials.js";
 import OldResponses from "./fetchOldResponses.js";
 
