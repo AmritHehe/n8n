@@ -2,7 +2,7 @@
 
 import {  type Request, type Response } from 'express' ; 
 import { prismaClient }  from '@repo/database/client'; 
-import { encryptJSON , safeDecrypt } from '../utls/crypto.js';
+import { encryptJSON , safeDecrypt } from '../utils/crypto.js';
 import { CreateCredentialSchema , DeleteCredentialsSchema } from '../validators/credential.validators.js';
 
 export async function GetCredentials( req :Request , res : Response){ 
@@ -32,10 +32,8 @@ export async function GetCredentials( req :Request , res : Response){
         
         // console.log(" data " + JSON.stringify(data) );
         res.status(200).json({
-            success : false , 
-            data : {
-                result : result
-            },
+            success : true , 
+            data : result ,
             message : "sucessfully fetched the credential",
             error : null
         })
@@ -117,7 +115,8 @@ export async function DeleteCredentials(req :Request, res : Response){
 
         const response = await prismaClient.credentials.delete({ 
             where : { 
-                id : id 
+                id : id, 
+                userId : userId
             }
         })
         return res.status(200).json({

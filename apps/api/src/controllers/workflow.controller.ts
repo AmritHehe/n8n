@@ -2,14 +2,10 @@ import express, {  type Request, type Response } from 'express' ;
 
 import { prismaClient }  from '@repo/database/client'; 
 import type { node } from '../types.js';
-import z, { success } from "zod"
+
+import { CreateWorflowSchema , DeleteWorkflowSchema } from '../validators/workflow.validator.js';
 
 
-export const CreateWorflowSchema = z.object({
-    title : z.string(),
-    nodes : z.any(),
-    connections : z.any()
-})
 
 export async function CreateWorflow (req : Request , res : Response){ 
     //user
@@ -63,12 +59,9 @@ export async function CreateWorflow (req : Request , res : Response){
     }    
 
 }
-
-
 export async function GetAllWorkflows (req  : Request, res : Response){ 
     //yha bs ek be call jayega vo call karega aur sara data be se le aayega
 
-    //@ts-ignore
     const userId = req.userId; 
     try { 
         const data = await prismaClient.workflow.findMany({ 
@@ -84,10 +77,6 @@ export async function GetAllWorkflows (req  : Request, res : Response){
     
 
 }
-
-export const DeleteWorkflowSchema = z.object({
-    id : z.string()
-})
 export async function DeleteWorkflow(req : Request , res : Response){ 
     const {data , success } = DeleteWorkflowSchema.safeParse(req.body)
     
@@ -130,11 +119,6 @@ export async function DeleteWorkflow(req : Request , res : Response){
         })
     }
 }
-
-export const UpdateWorkflowSchema = z.object({
- 
-})
-
 export async function UpdateWorkflow(req : Request , res : Response){ 
     //update that node with the following , dump new json there
     const userId = req.userId ;
@@ -178,8 +162,8 @@ export async function UpdateWorkflow(req : Request , res : Response){
         })
     } catch (error) {
         console.log(error)
-        return res.status(200).json({
-            sucess : false , 
+        return res.status(500).json({
+            success : false , 
             data : null , 
             error : "SERVER_DOWN",
             message : "failed with error " + JSON.stringify(error)
@@ -192,9 +176,10 @@ export async function GetWorkflow(req  : Request, res : Response){
     const userId = req.userId ;
     const id : string = (req.params.id)!;
     try {
-        const response = await prismaClient.workflow.findFirst({ 
+        const response = await prismaClient.workflow.findUnique({ 
             where : { 
-                id : id
+                id : id,
+                userId : userId
             } 
         })
         console.log("response " + response)
@@ -206,8 +191,8 @@ export async function GetWorkflow(req  : Request, res : Response){
         })
     } catch (error) {
         console.log(error)   
-        return res.status(200).json({
-            sucess : false , 
+        return res.status(500).json({
+            success : false , 
             data : null , 
             error : "SERVER_DOWN",
             message : "failed with error " + JSON.stringify(error)

@@ -3,19 +3,17 @@ import { prismaClient }  from '@repo/database/client';
 import type { node } from '../types.js';
 import { executeIt } from '../services/executeIt.js';
 import { workflowLogStreams } from './sse.controllers.js';
-import z from "zod"
+import { ExecuteSchema } from '../validators/execution.validator.js';
 
 export async function Webhook(req : Request , res : Response){ 
     const id  :number = Number( req.params.id ); 
     //@ts-ignore
     //ADD userId and workflow Id in params too
-    // let userId = req.userId;
 
     let userId = "";
     let ResponseData = "";
     try{ 
         if(req.body.message){ 
-            console.log("fuckin inside this")
             ResponseData = req.body.message;
         }
     }
@@ -24,8 +22,9 @@ export async function Webhook(req : Request , res : Response){
     }
     
     const workflowId :string  = (req.query.workflowId) as string;
+    let data 
     try { 
-        const data = await prismaClient.workflow.findFirst({ 
+        data = await prismaClient.workflow.findFirst({ 
             where : { 
                 id : workflowId
             }
@@ -55,11 +54,6 @@ export async function Webhook(req : Request , res : Response){
     //ab ye node already hai db mein , we just have to update its value to true and hit the execution end point again 
 
     try{ 
-        const data = await prismaClient.workflow.findFirst({ 
-            where : { 
-                id : workflowId
-            }
-        })
         if(data){ 
             const nodes = JSON.parse(data.nodes);
             const connections = JSON.parse(data.Connections)
@@ -130,12 +124,7 @@ export async function Webhook(req : Request , res : Response){
                     // res.json("executed the webhook");
                     logCallback?.("Webhook executed, continuing remaining workflow");
                     res.send({ status: "Webhook executed" });
-                    await executeIt(payload , userId ,  workflowId ,  indexToStartWith ,true ,logCallback)
-                   
-                    
-
-
-                        
+                    await executeIt(payload , userId ,  workflowId ,  indexToStartWith ,true ,logCallback)           
             }   
 
         } 
@@ -153,13 +142,6 @@ export async function Webhook(req : Request , res : Response){
 //         }
 //     }
 }
-
-
-export const ExecuteSchema = z.object({
-    id : z.string(),
-    nodes : z.string(),
-    connections : z.string()
-})
 
 export  async function  Execute(req : Request , res : Response) { 
     const {data , success } = ExecuteSchema.safeParse(req.body)
