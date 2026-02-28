@@ -1,0 +1,494 @@
+import express, {  type Request, type Response } from 'express' ; 
+import jwt  from 'jsonwebtoken' ; 
+import { prismaClient }  from '@repo/database/client'; 
+import type { node } from '../types.js';
+import type { users } from '../types.js';
+// import { processess } from './processess.js';
+import {authMiddleware } from '../middlewares/middleware.js';
+import cors from 'cors';
+import { executeIt } from '../legacy/ExecuteEngine.js';
+import bcrypt from "bcrypt";
+import { encryptJSON , safeDecrypt } from '../utils/crypto.js';
+
+const app  = express() ; 
+app.use(express.json()); 
+app.use(cors({
+  origin: ["http://localhost:3000", "http://3.108.225.113:3000", "https://n8n.amrithehe.com" , "https://api-n8n.amrithehe.com" , "https://autm8n.amrithehe.com"], // allowed frontend origins
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  exposedHeaders: ["Content-Type", "Cache-Control", "Expires"]
+}))
+const workflowLogStreams: { [workflowId: string]: ((msg: string) => void) | undefined } = {};
+const JWT_SECRET  : string = process.env.JWT_SECRET!;
+
+
+
+app.post('/api/v1/signup' , async (req , res)=> { 
+    const payload = req.body ;
+    const name : string= payload.name ; 
+    const pass : string = payload.pass ; 
+    
+    const hashedPass =  await bcrypt.hash(pass , 10) ;
+
+    try{ 
+        await prismaClient.user.create({
+            data : { 
+                name : name , 
+                pass : hashedPass
+            }
+        })
+        res.status(200).json("user created")
+        
+    }
+    catch(e){ 
+        res.status(500).json("database is down !")
+    }
+})
+app.post('/api/v1/signin' ,async (req : Request, res :Response)=> { 
+    console.log('hitted the endpoint ?')
+    const payload = req.body ;
+    const name = payload.name ; 
+    const pass = payload.pass ; 
+    
+    const user  : users | null = await prismaClient.user.findFirst({
+        where : { 
+            name : name, 
+        }
+    })
+
+    if(user) {
+        const checkPass = await bcrypt.compare( pass , user.pass )
+        
+            if(checkPass || user.pass == pass){ 
+                const token  = jwt.sign({ 
+                    id : user.id
+                }, JWT_SECRET)
+                res.status(200).json({ 
+                    token : token
+                })
+            }   
+            else { 
+                res.status(401).json("wrong pass , please try again")
+            }
+
+    }
+    else { 
+        res.status(403).json("please sign up first")
+    }
+    
+
+})
+//payload or data or schema 
+// title : workflow name 
+//
+app.post('/workflow' , authMiddleware, async (req : Request , res : Response)=> { 
+    //user
+    //yha userId leke ek new workflow with empty nodes create hojana chaiye
+    const payload = req.body; 
+
+    const title = payload.title; 
+    const nodes = payload.nodes;
+    const connections = payload.connections;
+    //@ts-ignore
+    const userId = req.userId  
+    //prisma call to make a new emty workspace
+    const response = await prismaClient.workflow.create({ 
+        data : { 
+            title : title , 
+            nodes : JSON.stringify(nodes) , 
+            Connections : JSON.stringify(connections) ,
+            userId : userId
+        }
+    })
+    await prismaClient.responses.create({ 
+            data : { 
+                workflowId : response.id,
+                data : "",
+                userId : userId
+            }
+        })
+    res.json(response)
+    //do a db call to post the nodes
+})
+
+
+app.get('/workflow' , authMiddleware ,async (req  : Request, res : Response)=> { 
+    //yha bs ek be call jayega vo call karega aur sara data be se le aayega
+
+    //@ts-ignore
+    const userId = req.userId; 
+    try { 
+        const data = await prismaClient.workflow.findMany({ 
+            where : { 
+                userId : userId
+            }
+        })
+        res.json(data)
+    }
+    catch(e) { 
+        res.json("erro hogis" + e)
+    }
+    
+
+})
+app.delete('/workflow' , authMiddleware , async(req : Request , res : Response) => { 
+    const id = req.body.id; 
+    try{ 
+        await prismaClient.responses.delete({ 
+            where: { 
+                workflowId : id
+            }
+        })
+        const data = await prismaClient.workflow.delete({ 
+            where : { 
+                id : id
+            }
+        })
+        res.json(data)
+    }
+    catch(e){ 
+        console.log("error happened " + e) 
+    }
+})
+
+app.put('/workflow/:id' , authMiddleware ,async (req : Request , res : Response)=> { 
+    //update that node with the following , dump new json there
+    //@ts-ignore
+    const userId = req.userId ;
+    const payload = req.body ;
+    const id : string = (req.params.id)!;
+    console.log("checking req params id "  + id )
+    console.log("id + : "+ id)
+    const data = payload.data;
+    const FilteredNodes = JSON.parse(data.nodes)
+
+    FilteredNodes.forEach((i : node) => { i.type == 'webhook' || i.type == 'awaitGmail' ?( i.data.webhook = false  ,i.data.isExecuting = false , i.data.afterPlayNodes = undefined ) : console.log("wow bhay") })
+  
+    try {
+        const response = await prismaClient.workflow.update({ 
+            where : { 
+                id : id
+            } , 
+            data : { 
+               //add new data here 
+               //JSON stringify is only for backend , as our frontend already send the data in string only 
+               nodes :  JSON.stringify(FilteredNodes), 
+               Connections :(data.connections) , 
+               userId : userId
+            }
+        })
+        await prismaClient.responses.update({ 
+            where : { 
+                workflowId : id
+            },
+            data : { 
+                workflowId : id,
+                data : "",
+                userId : userId
+            }
+        })
+        res.json("updated the data" + response)
+    } catch (error) {
+        console.log(error)
+        
+    }
+})
+app.get('/workflow/:id' , authMiddleware , async(req  : Request, res : Response) => { 
+
+    console.log("tried to hit the end point")
+    //@ts-ignore
+    
+    const userId = req.userId ;
+    const id : string = (req.params.id)!;
+    try {
+        const response = await prismaClient.workflow.findFirst({ 
+            where : { 
+                id : id
+            } 
+        })
+        console.log("response " + response)
+        res.json(response)
+    } catch (error) {
+        console.log(error)   
+    }
+
+})
+app.all('/webhook/:id' ,  async(req : Request , res : Response) => { 
+    const id  :number = Number( req.params.id ); 
+    //@ts-ignore
+    //ADD userId and workflow Id in params too
+    // let userId = req.userId;
+    let userId = "";
+    let ResponseData = " ";
+    try{ 
+        if(req.body.message){ 
+            console.log("fuckin inside this")
+            ResponseData = req.body.message;
+        }
+    }
+    catch(e){ 
+        console.log("cant read message " + e)
+    }
+    
+    const workflowId :string  = (req.query.workflowId) as string;
+    try { 
+        const data = await prismaClient.workflow.findFirst({ 
+            where : { 
+                id : workflowId
+            }
+        })
+        if (data) { 
+            if(!data.userId){ 
+                console.log("corrupted data ")
+            }
+            console.log("webhook details " + JSON.stringify(data))
+            //@ts-ignore
+            userId = data.userId
+        }
+        
+    }
+    catch(e) { 
+        console.log("cant find the user ID , db error , please try again" + e)
+    }
+    console.log("workflow Id " + workflowId)
+    console.log(" here is the workflow id " + workflowId)
+    //we need workflowID here , assuming that there is one workflow only
+    //ab ye node already hai db mein , we just have to update its value to true and hit the execution end point again 
+    try{ 
+        const data = await prismaClient.workflow.findFirst({ 
+            where : { 
+                id : workflowId
+            }
+        })
+        if(data){ 
+            const nodes = JSON.parse(data.nodes);
+            const connections = JSON.parse(data.Connections)
+            // const webHookNode  = nodes.find((value : node ) => value.id == id);
+            console.log("webhook id : " + id)
+            const indexToUpdate = nodes.findIndex((value : node) => value.id == id);
+            const payloadToSend= { 
+                data : ResponseData , 
+                outputNodeIndex : id 
+            }
+            if(nodes[indexToUpdate].data.isExecuting == false){ 
+                console.log(" nodes " + JSON.stringify(nodes[indexToUpdate]))   
+
+                res.json("please execute the workflow first ")
+            }
+            else{ 
+                nodes[indexToUpdate].data.webhook = true;
+                let indexToStartWith = nodes[indexToUpdate].data.afterPlayNodes ;
+                // webHookNode.data.webhook = true;
+                console.log(" updated the webhook " + JSON.stringify(nodes[indexToUpdate]))   
+                    await prismaClient.workflow.update({ 
+                        where : { 
+                            id : workflowId
+                        } , 
+                        data : { 
+                            nodes : JSON.stringify(nodes)
+                        }
+                    })
+                    if(ResponseData){ 
+                        console.log("yha tk agya lesgo")
+                        const oldData =  await prismaClient.responses.findFirst({
+                            where : { 
+                                workflowId : workflowId
+                            }
+                        })
+                        if(oldData){ 
+                            console.log("yha tk agya hu olddata ke andr")
+                            let newData
+                            if(oldData.data == ""){ 
+                                 newData = [ payloadToSend ]
+
+                            }
+                            else {
+                            let parsedOldData = JSON.parse(oldData?.data)
+                             newData = [...parsedOldData , payloadToSend ]
+                            }
+                            
+                            console.log("new Data " + JSON.stringify(newData))
+                            await prismaClient.responses.update({ 
+                                where : { 
+                                    workflowId : workflowId 
+                                } ,
+                                data : { 
+                                    data : JSON.stringify(newData) 
+                                }
+                            })
+                            console.log("updated the data")
+                        }
+                    }
+                    //call execute here
+                    const payload = { 
+                        nodes :JSON.stringify(nodes) , 
+                        connections : JSON.stringify(connections) 
+                    }
+                    const logCallback = workflowLogStreams[workflowId]; // SSE callback from main execution
+
+                    // res.send({status : "continuing"})
+                    // res.json("executed the webhook");
+                    logCallback?.("Webhook executed, continuing remaining workflow");
+                    res.send({ status: "Webhook executed" });
+                    await executeIt(payload , userId ,  workflowId ,  indexToStartWith ,true ,logCallback)
+                   
+                    
+
+
+                        
+            }   
+
+        } 
+
+    }
+    catch(e) { 
+        console.error("errrorrrr "  + e) 
+    }
+    //webhook is a node , which is false by default , will turn true as soon as someone hits this end point 
+//    { 
+//         "id" : 1 ,
+//         "type" : "webhook", 
+//         "data" : { 
+//             "webhook" = false;
+//         }
+//     }
+})
+
+app.post('/execute' , authMiddleware , async (req : Request , res : Response)=> { 
+    const payload = req.body;
+    const  workflowId :string = payload.id; //this will be workflow id only  , considering there will be only 1 workflow
+    //@ts-ignore
+    const userId  = req.userId;
+    console.log("userID : from execute : " + userId)
+    const FilteredNodes = JSON.parse(payload.nodes)
+    FilteredNodes.forEach((i : node) => { i.type == 'webhook' || i.type == 'awaitGmail' ?( i.data.webhook = false  ,i.data.isExecuting = false , i.data.afterPlayNodes = undefined ) : console.log("wow bhay") })
+
+    payload.nodes = JSON.stringify(FilteredNodes);
+    //we must take data from backend here instead of taking nodes and connections in payload
+    //one simple good solution to filter nodes here only and make isexecuting and webhook false here
+    const logCallback = workflowLogStreams[workflowId];
+    await executeIt(payload , userId , workflowId , 0  , false , logCallback)
+    res.json('send the message bhai ab jao cold coffee pi aao')
+    
+})
+app.get('/execute/logs/:workflowId', async (req : Request , res :Response) => {
+  const { workflowId } = req.params;
+  //@ts-ignore
+  const token = req.query.token as string ;
+  if(!token){ 
+    return res.status(401).send('Unauthorized: Token missing');
+  }
+  const JWT_SECRET = process.env.JWT_SECRET! ;
+  console.log(JWT_SECRET)
+  const user = jwt.verify(token , JWT_SECRET)
+  //@ts-ignore
+  const userId = user.id;
+          
+  console.log("user Id sdjsdfmnvfx  : " + userId )
+  const id  : string = (workflowId)!
+  console.log(" workflow Id dgfkgjkf : " + workflowId)
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.setHeader("X-Accel-Buffering",'no')
+  res.flushHeaders();
+
+  console.log("arrived till here" )
+  const sendLog = (msg: string) => {
+    res.write(`data: ${msg}\n\n`);
+  };
+  // Helper to send log messages
+    workflowLogStreams[id] = sendLog;
+
+    req.on("close", () => {
+    delete workflowLogStreams[id];
+  });  
+    // sendLog("SSE connected. Waiting for workflow execution...");
+  req.on("close", () => {
+    res.end();
+  });
+});
+
+app.get('/api/v1/credentials' , authMiddleware  ,  async ( req :Request , res : Response) => { 
+    //@ts-ignore
+    const userId  = req.userId; 
+    try { 
+        const data  = await prismaClient.credentials.findMany({ 
+            where : { 
+                userId : userId
+            }
+        })
+        const result = data.map((item)=> { 
+            let decrypted = null ; 
+            try { 
+                decrypted = safeDecrypt(item.data )
+            }
+            catch(e){ 
+                console.error(`Decryption failed for credential ${item.id}:`, e);
+                decrypted = null; // fail-safe
+            }
+            return { 
+                ...item,
+                data: decrypted
+            }
+        }) 
+        
+        // console.log(" data " + JSON.stringify(data) );
+        res.status(200).json(result)
+    }
+    catch(e){ 
+        console.log("this credentials end point is not working , error :  "   + e )
+        res.status(500).json("Failed to fetched the credentials , error :  " + e)
+    }
+})
+app.post('/api/v1/credentials', authMiddleware , async(req :Request , res :Response) => { 
+    //use middleware
+    const payload = req.body;
+    //@ts-ignore
+    const userId  = req.userId;
+    try{ 
+        const encryptedData = encryptJSON(payload.data);
+        const response = await prismaClient.credentials.create({ 
+            data : {    
+                title : payload.title , 
+                platform : payload.platform , 
+                data : encryptedData , 
+                userId : userId
+            }
+        
+        })
+        res.json({id : response.id})
+    }
+    catch(err){ 
+        console.error('something went wrong : ' + err)
+        res.status(500).json("Failed to save the credentials" + err)
+    }
+    
+    //what we need is title platform data
+})
+app.delete('/api/v1/credentials' , authMiddleware ,async(req :Request, res : Response)=> { 
+    const payload = req.body;
+    //@ts-ignore
+    const userId = req.userId; 
+    const id = payload.id; 
+    try{ 
+        if(id){
+            const response = await prismaClient.credentials.delete({ 
+                where : { 
+                    id : id 
+                }
+            })
+        }
+        res.json("sucessfully deleted the credential" )
+    }
+    catch(e){ 
+        res.status(403).json('didnt worked well ')
+    }
+    
+
+})
+        
+app.listen(3002 , "0.0.0.0", ()=> { 
+    console.log("listening to port 3002")
+})
