@@ -1,7 +1,7 @@
 import express, {  type Request, type Response } from 'express' ; 
 
 import { prismaClient }  from '@repo/database/client'; 
-import type { node } from '../types/types.js';
+import type { node } from '../types.js';
 
 import { CreateWorflowSchema , DeleteWorkflowSchema } from '../validators/workflow.validator.js';
 
@@ -42,9 +42,7 @@ export async function CreateWorflow (req : Request , res : Response){
             })
         return res.status(201).json({
             success : true , 
-            data : { 
-                newWorkflow 
-            },
+            data : newWorkflow,
             error : null , 
             message : "workflow created sucessfully"
         })
@@ -69,10 +67,20 @@ export async function GetAllWorkflows (req  : Request, res : Response){
                 userId : userId
             }
         })
-        res.json(data)
+        return res.status(200).json({
+            success : true, 
+            data : data,
+            error : null , 
+            message : "workflwows fetched sucessfully "
+        })
     }
     catch(e) { 
-        res.json("erro hogis" + e)
+        return res.status(500).json({
+            success : false , 
+            data : null,
+            error : "SERVER_ERROR",
+            message : "failed becausee of error" + e
+        })
     }
     
 
@@ -102,10 +110,8 @@ export async function DeleteWorkflow(req : Request , res : Response){
         })
         return res.status(200).json({
             success : true , 
-            data : { 
-                data 
-            }, 
-            message : "sucessfully deleted workflow" , 
+            data : data, 
+            message : "successfully deleted workflow" , 
             error : null
         })
     }
@@ -156,7 +162,7 @@ export async function UpdateWorkflow(req : Request , res : Response){
         })
         return res.status(200).json({
             success : true ,
-            data : response , 
+            data : response, 
             error : null , 
             message : "updated the data" 
         })
@@ -183,9 +189,9 @@ export async function GetWorkflow(req  : Request, res : Response){
             } 
         })
         console.log("response " + response)
-        res.status(200).json({
+        return res.status(200).json({
             success : true , 
-            data : response , 
+            data : response, 
             error : null,
             message  : "sucessfully fetched the workflow"
         })

@@ -1,5 +1,5 @@
 import { prismaClient } from "@repo/database/client";
-import type { node } from "../types/types.js";
+import type { node } from "../types.js";
 
 export default async function OldResponses(workflowId : string , logCallBack : any , proces : node) : Promise<string | null | undefined>{
 

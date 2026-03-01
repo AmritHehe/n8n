@@ -1,6 +1,6 @@
 import {  type Request, type Response } from 'express' ; 
 import { prismaClient }  from '@repo/database/client'; 
-import type { node } from '../types/types.js';
+import type { node } from '../types.js';
 import { executeIt } from '../services/executeIt.js';
 import { workflowLogStreams } from './sse.controllers.js';
 import { ExecuteSchema } from '../validators/execution.validator.js';
@@ -118,7 +118,7 @@ export async function Webhook(req : Request , res : Response){
                         nodes :JSON.stringify(nodes) , 
                         connections : JSON.stringify(connections) 
                     }
-                    const logCallback = workflowLogStreams[workflowId]; // SSE callback from main execution
+                    const logCallback = workflowLogStreams.get(workflowId); // SSE callback from main execution
 
                     // res.send({status : "continuing"})
                     // res.json("executed the webhook");
@@ -169,7 +169,7 @@ export  async function  Execute(req : Request , res : Response) {
     //we must take data from backend here instead of taking nodes and connections in payload
     //one simple good solution to filter nodes here only and make isexecuting and webhook false here
 
-    const logCallback = workflowLogStreams[workflowId];
+    const logCallback = workflowLogStreams.get(workflowId);
     await executeIt(payload , userId , workflowId , 0  , false , logCallback)
     res.json('send the message bhai ab jao cold coffee pi aao')
     

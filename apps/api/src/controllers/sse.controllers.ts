@@ -2,7 +2,7 @@ import {type Request,type Response } from 'express' ;
 import jwt, { type JwtPayload }  from 'jsonwebtoken' ; 
 
 
-export const workflowLogStreams: { [workflowId: string]: ((msg: string) => void) | undefined } = {};
+export const workflowLogStreams = new Map<string, (msg: string) => void>();
 
 export async function SSE(req : Request , res :Response){
 
@@ -20,10 +20,10 @@ export async function SSE(req : Request , res :Response){
     res.write(`data: ${msg}\n\n`);
   };
 
-    workflowLogStreams[id] = sendLog;
+    workflowLogStreams.set(id, sendLog);
 
     req.on("close", () => {
-    delete workflowLogStreams[id];
+    workflowLogStreams.delete(id);
   });  
 
   req.on("close", () => {

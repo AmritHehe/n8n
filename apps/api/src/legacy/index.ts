@@ -1,14 +1,14 @@
 import express, {  type Request, type Response } from 'express' ; 
 import jwt  from 'jsonwebtoken' ; 
 import { prismaClient }  from '@repo/database/client'; 
-import type { node } from '../types/types.js';
-import type { users } from '../types/types.js';
+import type { node } from '../types.js';
+import type { users } from '../types.js';
 // import { processess } from './processess.js';
 import {authMiddleware } from '../middlewares/middleware.js';
 import cors from 'cors';
 import { executeIt } from '../legacy/ExecuteEngine.js';
 import bcrypt from "bcrypt";
-import { encryptJSON , safeDecrypt } from '../utils/crypto.js';
+import { encryptJSON , safeDecrypt } from '../utls/crypto.js';
 
 const app  = express() ; 
 app.use(express.json()); 
@@ -19,7 +19,7 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"],
   exposedHeaders: ["Content-Type", "Cache-Control", "Expires"]
 }))
-const workflowLogStreams: { [workflowId: string]: ((msg: string) => void) | undefined } = {};
+const workflowLogStreams = new Map<string, (msg: string) => void>();
 const JWT_SECRET  : string = process.env.JWT_SECRET!;
 
 
@@ -325,7 +325,7 @@ app.all('/webhook/:id' ,  async(req : Request , res : Response) => {
                         nodes :JSON.stringify(nodes) , 
                         connections : JSON.stringify(connections) 
                     }
-                    const logCallback = workflowLogStreams[workflowId]; // SSE callback from main execution
+                    const logCallback = workflowLogStreams.get(workflowId); // SSE callback from main execution
 
                     // res.send({status : "continuing"})
                     // res.json("executed the webhook");
@@ -367,7 +367,7 @@ app.post('/execute' , authMiddleware , async (req : Request , res : Response)=> 
     payload.nodes = JSON.stringify(FilteredNodes);
     //we must take data from backend here instead of taking nodes and connections in payload
     //one simple good solution to filter nodes here only and make isexecuting and webhook false here
-    const logCallback = workflowLogStreams[workflowId];
+    const logCallback = workflowLogStreams.get(workflowId);
     await executeIt(payload , userId , workflowId , 0  , false , logCallback)
     res.json('send the message bhai ab jao cold coffee pi aao')
     
@@ -399,10 +399,10 @@ app.get('/execute/logs/:workflowId', async (req : Request , res :Response) => {
     res.write(`data: ${msg}\n\n`);
   };
   // Helper to send log messages
-    workflowLogStreams[id] = sendLog;
+    workflowLogStreams.set(id, sendLog);
 
     req.on("close", () => {
-    delete workflowLogStreams[id];
+    workflowLogStreams.delete(id);
   });  
     // sendLog("SSE connected. Waiting for workflow execution...");
   req.on("close", () => {

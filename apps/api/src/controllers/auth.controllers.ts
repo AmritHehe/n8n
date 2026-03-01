@@ -3,7 +3,7 @@
 import{type Request, type Response } from 'express' ; 
 import jwt  from 'jsonwebtoken' ; 
 import { prismaClient }  from '@repo/database/client'; 
-import type { users } from '../types/types.js';
+import type { users } from '../types.js';
 import { Auth } from '../validators/auth.validators.js';
 import bcrypt from "bcrypt";
 

@@ -1,5 +1,5 @@
 import { prismaClient } from "@repo/database/client";
-import { safeDecrypt } from "../utils/crypto.js";
+import { safeDecrypt } from "../utls/crypto.js";
 
 export default async function fetchCredentials(platform : "gmail" | "teligram" , logCallBack : any , userId : string , credId : number){
     
