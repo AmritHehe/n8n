@@ -2,7 +2,7 @@
 
 import {  type Request, type Response } from 'express' ; 
 import { prismaClient }  from '@repo/database/client'; 
-import { encryptJSON , safeDecrypt } from '../utls/crypto.js';
+import { encryptJSON , safeDecrypt } from '../utils/crypto.js';
 import { CreateCredentialSchema , DeleteCredentialsSchema } from '../validators/credential.validators.js';
 
 export async function GetCredentials( req :Request , res : Response){ 

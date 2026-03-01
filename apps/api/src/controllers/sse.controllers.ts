@@ -7,7 +7,15 @@ export const workflowLogStreams = new Map<string, (msg: string) => void>();
 export async function SSE(req : Request , res :Response){
 
   const { workflowId } = req.params;
-  const id  : string = (workflowId)!
+  const id   = (workflowId)!
+  if(typeof(id)!="string"){
+    return res.status(400).json({
+            success : false , 
+            message : "invalid params",
+            error : "INVALID_REQUEST",
+            data : null
+        })
+  }
   console.log(" workflow Id : " + workflowId)
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");

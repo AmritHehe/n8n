@@ -1,9 +1,10 @@
 import express, {  type Request, type Response } from 'express' ; 
 
 import { prismaClient }  from '@repo/database/client'; 
-import type { node } from '../types.js';
+import type { node } from '../types/types.js';
 
 import { CreateWorflowSchema , DeleteWorkflowSchema } from '../validators/workflow.validator.js';
+import { success } from 'zod';
 
 
 
@@ -129,7 +130,15 @@ export async function UpdateWorkflow(req : Request , res : Response){
     //update that node with the following , dump new json there
     const userId = req.userId ;
     const payload = req.body ;
-    const id : string = (req.params.id)!;
+    const id  = (req.params.id)!;
+    if(typeof(id)!="string"){
+        return res.status(400).json({
+            success : false , 
+            message : "invalid params",
+            error : "INVALID_REQUEST",
+            data : null
+        })
+    }
     console.log("checking req params id "  + id )
     console.log("id + : "+ id)
     const data = payload.data;
@@ -180,7 +189,15 @@ export async function UpdateWorkflow(req : Request , res : Response){
 export async function GetWorkflow(req  : Request, res : Response){ 
 
     const userId = req.userId ;
-    const id : string = (req.params.id)!;
+    const id  = (req.params.id)!;
+    if(typeof(id)!= "string"){
+        return res.status(400).json({
+            success : false , 
+            message : "invalid params",
+            error : "INVALID_REQUEST",
+            data : null
+        })
+    }
     try {
         const response = await prismaClient.workflow.findUnique({ 
             where : { 

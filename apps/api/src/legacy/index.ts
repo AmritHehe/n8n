@@ -1,14 +1,14 @@
 import express, {  type Request, type Response } from 'express' ; 
 import jwt  from 'jsonwebtoken' ; 
 import { prismaClient }  from '@repo/database/client'; 
-import type { node } from '../types.js';
-import type { users } from '../types.js';
+import type { node } from '../types/types.js';
+import type { users } from '../types/types.js';
 // import { processess } from './processess.js';
 import {authMiddleware } from '../middlewares/middleware.js';
 import cors from 'cors';
 import { executeIt } from '../legacy/ExecuteEngine.js';
 import bcrypt from "bcrypt";
-import { encryptJSON , safeDecrypt } from '../utls/crypto.js';
+import { encryptJSON , safeDecrypt } from '../utils/crypto.js';
 
 const app  = express() ; 
 app.use(express.json()); 
@@ -157,7 +157,15 @@ app.put('/workflow/:id' , authMiddleware ,async (req : Request , res : Response)
     //@ts-ignore
     const userId = req.userId ;
     const payload = req.body ;
-    const id : string = (req.params.id)!;
+    const id  = (req.params.id)!;
+    if(typeof(id)!="string"){
+    return res.status(400).json({
+            success : false , 
+            message : "invalid params",
+            error : "INVALID_REQUEST",
+            data : null
+        })
+  }
     console.log("checking req params id "  + id )
     console.log("id + : "+ id)
     const data = payload.data;
@@ -200,7 +208,15 @@ app.get('/workflow/:id' , authMiddleware , async(req  : Request, res : Response)
     //@ts-ignore
     
     const userId = req.userId ;
-    const id : string = (req.params.id)!;
+    const id  = (req.params.id)!;
+    if(typeof(id)!="string"){
+    return res.status(400).json({
+            success : false , 
+            message : "invalid params",
+            error : "INVALID_REQUEST",
+            data : null
+        })
+  }
     try {
         const response = await prismaClient.workflow.findFirst({ 
             where : { 
@@ -386,7 +402,15 @@ app.get('/execute/logs/:workflowId', async (req : Request , res :Response) => {
   const userId = user.id;
           
   console.log("user Id sdjsdfmnvfx  : " + userId )
-  const id  : string = (workflowId)!
+  const id   = (workflowId)!
+  if(typeof(id)!="string"){
+    return res.status(400).json({
+            success : false , 
+            message : "invalid params",
+            error : "INVALID_REQUEST",
+            data : null
+        })
+  }
   console.log(" workflow Id dgfkgjkf : " + workflowId)
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
