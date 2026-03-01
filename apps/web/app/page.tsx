@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Workflow, ArrowRight, Star } from "lucide-react";
+import { Workflow, ArrowRight, Star, Webhook } from "lucide-react";
 import ElectricalDither from "./components/shaders/ShaderDither";
 import ElectricalDitherNice  from "./components/shaders/ElectricalDither2";
 
@@ -12,7 +12,7 @@ const nodes = [
     { name: "Telegram", desc: "Send messages to Telegram chats and channels", icon: "/telegram.svg" },
     { name: "Gmail", desc: "Send emails through SMTP with full control", icon: "/sendmail.svg" },
     { name: "Await Gmail", desc: "Pause workflow and wait for an email reply", icon: "/sendMail&wait.svg" },
-    { name: "Webhook", desc: "Trigger workflows from HTTP requests", icon: "/workflow.svg" },
+    { name: "Webhook", desc: "Trigger workflows from HTTP requests", icon: <Webhook className="w-3 h-3 opacity-40" /> },
 ];
 
 export default function LandingPage() {
@@ -104,13 +104,17 @@ export default function LandingPage() {
                                     onMouseLeave={() => setTooltip(null)}
                                 >
                                     <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white/3 border border-white/6 hover:border-blue-400/25 hover:bg-white/6 transition-all cursor-default group">
-                                        <Image
-                                            src={node.icon}
-                                            alt={node.name}
-                                            width={16}
-                                            height={16}
-                                            className="invert opacity-40 group-hover:opacity-80 transition-opacity"
-                                        />
+                                        {typeof node.icon === 'string' ? (
+                                            <Image
+                                                src={node.icon}
+                                                alt={node.name}
+                                                width={16}
+                                                height={16}
+                                                className="invert opacity-40 group-hover:opacity-80 transition-opacity"
+                                            />
+                                        ) : (
+                                            node.icon
+                                        )}
                                         <span className="text-[12px] font-medium text-white/50 group-hover:text-white/80 transition-colors">
                                             {node.name}
                                         </span>

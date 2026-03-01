@@ -5,10 +5,8 @@ import { AnimatePresence } from "framer-motion";
 import IntroAnimation from "./_components/IntroAnimation";
 import Hero from "./_components/Hero";
 import BentoGrid from "./_components/BentoGrid";
-import FluidBackground from "./_components/FluidBackground";
 import ScrollSection from "./_components/ScrollSection";
 import WorkflowAnimation from "./_components/WorkflowAnimation";
-import SocialProof from "./_components/SocialProof";
 import Footer from "./_components/Footer";
 
 export default function LandingV3() {

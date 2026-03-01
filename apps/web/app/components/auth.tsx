@@ -44,7 +44,7 @@ export const AuthCard = ({ children, title, subtitle }: AuthCardProps) => {
                 </svg>
                 <div className="absolute inset-0 bg-linear-to-r from-white/20 to-transparent"></div>
               </div>
-              <h1 className="text-2xl  text-amber-50 font-bold text-foreground mb-2 bg-linear-to-r from-foreground to-foreground-secondary bg-clip-text">{title}</h1>
+              <h1 className="text-2xl  text-foreground font-bold  mb-2 bg-linear-to-r from-foreground to-foreground-secondary bg-clip-text">{title}</h1>
               <p className="text-foreground-muted">{subtitle}</p>
             </div>
             {children}
