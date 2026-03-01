@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export default function Footer() {
     return (
-        <footer className="relative py-20 border-t border-white/[0.05] overflow-hidden">
+        <footer className="relative py-20 border-t border-white/5 overflow-hidden">
             {/* Large AUTOM8N watermark */}
             <div className="container mx-auto px-4 relative">
                 {/* GitHub link */}
@@ -14,7 +14,7 @@ export default function Footer() {
                     <Link
                         href="https://github.com/amrithehe/n8n"
                         target="_blank"
-                        className="group flex items-center gap-3 px-6 py-3 rounded-full bg-white/[0.05] border border-white/[0.1] hover:bg-white/[0.1] transition-all"
+                        className="group flex items-center gap-3 px-6 py-3 rounded-full bg-white/5 border border-white/10 hover:bg-white/10transition-all"
                     >
                         <Github className="w-5 h-5 text-white/60 group-hover:text-white transition-colors" />
                         <span className="text-sm text-white/60 group-hover:text-white transition-colors">Star on GitHub</span>
@@ -28,7 +28,7 @@ export default function Footer() {
                     viewport={{ once: true }}
                     className="text-center select-none"
                 >
-                    <h2 className="text-[clamp(4rem,20vw,14rem)] font-black tracking-tighter leading-none text-white/[0.04]">
+                    <h2 className="text-[clamp(4rem,20vw,14rem)] font-black tracking-tighter leading-none text-white/4">
                         AUTOM8N
                     </h2>
                 </motion.div>

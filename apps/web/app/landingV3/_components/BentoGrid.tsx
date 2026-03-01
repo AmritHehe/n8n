@@ -32,7 +32,7 @@ function BentoItem({ className = "", children, gradient, delay = 0 }: { classNam
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay }}
             style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-            className={`relative group rounded-3xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-xl overflow-hidden hover:border-white/[0.15] transition-colors ${className}`}
+            className={`relative group rounded-3xl border border-white/9 bg-white/2 backdrop-blur-xl overflow-hidden hover:border-white/15 transition-colors ${className}`}
         >
             {gradient && <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${gradient}`} style={{ filter: "blur(50px)" }} />}
             <div className="relative z-10 h-full p-8">{children}</div>

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -16,7 +17,8 @@ import {
     Shield,
     X,
 } from "lucide-react";
-import api from "../apiClient";
+import Toast from "../_components/Toast";
+import api from "../../apiClient";
 
 interface Credential {
     id: number;
@@ -34,23 +36,22 @@ export default function CredentialsPage() {
     const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
     const [showPassword, setShowPassword] = useState<{ [key: string]: boolean }>({});
 
-    // Form states
+    /* Form states */
     const [telegramData, setTelegramData] = useState({ token: "", chatId: "" });
     const [smtpData, setSmtpData] = useState({ HOST: "", PORT: "", username: "", password: "" });
     const [saving, setSaving] = useState(false);
 
     useEffect(() => {
         const token = localStorage.getItem("token");
-        if (!token) redirect("/signin");
+        if (!token) redirect("/landingV4/signin");
         fetchCredentials();
     }, []);
 
     const fetchCredentials = async () => {
         try {
-            const response = await api.get("/api/v1/credentials");
-            setCredentials(Array.isArray(response.data) ? response.data : []);
-        } catch (error) {
-            console.error("Failed to fetch credentials:", error);
+            const res = await api.get("/api/v1/credentials");
+            setCredentials(Array.isArray(res.data) ? res.data : []);
+        } catch {
             setCredentials([]);
         } finally {
             setLoading(false);
@@ -67,13 +68,13 @@ export default function CredentialsPage() {
             await api.post("/api/v1/credentials", {
                 title: "Telegram Send Message",
                 platform: "teligram",
-                data: telegramData
+                data: telegramData,
             });
             setMessage({ type: "success", text: "Telegram credentials saved!" });
             setTelegramData({ token: "", chatId: "" });
             setShowCreateForm(null);
             fetchCredentials();
-        } catch (error) {
+        } catch {
             setMessage({ type: "error", text: "Failed to save Telegram credentials" });
         }
         setSaving(false);
@@ -89,13 +90,13 @@ export default function CredentialsPage() {
             await api.post("/api/v1/credentials", {
                 title: "SMTP Account",
                 platform: "gmail",
-                data: smtpData
+                data: smtpData,
             });
             setMessage({ type: "success", text: "SMTP credentials saved!" });
             setSmtpData({ HOST: "", PORT: "", username: "", password: "" });
             setShowCreateForm(null);
             fetchCredentials();
-        } catch (error) {
+        } catch {
             setMessage({ type: "error", text: "Failed to save SMTP credentials" });
         }
         setSaving(false);
@@ -107,57 +108,36 @@ export default function CredentialsPage() {
             setMessage({ type: "success", text: "Credential deleted!" });
             setDeleteConfirm(null);
             fetchCredentials();
-        } catch (error) {
+        } catch {
             setMessage({ type: "error", text: "Failed to delete credential" });
         }
     };
 
-    // Auto-dismiss messages
-    useEffect(() => {
-        if (message) {
-            const timer = setTimeout(() => setMessage(null), 4000);
-            return () => clearTimeout(timer);
-        }
-    }, [message]);
+    const clearMessage = useCallback(() => setMessage(null), []);
+    const togglePassword = (key: string) => setShowPassword((p) => ({ ...p, [key]: !p[key] }));
 
-    const togglePassword = (key: string) => {
-        setShowPassword(prev => ({ ...prev, [key]: !prev[key] }));
-    };
+    const inputCls = "w-full px-4 py-3 bg-white/3 border border-white/8 rounded-xl text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-blue-400/40 transition-all";
 
     return (
-        <div className="min-h-screen bg-[#030303] text-white overflow-hidden">
-            {/* Ambient Background */}
+        <div className="min-h-screen bg-[#08080c] text-white antialiased overflow-hidden">
+            {/* eslint-disable-next-line @next/next/no-page-custom-font */}
+            <link
+                href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap"
+                rel="stylesheet"
+            />
+            <style>{`
+                :root { --serif: 'Playfair Display', Georgia, serif; --sans: 'Inter', system-ui, sans-serif; }
+                body, * { font-family: var(--sans); }
+                .font-ed { font-family: var(--serif); }
+            `}</style>
+
+            {/* Ambient */}
             <div className="fixed inset-0 pointer-events-none">
-                <div className="absolute top-0 right-1/4 w-[800px] h-[800px] rounded-full blur-[200px] bg-blue-300/10" />
-                <div className="absolute bottom-0 left-1/4 w-[600px] h-[600px] rounded-full blur-[180px] bg-blue-300/8" />
-                <div className="absolute top-1/2 left-0 w-[400px] h-[400px] rounded-full blur-[150px] bg-cyan-500/6" />
+                <div className="absolute top-0 right-1/4 w-[700px] h-[700px] rounded-full blur-[200px] bg-blue-400/4" />
+                <div className="absolute bottom-0 left-1/4 w-[500px] h-[500px] rounded-full blur-[180px] bg-blue-400/3" />
             </div>
 
-            {/* Grid pattern */}
-            <div
-                className="fixed inset-0 pointer-events-none opacity-[0.02]"
-                style={{
-                    backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-                    backgroundSize: '60px 60px'
-                }}
-            />
-
-            {/* Toast */}
-            <AnimatePresence>
-                {message && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -20, x: "-50%" }}
-                        animate={{ opacity: 1, y: 0, x: "-50%" }}
-                        exit={{ opacity: 0, y: -20, x: "-50%" }}
-                        className={`fixed top-6 left-1/2 z-50 px-6 py-3 rounded-full backdrop-blur-xl border ${message.type === "success"
-                            ? "bg-blue-300/20 border-blue-300/40 text-blue-300"
-                            : "bg-red-500/20 border-red-500/40 text-red-300"
-                            }`}
-                    >
-                        {message.text}
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            <Toast message={message} onDismiss={clearMessage} />
 
             <div className="relative z-10 max-w-5xl mx-auto px-6 py-8">
                 {/* Header */}
@@ -167,100 +147,80 @@ export default function CredentialsPage() {
                     className="flex items-center gap-4 mb-12"
                 >
                     <Link
-                        href="/"
-                        className="p-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300"
+                        href="/landingV4/workflows"
+                        className="p-2.5 rounded-xl bg-white/4 border border-white/6 hover:bg-white/8 transition-all"
                     >
-                        <ArrowLeft className="w-5 h-5" />
+                        <ArrowLeft className="w-4 h-4 text-white/50" />
                     </Link>
                     <div>
-                        <h1 className="text-4xl font-bold bg-linear-to-r from-white via-white to-white/60 bg-clip-text text-transparent">
-                            Credentials
-                        </h1>
-                        <p className="text-white/40 mt-1">Securely manage your integration credentials</p>
+                        <h1 className="font-ed text-3xl text-white/90 tracking-tight">Credentials</h1>
+                        <p className="text-white/25 text-[13px] mt-0.5">Securely manage your integration credentials</p>
                     </div>
                 </motion.div>
 
-                {/* Your Credentials Section */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="mb-12"
-                >
-                    <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                        <Shield className="w-5 h-5 text-blue-200" />
+                {/* Your Credentials */}
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-12">
+                    <h2 className="text-[13px] font-medium text-white/40 uppercase tracking-wider mb-6 flex items-center gap-2">
+                        <Shield className="w-4 h-4 text-blue-300/50" />
                         Your Credentials
                     </h2>
 
                     {loading ? (
                         <div className="flex items-center justify-center py-16">
-                            <div className="w-8 h-8 border-2 border-blue-300/30 border-t-blue-300 rounded-full animate-spin" />
+                            <div className="w-8 h-8 border-2 border-blue-400/25 border-t-blue-400 rounded-full animate-spin" />
                         </div>
                     ) : credentials.length === 0 ? (
-                        <div className="text-center py-12 bg-white/2 border border-white/10 rounded-2xl">
-                            <Key className="w-10 h-10 text-white/20 mx-auto mb-3" />
-                            <p className="text-white/40">No credentials yet. Add your first one below.</p>
+                        <div className="text-center py-12 bg-white/2 border border-white/6 rounded-2xl">
+                            <Key className="w-8 h-8 text-white/15 mx-auto mb-3" />
+                            <p className="text-white/25 text-sm">No credentials yet. Add your first one below.</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {credentials.map((cred, index) => (
+                            {credentials.map((cred, i) => (
                                 <motion.div
                                     key={cred.id}
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: index * 0.05 }}
-                                    className="group relative bg-white/2 backdrop-blur-sm border border-white/10 rounded-2xl p-5 hover:border-blue-300/30 hover:bg-white/5 transition-all duration-500"
+                                    transition={{ delay: i * 0.05 }}
+                                    className="group relative bg-white/2 border border-white/6 rounded-2xl p-5 hover:border-blue-400/20 hover:bg-white/4 transition-all duration-500"
                                 >
-                                    <div className="absolute inset-0 rounded-2xl bg-linear-to-r from-blue-300/10 to-blue-300/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-
                                     <div className="relative z-10 flex items-center justify-between">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-xl bg-linear-to-r from-blue-300/20 to-cyan-500/10 flex items-center justify-center border border-blue-300/20">
+                                            <div className="w-11 h-11 rounded-xl bg-blue-400/8 flex items-center justify-center border border-blue-400/15">
                                                 {cred.platform === "teligram" ? (
-                                                    <Send className="w-5 h-5 text-blue-200" />
+                                                    <Image src="/telegram.svg" alt="" width={18} height={18} className="invert opacity-70" />
                                                 ) : (
-                                                    <Mail className="w-5 h-5 text-blue-200" />
+                                                    <Image src="/sendmail.svg" alt="" width={18} height={18} className="invert opacity-70" />
                                                 )}
                                             </div>
                                             <div>
-                                                <h3 className="font-medium text-white group-hover:text-blue-300 transition-colors">
+                                                <h3 className="font-medium text-white/80 group-hover:text-blue-300 transition-colors text-sm">
                                                     {cred.title}
                                                 </h3>
-                                                <p className="text-sm text-white/40 capitalize">{cred.platform}</p>
+                                                <p className="text-[12px] text-white/25 capitalize">{cred.platform}</p>
                                             </div>
                                         </div>
-
                                         <button
                                             onClick={() => setDeleteConfirm(cred.id)}
-                                            className="p-2 rounded-xl bg-white/5 hover:bg-red-500/20 text-white/40 hover:text-red-400 transition-all duration-300"
+                                            className="p-2 rounded-xl bg-white/4 hover:bg-red-500/15 text-white/30 hover:text-red-400 transition-all"
                                         >
                                             <Trash2 className="w-4 h-4" />
                                         </button>
                                     </div>
 
-                                    {/* Delete Confirmation */}
+                                    {/* Delete confirm */}
                                     <AnimatePresence>
                                         {deleteConfirm === cred.id && (
                                             <motion.div
                                                 initial={{ opacity: 0, scale: 0.95 }}
                                                 animate={{ opacity: 1, scale: 1 }}
                                                 exit={{ opacity: 0, scale: 0.95 }}
-                                                className="absolute inset-0 bg-[#0a0a0a]/95 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center z-20 p-6"
+                                                className="absolute inset-0 bg-[#0c0c14]/95 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center z-20 p-6"
                                             >
-                                                <p className="text-center mb-4 text-white/80">Delete this credential?</p>
+                                                <p className="text-center mb-4 text-white/60 text-sm">Delete this credential?</p>
                                                 <div className="flex gap-3">
-                                                    <button
-                                                        onClick={() => setDeleteConfirm(null)}
-                                                        className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white/60 transition-all duration-300"
-                                                    >
-                                                        Cancel
-                                                    </button>
-                                                    <button
-                                                        onClick={() => deleteCredential(cred.id)}
-                                                        className="px-4 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-400 transition-all duration-300"
-                                                    >
-                                                        Delete
-                                                    </button>
+                                                    <button onClick={() => setDeleteConfirm(null)} className="px-4 py-2 rounded-xl bg-white/6 text-white/50 hover:bg-white/12 transition-all text-sm">Cancel</button>
+                                                    <button onClick={() => deleteCredential(cred.id)} className="px-4 py-2 rounded-xl bg-red-500/15 text-red-400 hover:bg-red-500/25 transition-all text-sm">Delete</button>
                                                 </div>
                                             </motion.div>
                                         )}
@@ -271,81 +231,67 @@ export default function CredentialsPage() {
                     )}
                 </motion.div>
 
-                {/* Add New Credential Section */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                >
-                    <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                        <Plus className="w-5 h-5 text-blue-300" />
+                {/* Add New Credential */}
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+                    <h2 className="text-[13px] font-medium text-white/40 uppercase tracking-wider mb-6 flex items-center gap-2">
+                        <Plus className="w-4 h-4 text-blue-300/50" />
                         Add New Credential
                     </h2>
 
                     {!showCreateForm ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Telegram Option */}
-                            <motion.button
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
+                            <button
                                 onClick={() => setShowCreateForm("telegram")}
-                                className="group p-6 bg-white/3 border border-white/10 rounded-2xl hover:border-blue-300/30 transition-all duration-300 text-left"
+                                className="group p-6 bg-white/2 border border-white/6 rounded-2xl hover:border-blue-400/20 transition-all text-left"
                             >
                                 <div className="flex items-center gap-4">
-                                    <div className="w-14 h-14 rounded-2xl bg-linear-to-r from-blue-300/20 to-cyan-500/10 flex items-center justify-center border border-blue-300/20 group-hover:border-blue-300/40 transition-colors">
-                                        <Send className="w-6 h-6 text-blue-200" />
+                                    <div className="w-12 h-12 rounded-xl bg-blue-400/8 flex items-center justify-center border border-blue-400/15 group-hover:border-blue-400/30 transition-colors">
+                                        <Image src="/telegram.svg" alt="" width={22} height={22} className="invert opacity-70" />
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold text-lg text-white group-hover:text-blue-300 transition-colors">
-                                            Telegram Bot
-                                        </h3>
-                                        <p className="text-sm text-white/40">Send messages via Telegram</p>
+                                        <h3 className="font-medium text-white/80 group-hover:text-blue-300 transition-colors">Telegram Bot</h3>
+                                        <p className="text-[12px] text-white/25">Send messages via Telegram</p>
                                     </div>
                                 </div>
-                            </motion.button>
+                            </button>
 
-                            {/* SMTP Option */}
-                            <motion.button
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
+                            <button
                                 onClick={() => setShowCreateForm("smtp")}
-                                className="group p-6 bg-white/3 border border-white/10 rounded-2xl hover:border-blue-300/30 transition-all duration-300 text-left"
+                                className="group p-6 bg-white/2 border border-white/6 rounded-2xl hover:border-blue-400/20 transition-all text-left"
                             >
                                 <div className="flex items-center gap-4">
-                                    <div className="w-14 h-14 rounded-2xl bg-linear-to-r from-blue-300/20 to-blue-300/10 flex items-center justify-center border border-blue-300/20 group-hover:border-blue-300/40 transition-colors">
-                                        <Mail className="w-6 h-6 text-blue-300" />
+                                    <div className="w-12 h-12 rounded-xl bg-blue-400/8 flex items-center justify-center border border-blue-400/15 group-hover:border-blue-400/30 transition-colors">
+                                        <Image src="/sendmail.svg" alt="" width={22} height={22} className="invert opacity-70" />
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold text-lg text-white group-hover:text-blue-300 transition-colors">
-                                            SMTP Account
-                                        </h3>
-                                        <p className="text-sm text-white/40">Send emails via SMTP</p>
+                                        <h3 className="font-medium text-white/80 group-hover:text-blue-300 transition-colors">SMTP Account</h3>
+                                        <p className="text-[12px] text-white/25">Send emails via SMTP</p>
                                     </div>
                                 </div>
-                            </motion.button>
+                            </button>
                         </div>
                     ) : (
                         <motion.div
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-white/3 border border-white/10 rounded-2xl p-6"
+                            className="bg-white/2 border border-white/6 rounded-2xl p-6"
                         >
                             <div className="flex items-center justify-between mb-6">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-linear-to-r from-blue-300/20 to-cyan-500/10 flex items-center justify-center">
+                                    <div className="w-10 h-10 rounded-xl bg-blue-400/8 flex items-center justify-center border border-blue-400/15">
                                         {showCreateForm === "telegram" ? (
-                                            <Send className="w-5 h-5 text-blue-200" />
+                                            <Image src="/telegram.svg" alt="" width={18} height={18} className="invert opacity-70" />
                                         ) : (
-                                            <Mail className="w-5 h-5 text-blue-300" />
+                                            <Image src="/sendmail.svg" alt="" width={18} height={18} className="invert opacity-70" />
                                         )}
                                     </div>
-                                    <h3 className="font-semibold text-lg">
+                                    <h3 className="font-medium text-white/80">
                                         {showCreateForm === "telegram" ? "Telegram Bot" : "SMTP Account"}
                                     </h3>
                                 </div>
                                 <button
                                     onClick={() => setShowCreateForm(null)}
-                                    className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all"
+                                    className="p-2 rounded-xl bg-white/4 hover:bg-white/8 text-white/30 hover:text-white/60 transition-all"
                                 >
                                     <X className="w-4 h-4" />
                                 </button>
@@ -354,38 +300,38 @@ export default function CredentialsPage() {
                             {showCreateForm === "telegram" ? (
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-sm text-white/50 mb-2">Bot Token *</label>
+                                        <label className="block text-[11px] text-white/40 mb-2 uppercase tracking-wider">Bot Token *</label>
                                         <div className="relative">
                                             <input
                                                 type={showPassword.telegramToken ? "text" : "password"}
                                                 placeholder="Enter your bot token"
                                                 value={telegramData.token}
-                                                onChange={(e) => setTelegramData(prev => ({ ...prev, token: e.target.value }))}
-                                                className="w-full px-4 py-3 pr-12 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-blue-300/50 transition-all"
+                                                onChange={(e) => setTelegramData((p) => ({ ...p, token: e.target.value }))}
+                                                className={`${inputCls} pr-12`}
                                             />
                                             <button
                                                 type="button"
                                                 onClick={() => togglePassword("telegramToken")}
-                                                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60"
+                                                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/50"
                                             >
                                                 {showPassword.telegramToken ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                             </button>
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-sm text-white/50 mb-2">Chat ID *</label>
+                                        <label className="block text-[11px] text-white/40 mb-2 uppercase tracking-wider">Chat ID *</label>
                                         <input
                                             type="text"
                                             placeholder="Enter chat ID"
                                             value={telegramData.chatId}
-                                            onChange={(e) => setTelegramData(prev => ({ ...prev, chatId: e.target.value }))}
-                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-blue-300/50 transition-all"
+                                            onChange={(e) => setTelegramData((p) => ({ ...p, chatId: e.target.value }))}
+                                            className={inputCls}
                                         />
                                     </div>
                                     <button
                                         onClick={saveTelegramCredential}
                                         disabled={saving}
-                                        className="w-full py-3 mt-2 rounded-xl bg-linear-to-r from-blue-300 to-cyan-500 text-white font-medium hover:shadow-lg hover:shadow-blue-300/20 disabled:opacity-50 transition-all"
+                                        className="w-full py-3 mt-2 rounded-xl bg-blue-400/90 hover:bg-blue-400 text-white font-medium text-sm disabled:opacity-50 transition-all"
                                     >
                                         {saving ? "Saving..." : "Save Telegram Credential"}
                                     </button>
@@ -394,50 +340,50 @@ export default function CredentialsPage() {
                                 <div className="space-y-4">
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <label className="block text-sm text-white/50 mb-2">SMTP Host *</label>
+                                            <label className="block text-[11px] text-white/40 mb-2 uppercase tracking-wider">SMTP Host *</label>
                                             <input
                                                 type="text"
                                                 placeholder="smtp.gmail.com"
                                                 value={smtpData.HOST}
-                                                onChange={(e) => setSmtpData(prev => ({ ...prev, HOST: e.target.value }))}
-                                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-blue-300/50 transition-all"
+                                                onChange={(e) => setSmtpData((p) => ({ ...p, HOST: e.target.value }))}
+                                                className={inputCls}
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm text-white/50 mb-2">Port *</label>
+                                            <label className="block text-[11px] text-white/40 mb-2 uppercase tracking-wider">Port *</label>
                                             <input
                                                 type="text"
                                                 placeholder="587"
                                                 value={smtpData.PORT}
-                                                onChange={(e) => setSmtpData(prev => ({ ...prev, PORT: e.target.value }))}
-                                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-blue-300/50 transition-all"
+                                                onChange={(e) => setSmtpData((p) => ({ ...p, PORT: e.target.value }))}
+                                                className={inputCls}
                                             />
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-sm text-white/50 mb-2">Username *</label>
+                                        <label className="block text-[11px] text-white/40 mb-2 uppercase tracking-wider">Username *</label>
                                         <input
                                             type="text"
                                             placeholder="your-email@gmail.com"
                                             value={smtpData.username}
-                                            onChange={(e) => setSmtpData(prev => ({ ...prev, username: e.target.value }))}
-                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-blue-300/50 transition-all"
+                                            onChange={(e) => setSmtpData((p) => ({ ...p, username: e.target.value }))}
+                                            className={inputCls}
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm text-white/50 mb-2">Password *</label>
+                                        <label className="block text-[11px] text-white/40 mb-2 uppercase tracking-wider">Password *</label>
                                         <div className="relative">
                                             <input
                                                 type={showPassword.smtpPassword ? "text" : "password"}
                                                 placeholder="Enter your password"
                                                 value={smtpData.password}
-                                                onChange={(e) => setSmtpData(prev => ({ ...prev, password: e.target.value }))}
-                                                className="w-full px-4 py-3 pr-12 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-blue-300/50 transition-all"
+                                                onChange={(e) => setSmtpData((p) => ({ ...p, password: e.target.value }))}
+                                                className={`${inputCls} pr-12`}
                                             />
                                             <button
                                                 type="button"
                                                 onClick={() => togglePassword("smtpPassword")}
-                                                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60"
+                                                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/50"
                                             >
                                                 {showPassword.smtpPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                             </button>
@@ -446,7 +392,7 @@ export default function CredentialsPage() {
                                     <button
                                         onClick={saveSMTPCredential}
                                         disabled={saving}
-                                        className="w-full py-3 mt-2 rounded-xl bg-linear-to-r from-blue-300 to-blue-300 text-white font-medium hover:shadow-lg hover:shadow-blue-300/20 disabled:opacity-50 transition-all"
+                                        className="w-full py-3 mt-2 rounded-xl bg-blue-400/90 hover:bg-blue-400 text-white font-medium text-sm disabled:opacity-50 transition-all"
                                     >
                                         {saving ? "Saving..." : "Save SMTP Credential"}
                                     </button>

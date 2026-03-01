@@ -1,41 +1,7 @@
-// import { Handle , Position , useReactFlow  } from "@xyflow/react"
-// import Cross from "./components/cross";
-// import { useCallback, useState } from "react";
-// export function TeligramNode({ id , data }: { id: string  , data : any}){ 
-//     const { setNodes } = useReactFlow();
-//     const {setEdges} = useReactFlow(); 
-
-//   function deleteNode() {
-//     setNodes((nds) => nds.filter((n) => n.id !== id));
-//     setEdges((edges)=>edges.filter((n)=>n.target!==id));
-
-//   }
-//   const [previousResponse , setPreviousResponse] = useState<boolean>(true)
-//   const updateField = useCallback((field: string, value: string |number |boolean) => {
-//         setNodes((nds) =>
-//             nds.map((n) =>
-//                 n.id === id ? { ...n, data: { ...n.data, [field]: value } } : n
-//             )
-//         );
-//     }, [id, setNodes , previousResponse]);
-//     return <> 
-//         <button onClick={deleteNode} className="text-white "><Cross/></button>
-//         <input className="p-2 rounded-xl , border-1 border-black text-black bg-white" type="text" name="text"  onChange={(e)=>updateField("message" , e.target.value)} value={data?.message || ""} />
-//         <button className="bg-white text-black rounded-xl p-2 m-2 " onClick={()=> { updateField("previousResponse" , !data?.previousResponse )}}>previousResponse </button>
-//         {data.previousResponse ? <input  className="p-2 rounded-xl , border-1 border-black text-black bg-white" type= "number" placeholder="data from which previous node ? " onChange={(e) =>updateField("previousResponseFromWhichNode", e.target.value)}value={data?.previousResponseFromWhichNode || ""} /> : <></> }
-//         <div className="flex items-center justify-center shadow-zinc-600 bg-zinc-300 px-6 py-4 rounded-xl">
-//             <svg width="24px" height="24px" strokeWidth="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000"><path d="M21 5L2 12.5L9 13.5M21 5L18.5 20L9 13.5M21 5L9 13.5M9 13.5V19L12.2488 15.7229" stroke="#000000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path></svg>
-            
-//             <Handle type = "source"  position = {Position.Right}/>
-//              <Handle type = "target" position = {Position.Left}/>
-
-//         </div>
-//     </>
-// }
 import { Handle, Position, useReactFlow } from "@xyflow/react";
 import { useState, useCallback } from "react";
+import Image from "next/image";
 import NodeConfigModal from "../components/NodeConfigModal";
-import Cross from "../components/cross";
 
 export function TeligramNode({ id, data }: { id: string; data: any }) {
   const { setNodes, setEdges, getNodes } = useReactFlow();
@@ -61,62 +27,53 @@ export function TeligramNode({ id, data }: { id: string; data: any }) {
     [id, setNodes]
   );
 
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => setIsModalOpen(false);
-  const handleSaveModal = (updatedData: any) => {
-    updateField("", updatedData);
-  };
-
-  // ✅ Fetch all previous nodes for dropdown
   const previousNodes = getNodes().filter((n) => n.id !== id);
 
   return (
     <>
       <div
-        onClick={handleOpenModal}
-        className={`bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg shadow-lg min-w-[400px] border-2 border-blue-400 relative cursor-pointer hover:shadow-xl transition-all duration-200 ${
-          data?.isExecuting
-            ? "animate-[pulse_1.2s_ease-in-out_infinite] shadow-blue-400/30 shadow-lg ring-4 ring-red-400/20"
-            : ""
-        }`}
+        onClick={() => setIsModalOpen(true)}
+        className={`bg-[#0c0c14] border rounded-xl min-w-[280px] cursor-pointer transition-all duration-200
+          ${data?.isExecuting
+            ? "border-blue-400/50 shadow-[0_0_20px_rgba(96,165,250,0.15)] animate-pulse"
+            : "border-blue-500/25 hover:border-blue-500/40 shadow-lg shadow-blue-500/5"
+          }`}
       >
-        <div className="p-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M2 10l16-5-5 16-3-5-3 5-5-16z" />
-              </svg>
+        <div className="p-3.5 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 bg-blue-500/15 rounded-lg flex items-center justify-center">
+              <Image src="/telegram.svg" alt="Telegram" width={14} height={14} className="invert opacity-70" />
             </div>
-            <h3 className="font-semibold text-sm">{"send telegram msg, "  +"id :  "+ id|| `Telegram  + ${id}`}</h3>
+            <div>
+              <h3 className="text-[13px] font-medium text-white/80">Telegram</h3>
+              <p className="text-[10px] text-white/25">id: {id}</p>
+            </div>
           </div>
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              deleteNode();
-            }}
-            className="text-white"
+            onClick={(e) => { e.stopPropagation(); deleteNode(); }}
+            className="p-1.5 rounded-lg hover:bg-white/6 transition-colors"
           >
-            <Cross />
+            <svg className="w-3.5 h-3.5 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
         </div>
 
-        <p className="text-xs text-white/80 p-4">{data?.description || "Send message via Telegram"}</p>
+        <p className="px-3.5 pb-3 text-[11px] text-white/30">{data?.description || "Send message via Telegram"}</p>
 
-          <Handle type="source" position={Position.Right} className="!bg-white !w-4 !h-4 hover:scale-125 transition-transform" />
-          <Handle type="target" position={Position.Left} className="!bg-white !w-4 !h-4 hover:scale-125 transition-transform" />
+        <Handle type="source" position={Position.Right} className="bg-blue-400! w-3! h-3! border-0!" />
+        <Handle type="target" position={Position.Left} className="bg-blue-400! w-3! h-3! border-0!" />
       </div>
 
-      {/* Node configuration modal */}
       <NodeConfigModal
         isOpen={isModalOpen}
         nodeType="teligram"
         nodeData={data}
         nodeId={id}
-        previousNodes={previousNodes} 
-        onClose={handleCloseModal}
-        onSave={handleSaveModal}
+        previousNodes={previousNodes}
+        onClose={() => setIsModalOpen(false)}
+        onSave={(updatedData: any) => updateField("", updatedData)}
       />
     </>
   );
 }
-

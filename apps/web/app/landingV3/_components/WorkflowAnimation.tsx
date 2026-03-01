@@ -177,8 +177,8 @@ export default function WorkflowAnimation() {
 
                 {/* Workflow visualization */}
                 <div className="relative max-w-5xl mx-auto">
-                    <div className="relative p-8 md:p-10 rounded-3xl bg-white/[0.03] border border-white/[0.1] backdrop-blur-xl overflow-visible shadow-2xl">
-                        <div className="absolute inset-0 bg-linear-to-r from-white/[0.05] to-transparent pointer-events-none rounded-3xl" />
+                    <div className="relative p-8 md:p-10 rounded-3xl bg-white/3 border border-white/1backdrop-blur-xl overflow-visible shadow-2xl">
+                        <div className="absolute inset-0 bg-linear-to-r from-white/5 to-transparent pointer-events-none rounded-3xl" />
 
                         {/* Nodes row */}
                         <div className="relative flex items-center justify-center flex-wrap gap-8 md:gap-0 md:flex-nowrap py-8">

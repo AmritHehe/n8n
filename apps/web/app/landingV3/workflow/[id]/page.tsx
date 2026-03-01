@@ -1,10 +1,10 @@
-import WorkflowClient from "./workflowClient";
+import { redirect } from "next/navigation";
 
 interface PageProps {
     params: Promise<{ id: string }>;
 }
 
-export default async function WorkflowPage({ params }: PageProps) {
+export default async function LandingV3WorkflowEditor({ params }: PageProps) {
     const { id } = await params;
-    return <WorkflowClient workflowId={id} />;
+    redirect(`/workflow/${id}`);
 }

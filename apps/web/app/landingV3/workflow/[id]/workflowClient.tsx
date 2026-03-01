@@ -40,6 +40,7 @@ import {
     Check,
     Loader2,
     Workflow,
+    Key,
 } from "lucide-react";
 import api from "../../../apiClient";
 
@@ -209,13 +210,13 @@ function PremiumNode({
                 <Handle
                     type="target"
                     position={Position.Left}
-                    className="!w-4 !h-4 !bg-white !border-2 hover:!scale-150 hover:!shadow-lg transition-all duration-200"
+                    className="w-4! h-4! bg-white! border-21 hover:scale-150! hover:shadow-lg! transition-all duration-200"
                     style={{ borderColor: color }}
                 />
                 <Handle
                     type="source"
                     position={Position.Right}
-                    className="!w-4 !h-4 !bg-white !border-2 hover:!scale-150 hover:!shadow-lg transition-all duration-200"
+                    className="w-4! h-4! bg-white! border-21 hover:scale-150! hover:shadow-lg! transition-all duration-200"
                     style={{ borderColor: color }}
                 />
             </div>
@@ -654,8 +655,8 @@ function WorkflowEditorInner({ workflowId }: WorkflowClientProps) {
 
         api.get(`/workflow/${workflowId}`)
             .then((res: any) => {
-                const nodesData = JSON.parse(res.data.nodes || "[]");
-                const edgesData = JSON.parse(res.data.Connections || "[]");
+                const nodesData = JSON.parse(res.data?.nodes || "[]");
+                const edgesData = JSON.parse(res.data?.Connections || "[]");
                 // Make sure edges use animated type and have data
                 const animatedEdges = edgesData.map((e: Edge) => ({
                     ...e,
@@ -1010,6 +1011,15 @@ function WorkflowEditorInner({ workflowId }: WorkflowClientProps) {
                     )}
                 </div>
 
+                {/* Credentials Link */}
+                <Link
+                    href="/landingV3/credentials"
+                    className="mx-4 mb-2 p-3 bg-white/5 border border-white/10 rounded-xl flex items-center gap-3 text-white/40 hover:text-white/80 hover:bg-white/10 hover:border-white/20 transition-all duration-300 group"
+                >
+                    <Key className="w-4 h-4" />
+                    <span className="text-xs">Manage Credentials</span>
+                </Link>
+
                 {/* Execution Logs */}
                 {executionLogs.length > 0 && (
                     <div className="border-t border-white/10 p-4">
@@ -1103,9 +1113,9 @@ function WorkflowEditorInner({ workflowId }: WorkflowClientProps) {
                             connectionLineStyle={{ stroke: "#60a5fa", strokeWidth: 2 }}
                         >
                             <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="#ffffff10" />
-                            <Controls className="!bg-[#0a0a0a] !border-white/10 !rounded-xl [&>button]:!bg-transparent [&>button]:!border-white/10 [&>button]:!text-white/60 [&>button:hover]:!bg-white/10" />
+                        <Controls className="bg-[#0a0a0a]! border-white/10! rounded-xl! [&>button]:bg-transparent1 [&>button]:border-white/10! [&>button]:text-white/601 [&>button:hover]:bg-white/10!" />
                             <MiniMap
-                                className="!bg-[#0a0a0a] !border-white/10 !rounded-xl"
+                            className="bg-[#0a0a0a]! border-white/10! rounded-xl!"
                                 nodeColor={(node) => {
                                     const colors: Record<string, string> = {
                                         trigger: "#60a5fa",

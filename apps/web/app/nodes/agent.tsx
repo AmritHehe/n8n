@@ -1,30 +1,19 @@
-import React, { useEffect } from "react";
-import { Handle, Position, useEdges, useReactFlow } from "@xyflow/react";
-import { useState, useCallback } from "react";
+import { Handle, Position, useReactFlow } from "@xyflow/react";
+import { useState, useEffect, useCallback } from "react";
 import { Bot } from "lucide-react";
 import NodeConfigModal from "../components/NodeConfigModal";
-import Cross from "../components/cross";
 
 export function AINode({ id, data }: { id: string; data: any }) {
-  
-  const { setNodes ,getNodes , getEdges} = useReactFlow();
+  const { setNodes, getNodes } = useReactFlow();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isExecuting , setIsExecuting ] = useState(false)
-  useEffect(()=>{
-    setIsExecuting(data.isExecuting)
-    console.log("hello " + isExecuting)
-  },[setNodes , getNodes , getEdges, ])
+  const [isExecuting, setIsExecuting] = useState(false);
 
-// const previousNodes = React.useMemo(() => {
-//   const edges = getEdges() ?? [];
-//   const nodes = getNodes() ?? [];
-//   const incomingEdges = edges.filter(edge => String(edge.target) === String(id));
+  useEffect(() => {
+    setIsExecuting(data.isExecuting);
+  }, [data.isExecuting]);
+
   const previousNodes = getNodes().filter((n) => n.id !== id);
 
-//   return incomingEdges
-//     .map(edge => nodes.find(node => String(node.id) === String(edge.source)))
-//     .filter((node): node is NonNullable<typeof node> => Boolean(node));
-// }, [id, getNodes, getEdges]);
   const updateField = useCallback(
     (field: string, value: any) => {
       setNodes((nds) =>
@@ -40,9 +29,6 @@ export function AINode({ id, data }: { id: string; data: any }) {
     [id, setNodes]
   );
 
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => setIsModalOpen(false);
-  const handleSaveModal = (updatedData: any) => updateField("", updatedData);
   const handleDeleteNode = (e: React.MouseEvent) => {
     e.stopPropagation();
     setNodes((nds) => nds.filter((n) => n.id !== id));
@@ -51,84 +37,59 @@ export function AINode({ id, data }: { id: string; data: any }) {
   return (
     <>
       <div
-        onClick={handleOpenModal}
-        className={`relative cursor-pointer bg-gradient-to-br from-purple-600 to-indigo-700 text-white rounded-2xl shadow-lg border-2 border-purple-400 min-w-[400px] transition-all duration-300 hover:shadow-xl ${
-          isExecuting
-            ? "animate-[pulse_1.2s_ease-in-out_infinite] shadow-purple-400/40 ring-4 ring-purple-400/30"
-            : ""
-        }`}
+        onClick={() => setIsModalOpen(true)}
+        className={`bg-[#0c0c14] border rounded-xl min-w-[280px] cursor-pointer transition-all duration-200
+          ${isExecuting
+            ? "border-purple-400/50 shadow-[0_0_20px_rgba(168,85,247,0.15)] animate-pulse"
+            : "border-purple-500/25 hover:border-purple-500/40 shadow-lg shadow-purple-500/5"
+          }`}
       >
-        <div className="p-4 flex items-center justify-between">
-          {/* Left side: Icon + Title */}
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-              <Bot className="w-4 h-4 text-white" />
+        <div className="p-3.5 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 bg-purple-500/15 rounded-lg flex items-center justify-center">
+              <Bot className="w-3.5 h-3.5 text-purple-400" />
             </div>
-            <h3 className="font-semibold text-sm">{"AI agent, " + "id " +id || "AI Node"}</h3>
+            <div>
+              <h3 className="text-[13px] font-medium text-white/80">AI Agent</h3>
+              <p className="text-[10px] text-white/25">id: {id}</p>
+            </div>
           </div>
-
-          {/* Delete Button */}
-          <button onClick={handleDeleteNode} className="text-white">
-            <Cross />
+          <button onClick={handleDeleteNode} className="p-1.5 rounded-lg hover:bg-white/6 transition-colors">
+            <svg className="w-3.5 h-3.5 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
         </div>
 
-        {/* Node Info */}
-        <div className="px-4 pb-4 text-xs text-white/80 space-y-1">
-          <p>
-            Model:{" "}
-            <span className="font-medium text-white">
-              {data?.model || "Gemini"}
-            </span>
-          </p>
-
+        <div className="px-3.5 pb-3 text-[11px] text-white/30 space-y-0.5">
+          <p>Model: <span className="text-white/50 font-medium">{data?.model || "Gemini"}</span></p>
           {data?.usePreviousResponse ? (
-            <p>
-              Using response from node:{" "}
-              <span className="font-medium text-white">
-                {data?.previousNodeId || "N/A"}
-              </span>
-            </p>
+            <p>Input from node: <span className="text-white/50 font-medium">{data?.previousNodeId || "N/A"}</span></p>
           ) : (
-            <p className="truncate italic">
-              “{data?.message || "No message set"}”
-            </p>
+            <p className="truncate italic">"{data?.message || "No message set"}"</p>
           )}
         </div>
 
-        {/* Show progress if executing */}
-        {data?.isExecuting && (
-          <div className="mt-2 text-xs bg-white/20 px-2 py-1 rounded flex items-center gap-2 mx-4">
-            <div className="w-3 h-3 border border-white/50 border-t-white rounded-full animate-spin"></div>
+        {isExecuting && (
+          <div className="mx-3.5 mb-3 flex items-center gap-2 text-[10px] text-purple-300/70 bg-purple-500/8 px-2.5 py-1.5 rounded-lg">
+            <div className="w-2.5 h-2.5 border border-purple-300/40 border-t-purple-300 rounded-full animate-spin" />
             Generating response...
           </div>
         )}
 
-        {/* React Flow Handles */}
-        <Handle
-          type="target"
-          position={Position.Left}
-          className="!bg-white !w-4 !h-4 hover:scale-125 transition-transform"
-        />
-        <Handle
-          type="source"
-          position={Position.Right}
-          className="!bg-white !w-4 !h-4 hover:scale-125 transition-transform"
-        />
+        <Handle type="target" position={Position.Left} className="bg-purple-400! w-3! h-3! border-0!" />
+        <Handle type="source" position={Position.Right} className="bg-purple-400! w-3! h-3! border-0!" />
       </div>
 
-      {/* Modal */}
       <NodeConfigModal
         isOpen={isModalOpen}
         nodeType="agent"
         nodeData={data}
         nodeId={id}
-        onClose={handleCloseModal}
-        onSave={handleSaveModal}
-        previousNodes={previousNodes} 
-
+        onClose={() => setIsModalOpen(false)}
+        onSave={(updatedData: any) => updateField("", updatedData)}
+        previousNodes={previousNodes}
       />
-
     </>
   );
 }

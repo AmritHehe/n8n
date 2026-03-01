@@ -1,234 +1,396 @@
-"use client"
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import axios from 'axios';
-import { redirect } from 'next/navigation';
-import api from '../apiClient';
-const Workflows = () => {
-  const [workflows, setWorkflows] = useState<any[]>([]);
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [newWorkflowTitle, setNewWorkflowTitle] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [token , setToken ] = useState<string>()
-  useEffect(() => {
-    fetchWorkflows();
-    getToken();
-  }, []);
+"use client";
 
-  function getToken(){ 
-      const tokennn = localStorage.getItem("token")
-      if(!tokennn) { 
-        redirect('/signin')
-      }
-     
-      setToken(tokennn)
-      // console.log("token " + tokennn )
-    }
-  const fetchWorkflows = async () => {
-    try {
-      const token = localStorage.getItem('token')
-      const response = await api.get('/workflow');
-      const data = response.data;
-      console.log("incoming data " + JSON.stringify(data))
-      setWorkflows(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error('Failed to fetch workflows:', error);
-      setWorkflows([]);
-    }
-  };
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { redirect } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+    Plus,
+    Zap,
+    Trash2,
+    Play,
+    Clock,
+    ArrowLeft,
+    Search,
+    Grid3X3,
+    List,
+    Workflow,
+    Key,
+} from "lucide-react";
+import api from "../apiClient";
 
-  const deleteWorkflow = async (id: number  , title : string) => {
-    setLoading(true);
-    console.log("token")
-    try {
-      await api.delete("/workflow",{ 
-        data : { 
-          id : id
+interface Workflow {
+    id: number;
+    title: string;
+    nodes: string;
+    createdAt: string;
+    updatedAt?: string;
+}
+
+export default function WorkflowsPage() {
+    const [workflows, setWorkflows] = useState<Workflow[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [newTitle, setNewTitle] = useState("");
+    const [searchQuery, setSearchQuery] = useState("");
+    const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+    const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+    const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (!token) redirect("/signin");
+        fetchWorkflows();
+    }, []);
+
+    const fetchWorkflows = async () => {
+        try {
+            const response = await api.get("/workflow");
+            setWorkflows(Array.isArray(response.data) ? response.data : []);
+        } catch (error) {
+            console.error("Failed to fetch workflows:", error);
+            setWorkflows([]);
+        } finally {
+            setLoading(false);
         }
-      } as any );
-      setMessage(`workflow ${title}  deleted successfully!`);
-      fetchWorkflows();
-    } catch (error) {
-      setMessage(`Failed to delete credential with id : ${title} `);
-      console.error(error);
-    }
-    setLoading(false);
-  };
-  const createWorkflow = async () => {
-    // const token = localStorage.getItem('token');
-    if (!newWorkflowTitle.trim()) {
-      setMessage('Please enter a workflow title');
-      return;
-    }
+    };
 
-    setLoading(true);
-    try {
-      await api.post('/workflow', {
-        title: newWorkflowTitle,
-        nodes: [],
-        connections: []
-      });
-      setMessage('Workflow created successfully!');
-      setNewWorkflowTitle('');
-      setShowCreateForm(false);
-      fetchWorkflows();
-    } catch (error) {
-      setMessage('Failed to create workflow');
-      console.error(error);
-    }
-    setLoading(false);
-  };
+    const createWorkflow = async () => {
+        if (!newTitle.trim()) {
+            setMessage({ type: "error", text: "Please enter a workflow title" });
+            return;
+        }
+        try {
+            await api.post("/workflow", { title: newTitle, nodes: [], connections: [] });
+            setMessage({ type: "success", text: "Workflow created successfully!" });
+            setNewTitle("");
+            setShowCreateModal(false);
+            fetchWorkflows();
+        } catch (error) {
+            setMessage({ type: "error", text: "Failed to create workflow" });
+        }
+    };
 
-  return (
-    <div
-      className="min-h-screen p-8 relative overflow-hidden"
-      style={{ background: 'var(--gradient-hero)' }}
-    >
-      {/* Background effects */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[hsl(var(--primary))]/30 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/3 right-1/3 w-80 h-80 bg-[hsl(var(--secondary))]/25 rounded-full blur-3xl animate-pulse delay-1000"></div>
-      </div>
+    const deleteWorkflow = async (id: number) => {
+        try {
+            await api.delete("/workflow", { data: { id } } as any);
+            setMessage({ type: "success", text: "Workflow deleted successfully!" });
+            setDeleteConfirm(null);
+            fetchWorkflows();
+        } catch (error) {
+            setMessage({ type: "error", text: "Failed to delete workflow" });
+        }
+    };
 
-      <div className="max-w-6xl mx-auto relative z-10">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-4xl font-bold text-[hsl(var(--foreground))] mb-2">Workflows</h1>
-            <p className="text-[hsl(var(--foreground-muted))]">Manage your automation workflows</p>
-          </div>
-          <div className="flex gap-4">
-            <Link
-              href="/"
-              className="px-6 py-2 bg-[hsl(var(--surface-elevated))]/50 border border-[hsl(var(--border))] text-[hsl(var(--foreground))] rounded-[var(--radius)] hover:bg-[hsl(var(--surface-elevated))] hover:border-[hsl(var(--border-hover))] transition-[var(--transition-smooth)]"
-            >
-              ← Back to Home
-            </Link>
-            <button
-              onClick={() => setShowCreateForm(true)}
-              className="px-6 py-2 bg-[hsl(var(--primary))] text-[hsl(var(--foreground))] rounded-[var(--radius)] hover:bg-[hsl(var(--primary-hover))] transition-[var(--transition-smooth)]"
-            >
-              + Create Workflow
-            </button>
-          </div>
-        </div>
+    const filteredWorkflows = workflows.filter(w =>
+        w.title?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
-        {/* Message */}
-        {message && (
-          <div
-            className={`mb-6 p-4 rounded-[var(--radius)] ${
-              message.includes('successfully')
-                ? 'bg-[hsl(var(--success))]/20 border border-[hsl(var(--success))]/40 text-[hsl(var(--success))]'
-                : 'bg-[hsl(var(--error))]/20 border border-[hsl(var(--error))]/40 text-[hsl(var(--error))]'
-            }`}
-          >
-            {message}
-          </div>
-        )}
+    // Auto-dismiss messages
+    useEffect(() => {
+        if (message) {
+            const timer = setTimeout(() => setMessage(null), 4000);
+            return () => clearTimeout(timer);
+        }
+    }, [message]);
 
-        {/* Create Workflow Form */}
-        {showCreateForm && (
-          <div className="mb-8 bg-[hsl(var(--surface))]/60 backdrop-blur-xl border border-[hsl(var(--border))] rounded-2xl p-6">
-            <h2 className="text-xl font-bold text-[hsl(var(--foreground))] mb-4">Create New Workflow</h2>
-            <div className="flex gap-4">
-              <input
-                type="text"
-                placeholder="Enter workflow title"
-                value={newWorkflowTitle}
-                onChange={(e) => setNewWorkflowTitle(e.target.value)}
-                className="flex-1 px-4 py-3 bg-[hsl(var(--input-background))] border border-[hsl(var(--input-border))] rounded-[var(--radius)] text-[hsl(var(--foreground))] placeholder:text-[hsl(var(--foreground-dim))] focus:outline-none focus:border-[hsl(var(--primary))] focus:ring-1 focus:ring-[hsl(var(--primary))]/30 transition-[var(--transition-smooth)]"
-              />
-              <button
-                onClick={createWorkflow}
-                disabled={loading}
-                className="px-6 py-3 bg-[hsl(var(--primary))] text-[hsl(var(--foreground))] rounded-[var(--radius)] hover:bg-[hsl(var(--primary-hover))] disabled:opacity-50 transition-[var(--transition-smooth)]"
-              >
-                {loading ? 'Creating...' : 'Create'}
-              </button>
-              <button
-                onClick={() => {
-                  setShowCreateForm(false);
-                  setNewWorkflowTitle('');
+    return (
+        <div className="min-h-screen bg-[#030303] text-white overflow-hidden">
+            {/* Ambient Background */}
+            <div className="fixed inset-0 pointer-events-none">
+                <div className="absolute top-0 left-1/4 w-[800px] h-[800px] rounded-full blur-[200px] bg-blue-300/10" />
+                <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] rounded-full blur-[180px] bg-blue-300/8" />
+                <div className="absolute top-1/2 right-0 w-[400px] h-[400px] rounded-full blur-[150px] bg-cyan-500/6" />
+            </div>
+
+            {/* Subtle grid pattern */}
+            <div
+                className="fixed inset-0 pointer-events-none opacity-[0.02]"
+                style={{
+                    backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
+                    backgroundSize: '60px 60px'
                 }}
-                className="px-6 py-3 bg-[hsl(var(--surface-elevated))]/50 border border-[hsl(var(--border))] text-[hsl(var(--foreground))] rounded-[var(--radius)] hover:bg-[hsl(var(--surface-elevated))] hover:border-[hsl(var(--border-hover))] transition-[var(--transition-smooth)]"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
+            />
 
-        {/* Workflows Grid */}
-        {Array.isArray(workflows) && workflows.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {workflows.map((workflow) => (
-              <div
-                key={workflow.id}
-                className="bg-[hsl(var(--surface))]/60 backdrop-blur-xl border border-[hsl(var(--border))] rounded-2xl p-6 hover:border-[hsl(var(--primary))]/50 hover:scale-105 transition-[var(--transition-slow)] group"
-              >
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-[hsl(var(--primary))]/20 rounded-[var(--radius)] flex items-center justify-center group-hover:bg-[hsl(var(--primary))]/30 transition-[var(--transition-smooth)]">
-                    <svg
-                      className="w-6 h-6 text-[hsl(var(--primary))]"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+            {/* Toast Message */}
+            <AnimatePresence>
+                {message && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20, x: "-50%" }}
+                        animate={{ opacity: 1, y: 0, x: "-50%" }}
+                        exit={{ opacity: 0, y: -20, x: "-50%" }}
+                        className={`fixed top-6 left-1/2 z-50 px-6 py-3 rounded-full backdrop-blur-xl border ${message.type === "success"
+                            ? "bg-blue-300/20 border-blue-300/40 text-blue-300"
+                            : "bg-red-500/20 border-red-500/40 text-red-300"
+                            }`}
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                  </div>
-                  <Link 
-                    key={workflow.id}
-                    href={`/workflow/${workflow.id}`}
-                  >
-                    <div className="flex-1">
-          
-                      <h3 className="font-semibold text-lg text-[hsl(var(--foreground))] group-hover:text-[hsl(var(--primary))] transition-colors">
-                        {workflow.title || 'Untitled Workflow'}
-                      </h3>
+                        {message.text}
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-                      <p className="text-sm text-[hsl(var(--foreground-muted))]">
-                        {(JSON.parse(workflow.nodes)).length|| 0} nodes
-                      </p>
-                    
+            <div className="relative z-10 max-w-7xl mx-auto px-6 py-8">
+                {/* Header */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12"
+                >
+                    <div className="flex items-center gap-4">
+                        <Link
+                            href="/"
+                            className="p-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300"
+                        >
+                            <ArrowLeft className="w-5 h-5" />
+                        </Link>
+                        <div>
+                            <h1 className="text-4xl font-bold bg-linear-to-r from-white via-white to-white/60 bg-clip-text text-transparent">
+                                Workflows
+                            </h1>
+                            <p className="text-white/40 mt-1">Manage your automation workflows</p>
+                        </div>
                     </div>
-                    </Link>
-                  <button
-                      onClick={() => deleteWorkflow(workflow.id , workflow.title)}
-                      // disabled={loading === true}
-                      className="px-4 py-2 bg-[hsl(var(--error)/0.2)] text-[hsl(var(--error))] border border-[hsl(var(--error)/0.4)] rounded-[var(--radius)] hover:bg-[hsl(var(--error)/0.3)] transition-[var(--transition-smooth)]"
-                    >
-                      Delete
-                    </button>
-                </div>
-                <div className="text-xs text-[hsl(var(--foreground-dim))]">
-                  Created: {new Date(workflow.createdAt).toLocaleDateString()}
-                </div>
-              
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-16">
-            <div className="w-24 h-24 bg-[hsl(var(--primary))]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-12 h-12 text-[hsl(var(--primary))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-[hsl(var(--foreground))] mb-2">No workflows yet</h3>
-            <p className="text-[hsl(var(--foreground-muted))] mb-6">Create your first automation workflow to get started</p>
-            <button
-              onClick={() => setShowCreateForm(true)}
-              className="px-6 py-3 bg-[hsl(var(--primary))] text-[hsl(var(--foreground))] rounded-[var(--radius)] hover:bg-[hsl(var(--primary-hover))] transition-[var(--transition-smooth)]"
-            >
-              Create Your First Workflow
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
 
-export default Workflows;
+                    <div className="flex items-center gap-3">
+                        {/* Search */}
+                        <div className="relative">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                            <input
+                                type="text"
+                                placeholder="Search workflows..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="pl-11 pr-5 py-2.5 w-64 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-blue-300/50 focus:bg-white/8 transition-all duration-300"
+                            />
+                        </div>
+
+                        {/* View Toggle */}
+                        <div className="flex bg-white/5 border border-white/10 rounded-xl p-1">
+                            <button
+                                onClick={() => setViewMode("grid")}
+                                className={`p-2 rounded-lg transition-all duration-300 ${viewMode === "grid" ? "bg-blue-300/20 text-blue-200" : "text-white/40 hover:text-white/60"}`}
+                            >
+                                <Grid3X3 className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={() => setViewMode("list")}
+                                className={`p-2 rounded-lg transition-all duration-300 ${viewMode === "list" ? "bg-blue-300/20 text-blue-200" : "text-white/40 hover:text-white/60"}`}
+                            >
+                                <List className="w-4 h-4" />
+                            </button>
+                        </div>
+
+                        {/* Credentials */}
+                        <Link
+                            href="/credentials"
+                            className="flex items-center gap-2 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white/50 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all duration-300"
+                        >
+                            <Key className="w-4 h-4" />
+                            <span className="text-sm">Credentials</span>
+                        </Link>
+
+                        {/* Create Button */}
+                        <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => setShowCreateModal(true)}
+                            className="flex items-center gap-2 px-5 py-2.5 bg-linear-to-r from-blue-300 to-blue-300 rounded-xl font-medium hover:shadow-lg hover:shadow-blue-300/20 transition-all duration-300"
+                        >
+                            <Plus className="w-4 h-4" />
+                            Create Workflow
+                        </motion.button>
+                    </div>
+                </motion.div>
+
+                {/* Loading State */}
+                {loading ? (
+                    <div className="flex items-center justify-center py-32">
+                        <div className="w-8 h-8 border-2 border-blue-300/30 border-t-blue-300 rounded-full animate-spin" />
+                    </div>
+                ) : filteredWorkflows.length === 0 ? (
+                    /* Empty State */
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="flex flex-col items-center justify-center py-32"
+                    >
+                        <div className="w-24 h-24 rounded-3xl bg-linear-to-r from-blue-300/20 to-blue-300/10 flex items-center justify-center mb-6 border border-blue-300/20">
+                            <Zap className="w-10 h-10 text-blue-200" />
+                        </div>
+                        <h3 className="text-2xl font-semibold mb-2">No workflows yet</h3>
+                        <p className="text-white/40 mb-8 text-center max-w-md">
+                            Create your first automation workflow to start connecting your apps
+                        </p>
+                        <button
+                            onClick={() => setShowCreateModal(true)}
+                            className="flex items-center gap-2 px-6 py-3 bg-linear-to-r from-blue-300 to-blue-300 rounded-xl font-medium hover:shadow-lg hover:shadow-blue-300/20 transition-all duration-300"
+                        >
+                            <Plus className="w-5 h-5" />
+                            Create Your First Workflow
+                        </button>
+                    </motion.div>
+                ) : (
+                    /* Workflows Grid/List */
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className={viewMode === "grid"
+                            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+                            : "flex flex-col gap-3"
+                        }
+                    >
+                        {filteredWorkflows.map((workflow, index) => {
+                            const nodeCount = workflow.nodes ? JSON.parse(workflow.nodes).length : 0;
+
+                            return (
+                                <motion.div
+                                    key={workflow.id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: index * 0.05 }}
+                                    className={`group relative bg-white/3 backdrop-blur-sm border border-white/10 rounded-2xl hover:border-blue-300/30 hover:bg-white/5 transition-all duration-500 ${viewMode === "list" ? "flex items-center justify-between p-4" : "p-6"
+                                        }`}
+                                >
+                                    {/* Hover glow */}
+                                    <div className="absolute inset-0 rounded-2xl bg-linear-to-r from-blue-300/10 to-blue-300/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                                    <Link href={`/workflow/${workflow.id}`} className="relative z-10 flex-1">
+                                        <div className={viewMode === "list" ? "flex items-center gap-4" : ""}>
+                                            {/* Icon */}
+                                            <div className={`${viewMode === "list" ? "" : "mb-4"} w-12 h-12 rounded-xl bg-linear-to-r from-blue-300/20 to-cyan-500/10 flex items-center justify-center border border-blue-300/20 group-hover:border-blue-300/40 transition-colors duration-300`}>
+                                                 <Image src="/Workflow.svg" alt="Send Mail" width={28} height={28} className="invert opacity-90" />
+                                            </div>
+
+                                            <div>
+                                                <h3 className="font-semibold text-lg text-white group-hover:text-blue-300 transition-colors duration-300">
+                                                    {workflow.title || "Untitled Workflow"}
+                                                </h3>
+                                                <div className={`flex items-center gap-4 ${viewMode === "list" ? "" : "mt-2"} text-sm text-white/40`}>
+                                                    <span className="flex items-center gap-1.5">
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-blue-300" />
+                                                        {nodeCount} node{nodeCount !== 1 ? "s" : ""}
+                                                    </span>
+                                                    <span className="flex items-center gap-1.5">
+                                                        <Clock className="w-3.5 h-3.5" />
+                                                        {new Date(workflow.createdAt).toLocaleDateString()}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Link>
+
+                                    {/* Actions */}
+                                    <div className={`relative z-10 flex items-center gap-2 ${viewMode === "list" ? "" : "mt-5 pt-4 border-t border-white/5"}`}>
+                                        <Link
+                                            href={`/workflow/${workflow.id}`}
+                                            className="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-white/5 hover:bg-blue-300/20 text-white/60 hover:text-blue-300 transition-all duration-300 text-sm font-medium"
+                                        >
+                                            <Play className="w-3.5 h-3.5" />
+                                            {viewMode === "list" ? "" : "Open"}
+                                        </Link>
+                                        <button
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                setDeleteConfirm(workflow.id);
+                                            }}
+                                            className="p-2 rounded-xl bg-white/5 hover:bg-red-500/20 text-white/40 hover:text-red-400 transition-all duration-300"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    </div>
+
+                                    {/* Delete Confirmation */}
+                                    <AnimatePresence>
+                                        {deleteConfirm === workflow.id && (
+                                            <motion.div
+                                                initial={{ opacity: 0, scale: 0.95 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                exit={{ opacity: 0, scale: 0.95 }}
+                                                className="absolute inset-0 bg-[#0a0a0a]/95 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center z-20 p-6"
+                                            >
+                                                <p className="text-center mb-4 text-white/80">Delete this workflow?</p>
+                                                <div className="flex gap-3">
+                                                    <button
+                                                        onClick={() => setDeleteConfirm(null)}
+                                                        className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white/60 transition-all duration-300"
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                    <button
+                                                        onClick={() => deleteWorkflow(workflow.id)}
+                                                        className="px-4 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-400 transition-all duration-300"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </motion.div>
+                            );
+                        })}
+                    </motion.div>
+                )}
+            </div>
+
+            {/* Create Modal */}
+            <AnimatePresence>
+                {showCreateModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                        onClick={() => setShowCreateModal(false)}
+                    >
+                        {/* Backdrop */}
+                        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+
+                        {/* Modal */}
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="relative w-full max-w-lg bg-[#0a0a0a] border border-white/10 rounded-3xl p-8"
+                        >
+                            {/* Glow */}
+                            <div className="absolute -inset-1 bg-linear-to-r from-blue-300/20 to-blue-300/20 rounded-3xl blur-xl opacity-50" />
+
+                            <div className="relative">
+                                <h2 className="text-2xl font-bold mb-2">Create New Workflow</h2>
+                                <p className="text-white/40 mb-6">Give your workflow a descriptive name</p>
+
+                                <input
+                                    type="text"
+                                    placeholder="My Awesome Workflow"
+                                    value={newTitle}
+                                    onChange={(e) => setNewTitle(e.target.value)}
+                                    onKeyDown={(e) => e.key === "Enter" && createWorkflow()}
+                                    autoFocus
+                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-blue-300/50 focus:ring-2 focus:ring-blue-300/20 transition-all duration-300 text-lg"
+                                />
+
+                                <div className="flex gap-3 mt-6">
+                                    <button
+                                        onClick={() => setShowCreateModal(false)}
+                                        className="flex-1 py-3 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:bg-white/10 hover:text-white transition-all duration-300 font-medium"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={createWorkflow}
+                                        className="flex-1 py-3 rounded-xl bg-linear-to-r from-blue-300 to-blue-300 text-white font-medium hover:shadow-lg hover:shadow-blue-300/20 transition-all duration-300"
+                                    >
+                                        Create Workflow
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}

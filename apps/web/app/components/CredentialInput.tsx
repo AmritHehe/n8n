@@ -31,13 +31,13 @@ const CredentialInput = ({
           w-full px-4 py-3 
           bg-[hsl(var(--input))] 
           border border-[hsl(var(--input-border))] 
-          rounded-[var(--radius)] 
+          rounded-(--radius)
           text-[hsl(var(--foreground))] 
           placeholder:text-[hsl(var(--foreground-dim))] 
           focus:outline-none 
           focus:border-[hsl(var(--primary))] 
           focus:ring-1 focus:ring-[hsl(var(--primary)/0.3)] 
-          transition-[var(--transition-smooth)]
+          transition-(--transition-smooth)
         "
       />
     </div>

@@ -36,8 +36,8 @@ export default function SignUp() {
         try {
             await api.post("/api/v1/signup", { name: email, pass: password });
             router.push("/landingV3/signin");
-        } catch {
-            setError("Something went wrong. Please try again.");
+        } catch (err: any) {
+            setError(err.message || "Something went wrong. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -47,7 +47,7 @@ export default function SignUp() {
         <div className="min-h-screen bg-[#030303] flex items-center justify-center p-4">
             {/* Subtle background glow */}
             <div className="fixed inset-0 pointer-events-none">
-                <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full blur-[200px] bg-blue-300/[0.06]" />
+                <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full blur-[200px] bg-blue-300/6" />
             </div>
 
             <motion.div
@@ -81,7 +81,7 @@ export default function SignUp() {
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-3.5 py-2.5 bg-white/[0.04] border border-white/10 rounded-lg text-white text-sm placeholder-white/25 focus:outline-none focus:border-blue-300/50 transition-colors"
+                            className="w-full px-3.5 py-2.5 bg-white/4 border border-white/10 rounded-lg text-white text-sm placeholder-white/25 focus:outline-none focus:border-blue-300/50 transition-colors"
                             placeholder="name@company.com"
                         />
                     </div>
@@ -92,7 +92,7 @@ export default function SignUp() {
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-3.5 py-2.5 bg-white/[0.04] border border-white/10 rounded-lg text-white text-sm placeholder-white/25 focus:outline-none focus:border-blue-300/50 transition-colors"
+                            className="w-full px-3.5 py-2.5 bg-white/4 border border-white/10 rounded-lg text-white text-sm placeholder-white/25 focus:outline-none focus:border-blue-300/50 transition-colors"
                             placeholder="Minimum 8 characters"
                         />
                     </div>
@@ -103,7 +103,7 @@ export default function SignUp() {
                             type="password"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            className="w-full px-3.5 py-2.5 bg-white/[0.04] border border-white/10 rounded-lg text-white text-sm placeholder-white/25 focus:outline-none focus:border-blue-300/50 transition-colors"
+                            className="w-full px-3.5 py-2.5 bg-white/4 border border-white/10 rounded-lg text-white text-sm placeholder-white/25 focus:outline-none focus:border-blue-300/50 transition-colors"
                             placeholder="Confirm your password"
                         />
                     </div>
