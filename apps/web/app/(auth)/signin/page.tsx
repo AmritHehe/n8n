@@ -6,7 +6,7 @@ import { AuthButton } from "../../components/AuthButton";
 import {FormInput} from "../../components/FormInput"
 import Link from "next/link";
 import axios from "axios";
-import api from "../../apiClient";
+import api from "../../libs/apiClient";
 // import FormInput from "@/components/FormInput";
 
 export default function SignIn() {

@@ -27,7 +27,7 @@ export const AuthButton = ({
         focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background
         disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100
         ${isPrimary 
-          ? `text-white shadow-[var(--shadow-medium)] hover:shadow-[var(--shadow-strong)]
+          ? `text-white shadow-medium hover:shadow-strong
              focus:ring-primary/50 group` 
           : `bg-surface-elevated/50 border-2 border-border text-foreground backdrop-blur-sm
              hover:bg-surface-elevated hover:border-border-hover

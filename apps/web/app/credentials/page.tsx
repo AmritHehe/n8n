@@ -16,7 +16,7 @@ import {
     Shield,
     X,
 } from "lucide-react";
-import api from "../apiClient";
+import api from "../libs/apiClient";
 
 interface Credential {
     id: number;

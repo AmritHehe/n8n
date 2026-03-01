@@ -1,5 +1,45 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary: hsl(var(--primary));
+  --color-primary-hover: hsl(var(--primary-hover));
+  --color-primary-dark: hsl(var(--primary-dark));
+  --color-secondary: hsl(var(--secondary));
+  --color-accent: hsl(var(--accent));
+  --color-tertiary: hsl(var(--tertiary));
+
+  /* Map to basic background colors */
+  --color-background-primary: hsl(var(--background));
+  --color-background-secondary: hsl(var(--background-secondary));
+  --color-background-tertiary: hsl(var(--background-tertiary));
+  
+  --color-surface: hsl(var(--surface));
+  --color-surface-elevated: hsl(var(--surface-elevated));
+
+  --color-foreground: hsl(var(--foreground));
+  --color-foreground-secondary: hsl(var(--foreground-secondary));
+  --color-foreground-muted: hsl(var(--foreground-muted));
+  --color-foreground-dim: hsl(var(--foreground-dim));
+
+  --color-border: hsl(var(--border));
+  --color-border-hover: hsl(var(--border-hover));
+  --color-border-focus: hsl(var(--border-focus));
+
+  --color-input-background: hsl(var(--input-background));
+  --color-input-border: hsl(var(--input-border));
+  --color-input-focus: hsl(var(--input-focus));
+
+  --color-success: hsl(var(--success));
+  --color-warning: hsl(var(--warning));
+  --color-error: hsl(var(--error));
+
+  /* Enable shadows without arbitrary syntax */
+  --shadow-soft: var(--shadow-soft);
+  --shadow-medium: var(--shadow-medium);
+  --shadow-strong: var(--shadow-strong);
+  --shadow-glow: var(--shadow-glow);
+}
+
 @layer base {
   :root {
     /* n8n Dark Theme - Authentic Brand Colors */

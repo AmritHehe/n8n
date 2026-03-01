@@ -18,7 +18,7 @@ import {
     Workflow,
     Key,
 } from "lucide-react";
-import api from "../apiClient";
+import api from "../libs/apiClient";
 
 interface Workflow {
     id: number;
@@ -242,7 +242,7 @@ export default function WorkflowsPage() {
                     >
                         {filteredWorkflows.map((workflow, index) => {
                             const nodeCount = workflow.nodes ? JSON.parse(workflow.nodes).length : 0;
-
+                            
                             return (
                                 <motion.div
                                     key={workflow.id}

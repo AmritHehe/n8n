@@ -5,8 +5,8 @@ import Image from "next/image";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Workflow, ArrowRight, Star } from "lucide-react";
-import ElectricalDither from "./components/ShaderDither";
-import ElectricalDitherNice  from "./components/ElectricalDither2";
+import ElectricalDither from "./components/shaders/ShaderDither";
+import ElectricalDitherNice  from "./components/shaders/ElectricalDither2";
 
 const nodes = [
     { name: "Telegram", desc: "Send messages to Telegram chats and channels", icon: "/telegram.svg" },
@@ -32,7 +32,7 @@ export default function LandingPage() {
                 </div>
                 <div className="flex items-center gap-5">
                     <a
-                        href="https://github.com"
+                        href="https://github.com/amrithehe/n8n"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-1.5 text-[13px] text-white/30 hover:text-white/60 transition-colors"

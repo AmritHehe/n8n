@@ -18,7 +18,7 @@ export const AuthCard = ({ children, title, subtitle }: AuthCardProps) => {
       </div>
 
       <div className="w-full max-w-sm relative z-10">
-        <div className="bg-surface/80 backdrop-blur-xl rounded-2xl shadow-[var(--shadow-strong)] border border-border/30 p-6 relative">
+        <div className="bg-surface/80 backdrop-blur-xl rounded-2xl shadow-strong border border-border/30 p-6 relative">
           {/* Subtle glow effect */}
           <div className="absolute inset-0 bg-linear-to-r from-primary/5 via-transparent to-secondary/5 rounded-2xl"></div>
 
