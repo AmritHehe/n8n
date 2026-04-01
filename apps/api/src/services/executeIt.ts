@@ -43,26 +43,27 @@ export async function executeIt( payload : any , userId :string  , workflowId : 
 
 
         logCallBack?.("currently executing the process no . " + processtoexecute)
-
+        console.log("process type " + proces.type)
         if(proces.data.label == 'trigger'){ 
             console.log('trigger done')
         }
         else if (proces.data.label == 'action'){ 
 
             if(proces.type == 'telegram'){ 
-
+                console.log("inside telegram")
                 const message = proces.data.message || "[EMPTY_MESSAGE]"
 
                 logCallBack?.("executing telegram")
                 logCallBack?.(`${JSON.stringify({ type: "nodeExecuting", nodeId: proces.id })}`);
 
                 try { 
-            
+                    console.log("triying to fetch telegram")
                     const credId = proces.data.credentialsId; 
                     const chatId = proces.data.chatId;
 
                     const DecryptedCredentialsData = await fetchCredentials("teligram" , logCallBack, userId , credId)
-                    
+                    console.log("DecryptedCredentials : " + DecryptedCredentialsData)
+                    console.log("DecryptedCredentials  stringified: " + JSON.stringify(DecryptedCredentialsData))
                     if(!DecryptedCredentialsData){
                         logCallBack?.("unable to fetch the credentials from backend")
                     }
